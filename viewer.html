@@ -521,6 +521,36 @@
         font-size: 0.88rem;
       }
 
+      .example-media {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 10px;
+        padding: 12px 13px 2px;
+      }
+
+      .example-media figure {
+        margin: 0;
+        border: 1px solid rgba(33, 181, 115, 0.16);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.72);
+        overflow: hidden;
+      }
+
+      .example-media img {
+        display: block;
+        width: 100%;
+        max-height: 260px;
+        object-fit: contain;
+        background: #ffffff;
+      }
+
+      .example-media figcaption {
+        padding: 7px 9px;
+        color: var(--muted);
+        font-size: 0.76rem;
+        line-height: 1.35;
+      }
+
       .example-source {
         margin-left: auto;
         color: var(--muted);
@@ -1677,14 +1707,23 @@
       function normalizeExampleEntry(entry) {
         if (!entry) return null;
         if (typeof entry === 'string') {
-          return { title: '举个例子', body: entry, code: '', source: '简化示例' };
+          return { title: '举个例子', body: entry, code: '', images: [], source: '简化示例' };
         }
         const title = String(entry.title || entry.name || '项目里的示例').trim();
         const body = String(entry.body || entry.text || entry.description || '').trim();
         const code = String(entry.code || '').trim();
+        const images = Array.isArray(entry.images)
+          ? entry.images
+              .map((image) => ({
+                url: String(image?.url || '').trim(),
+                alt: String(image?.alt || '项目示例图').trim(),
+              }))
+              .filter((image) => image.url)
+              .slice(0, 2)
+          : [];
         const source = String(entry.source || 'README').trim();
-        if (!body && !code) return null;
-        return { title, body, code, source };
+        if (!body && !code && !images.length) return null;
+        return { title, body, code, images, source };
       }
 
       function repoExamples(repo) {
@@ -1693,10 +1732,18 @@
           : [];
         const manual = normalizeExampleEntry(projectExampleText[repo.full_name]);
         const combined = [];
-        if (manual) combined.push(manual);
+        if (manual) {
+          if (!manual.images.length && extracted[0]?.images?.length) {
+            manual.images = extracted[0].images;
+          }
+          combined.push(manual);
+        }
         for (const example of extracted) {
           const repeated = combined.some(
-            (item) => item.body === example.body || (item.code && item.code === example.code),
+            (item) =>
+              item.body === example.body ||
+              (item.code && item.code === example.code) ||
+              (item.images?.[0]?.url && item.images[0].url === example.images?.[0]?.url),
           );
           if (!repeated) combined.push(example);
         }
@@ -1717,6 +1764,22 @@
                       <span>${escapeHtml(example.title || '点开看具体用法')}</span>
                       <span class="example-source">${escapeHtml(example.source || 'README')}</span>
                     </summary>
+                    ${
+                      example.images?.length
+                        ? `<div class="example-media">
+                            ${example.images
+                              .map(
+                                (image) => `
+                                  <figure>
+                                    <img src="${escapeHtml(image.url)}" alt="${escapeHtml(image.alt || '项目示例图')}" loading="${index === 0 ? 'eager' : 'lazy'}" decoding="async" referrerpolicy="no-referrer" onerror="this.closest('figure').hidden = true" />
+                                    <figcaption>${escapeHtml(image.alt || '项目示例图')}</figcaption>
+                                  </figure>
+                                `,
+                              )
+                              .join('')}
+                          </div>`
+                        : ''
+                    }
                     ${example.body ? `<p>${escapeHtml(example.body)}</p>` : ''}
                     ${example.code ? `<pre><code>${escapeHtml(example.code)}</code></pre>` : ''}
                   </details>
@@ -1831,7 +1894,12 @@
           details.what,
           details.canDo,
           details.who,
-          ...repoExamples(repo).flatMap((example) => [example.title, example.body, example.code]),
+          ...repoExamples(repo).flatMap((example) => [
+            example.title,
+            example.body,
+            example.code,
+            ...(example.images || []).map((image) => image.alt),
+          ]),
           repo.language,
           repo.license,
           rankingReason(repo),

@@ -36,6 +36,8 @@ Some intro text.
 
 ## Quick start
 
+![Preview screen](docs/preview-screen.png)
+
 Run this command to create your first app:
 
 ```bash
@@ -53,12 +55,21 @@ Only read this when you need custom settings.
 
 MIT
 """
-        examples = daily.extract_readme_examples(readme)
+        examples = daily.extract_readme_examples(
+            readme,
+            full_name="demo/project",
+            default_branch="main",
+        )
         self.assertEqual(len(examples), 1)
         self.assertEqual(examples[0]["title"], "Quick start")
         self.assertIn("create your first app", examples[0]["body"])
         self.assertNotIn("Advanced options", examples[0]["body"])
         self.assertIn("npx demo create my-app", examples[0]["code"])
+        self.assertEqual(examples[0]["images"][0]["alt"], "Preview screen")
+        self.assertEqual(
+            examples[0]["images"][0]["url"],
+            "https://raw.githubusercontent.com/demo/project/main/docs/preview-screen.png",
+        )
         self.assertEqual(examples[0]["source"], "README")
 
     def test_score_repo_uses_history_delta(self):

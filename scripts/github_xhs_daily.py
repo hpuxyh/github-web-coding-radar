@@ -461,6 +461,72 @@ def clean_example_text(line: str) -> str:
     return line.strip()
 
 
+def image_alt_from_html_img(tag: str) -> str:
+    match = re.search(r"\balt=[\"']([^\"']*)[\"']", tag, re.I)
+    return clean_markdown(match.group(1)).strip() if match else ""
+
+
+def image_url_from_html_img(tag: str) -> str:
+    match = re.search(r"\bsrc=[\"']([^\"']+)[\"']", tag, re.I)
+    return match.group(1).strip() if match else ""
+
+
+def normalize_image_url(raw_url: str, full_name: str, default_branch: str) -> str:
+    url = raw_url.strip().strip("<>").strip("'\"")
+    if not url or url.startswith(("#", "mailto:", "data:")):
+        return ""
+    if url.startswith("//"):
+        return f"https:{url}"
+    if url.startswith(("http://", "https://")):
+        return url.replace("/blob/", "/raw/")
+    if not full_name:
+        return ""
+
+    path = url.lstrip("/")
+    if path.startswith("./"):
+        path = path[2:]
+    quoted_path = urllib.parse.quote(path, safe="/:%?&=+.-_~")
+    return f"https://raw.githubusercontent.com/{full_name}/{default_branch or 'main'}/{quoted_path}"
+
+
+def looks_like_useful_image(url: str, alt: str) -> bool:
+    haystack = f"{url} {alt}".lower()
+    if any(skip in haystack for skip in ["badge", "shields.io", "codecov", "license", "npm version"]):
+        return False
+    if re.search(r"\.(png|jpe?g|gif|webp|avif|svg)(?:[?#].*)?$", url, re.I):
+        return True
+    return any(host in url for host in ["github.com/user-attachments/assets/", "githubusercontent.com"])
+
+
+def extract_images_from_lines(
+    lines: list[str], full_name: str, default_branch: str, limit: int = 2
+) -> list[dict[str, str]]:
+    images: list[dict[str, str]] = []
+    seen: set[str] = set()
+
+    for raw_line in lines:
+        for alt, raw_url in re.findall(r"!\[([^\]]*)\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)", raw_line):
+            url = normalize_image_url(raw_url, full_name, default_branch)
+            clean_alt = clean_markdown(alt).strip()
+            if url and url not in seen and looks_like_useful_image(url, clean_alt):
+                images.append({"url": url, "alt": clean_alt or "项目示例图"})
+                seen.add(url)
+            if len(images) >= limit:
+                return images
+
+        for tag in re.findall(r"<img\b[^>]*>", raw_line, re.I):
+            raw_url = image_url_from_html_img(tag)
+            clean_alt = image_alt_from_html_img(tag)
+            url = normalize_image_url(raw_url, full_name, default_branch)
+            if url and url not in seen and looks_like_useful_image(url, clean_alt):
+                images.append({"url": url, "alt": clean_alt or "项目示例图"})
+                seen.add(url)
+            if len(images) >= limit:
+                return images
+
+    return images
+
+
 def compact_example_body(lines: list[str], max_chars: int = 260) -> str:
     cleaned: list[str] = []
     for raw_line in lines:
@@ -499,12 +565,14 @@ def extract_first_code_block(lines: list[str], max_chars: int = 360) -> str:
     return code[:max_chars].strip()
 
 
-def extract_readme_examples(text: str | None, limit: int = 2) -> list[dict[str, str]]:
+def extract_readme_examples(
+    text: str | None, full_name: str = "", default_branch: str = "main", limit: int = 2
+) -> list[dict[str, Any]]:
     if not text:
         return []
 
     lines = text.splitlines()
-    examples: list[dict[str, str]] = []
+    examples: list[dict[str, Any]] = []
     for index, line in enumerate(lines):
         heading = heading_parts(line)
         if not heading:
@@ -526,7 +594,8 @@ def extract_readme_examples(text: str | None, limit: int = 2) -> list[dict[str, 
 
         body = compact_example_body(section_lines)
         code = extract_first_code_block(section_lines)
-        if not body and not code:
+        images = extract_images_from_lines(section_lines, full_name, default_branch)
+        if not body and not code and not images:
             continue
 
         examples.append(
@@ -534,11 +603,26 @@ def extract_readme_examples(text: str | None, limit: int = 2) -> list[dict[str, 
                 "title": title[:60],
                 "body": body,
                 "code": code,
+                "images": images,
                 "source": "README",
             }
         )
         if len(examples) >= limit:
             break
+
+    fallback_images = extract_images_from_lines(lines[:120], full_name, default_branch)
+    if examples and fallback_images and not any(example.get("images") for example in examples):
+        examples[0]["images"] = fallback_images
+    elif not examples and fallback_images:
+        examples.append(
+            {
+                "title": "项目截图 / 演示图",
+                "body": "README 里提供的项目截图，先看图大致了解它实际长什么样。",
+                "code": "",
+                "images": fallback_images,
+                "source": "README",
+            }
+        )
 
     return examples
 
@@ -1031,7 +1115,11 @@ def enrich_repositories(
         if repo["full_name"] in readme_targets:
             readme_text = client.get_readme_text(repo["full_name"])
             repo["readme_excerpt"] = first_readme_excerpt(readme_text, readme_chars)
-            repo["examples"] = extract_readme_examples(readme_text)
+            repo["examples"] = extract_readme_examples(
+                readme_text,
+                full_name=repo["full_name"],
+                default_branch=repo.get("default_branch") or "main",
+            )
         repo["features"] = infer_features(repo)
         score_repo(repo, history, run_date)
 
