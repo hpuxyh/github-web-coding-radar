@@ -1057,7 +1057,7 @@ def print_queries(args: argparse.Namespace) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="我自己的爬虫前沿信息：生成 AI 前沿、Web Coding 和 GitHub 热门项目榜单。"
+        description="github好项目雷达（自己爬）：生成 AI 前沿、Web Coding 和 GitHub 热门项目榜单。"
     )
     subparsers = parser.add_subparsers(dest="command")
 
