@@ -1270,7 +1270,7 @@ def print_queries(args: argparse.Namespace) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="每天帮你找 GitHub 好项目：生成 AI 前沿、Web Coding 和 GitHub 热门项目榜单。"
+        description="每天帮你找好项目：生成 AI 前沿、Web Coding 和热门开源项目榜单。"
     )
     subparsers = parser.add_subparsers(dest="command")
 
