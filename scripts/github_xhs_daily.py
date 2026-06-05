@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a daily GitHub Web Coding ranking and Xiaohongshu draft."""
+"""Build daily crawler-based AI frontier rankings and Xiaohongshu drafts."""
 
 from __future__ import annotations
 
@@ -428,6 +428,7 @@ def normalize_repo(item: dict[str, Any], source: str, query: str) -> dict[str, A
         "name": item.get("name"),
         "owner": owner.get("login"),
         "html_url": item.get("html_url"),
+        "default_branch": item.get("default_branch") or "main",
         "description": item.get("description") or "",
         "language": item.get("language"),
         "stars": int(item.get("stargazers_count") or 0),
@@ -926,25 +927,24 @@ def select_rankings(
     xhs_count = int(config.get("xhs_count", 5))
     rising_max_age_days = int(config.get("rising_max_age_days", 180))
 
+    # 同一个项目只进一个榜单，避免不同标签页里重复出现。
+    # 认领顺序：经典项目 -> 大佬在看 -> 产品灵感 -> 正在变火。
+    claimed: set[str] = set()
+
+    def take(candidates: list[dict[str, Any]], score_key: str, limit: int) -> list[dict[str, Any]]:
+        ranked = sorted(
+            (repo for repo in candidates if repo["full_name"] not in claimed),
+            key=lambda repo: repo["scores"][score_key],
+            reverse=True,
+        )[:limit]
+        for repo in ranked:
+            claimed.add(repo["full_name"])
+        return ranked
+
     all_time_candidates = [repo for repo in repos if "all_time" in repo.get("sources", [])]
     if not all_time_candidates:
         all_time_candidates = repos
-    all_time = sorted(
-        all_time_candidates,
-        key=lambda repo: repo["scores"]["all_time"],
-        reverse=True,
-    )[:top_limit]
-
-    rising_candidates = [
-        repo
-        for repo in repos
-        if "rising" in repo.get("sources", []) or repo.get("age_days", 9999) <= rising_max_age_days
-    ]
-    rising = sorted(
-        rising_candidates,
-        key=lambda repo: repo["scores"]["rising"],
-        reverse=True,
-    )[:rising_limit]
+    all_time = take(all_time_candidates, "all_time", top_limit)
 
     frontier_candidates = [
         repo
@@ -954,11 +954,7 @@ def select_rankings(
         or "AI Coding / Agent" in repo.get("features", [])
         or "MCP / Tool Calling" in repo.get("features", [])
     ]
-    frontier = sorted(
-        frontier_candidates,
-        key=lambda repo: repo["scores"]["frontier"],
-        reverse=True,
-    )[:frontier_limit]
+    frontier = take(frontier_candidates, "frontier", frontier_limit)
 
     product_candidates = [
         repo
@@ -969,11 +965,14 @@ def select_rankings(
         or "Low-code / No-code" in repo.get("features", [])
         or "Sandbox / Preview" in repo.get("features", [])
     ]
-    product_ideas = sorted(
-        product_candidates,
-        key=lambda repo: repo["scores"]["product"],
-        reverse=True,
-    )[:product_limit]
+    product_ideas = take(product_candidates, "product", product_limit)
+
+    rising_candidates = [
+        repo
+        for repo in repos
+        if "rising" in repo.get("sources", []) or repo.get("age_days", 9999) <= rising_max_age_days
+    ]
+    rising = take(rising_candidates, "rising", rising_limit)
 
     seen: set[str] = set()
     xhs_repos: list[dict[str, Any]] = []
@@ -1058,7 +1057,7 @@ def print_queries(args: argparse.Namespace) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Daily GitHub Web Coding rankings and Xiaohongshu draft generator."
+        description="我自己的爬虫前沿信息：生成 AI 前沿、Web Coding 和 GitHub 热门项目榜单。"
     )
     subparsers = parser.add_subparsers(dest="command")
 
