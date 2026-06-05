@@ -551,6 +551,112 @@
         line-height: 1.35;
       }
 
+      .generated-example {
+        margin: 12px 13px 2px;
+        border: 1px solid rgba(43, 159, 214, 0.18);
+        border-radius: 12px;
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(241, 247, 243, 0.92)),
+          radial-gradient(circle at 18% 12%, rgba(33, 181, 115, 0.18), transparent 32%),
+          radial-gradient(circle at 88% 18%, rgba(43, 159, 214, 0.18), transparent 34%);
+        overflow: hidden;
+      }
+
+      .generated-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 12px;
+        border-bottom: 1px solid rgba(43, 159, 214, 0.12);
+      }
+
+      .generated-title {
+        color: var(--ink);
+        font-weight: 850;
+        font-size: 0.88rem;
+      }
+
+      .generated-label {
+        flex: 0 0 auto;
+        border-radius: 999px;
+        padding: 2px 8px;
+        background: rgba(43, 159, 214, 0.12);
+        color: #216f97;
+        font-size: 0.72rem;
+        font-weight: 800;
+      }
+
+      .generated-canvas {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 34px minmax(0, 1fr);
+        gap: 10px;
+        align-items: stretch;
+        padding: 12px;
+      }
+
+      .generated-panel {
+        min-height: 112px;
+        padding: 11px;
+        border: 1px solid rgba(24, 60, 44, 0.1);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.76);
+        box-shadow: 0 8px 18px rgba(31, 70, 50, 0.07);
+      }
+
+      .generated-panel strong {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--muted);
+        font-size: 0.74rem;
+      }
+
+      .generated-panel span {
+        display: block;
+        color: #263c32;
+        font-size: 0.86rem;
+        line-height: 1.45;
+      }
+
+      .generated-arrow {
+        display: grid;
+        place-items: center;
+        color: #1f7a52;
+        font-weight: 950;
+      }
+
+      .generated-output-lines {
+        display: grid;
+        gap: 7px;
+        margin-top: 8px;
+      }
+
+      .generated-output-lines i {
+        display: block;
+        height: 8px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(33, 181, 115, 0.45), rgba(43, 159, 214, 0.32));
+      }
+
+      .generated-output-lines i:nth-child(2) {
+        width: 78%;
+      }
+
+      .generated-output-lines i:nth-child(3) {
+        width: 56%;
+      }
+
+      @media (max-width: 680px) {
+        .generated-canvas {
+          grid-template-columns: 1fr;
+        }
+
+        .generated-arrow {
+          min-height: 18px;
+          transform: rotate(90deg);
+        }
+      }
+
       .example-source {
         margin-left: auto;
         color: var(--muted);
@@ -1747,12 +1853,92 @@
           );
           if (!repeated) combined.push(example);
         }
+        if (!combined.length) {
+          const details = projectDetails(repo);
+          const playbook = repoPlaybook(repo);
+          combined.push({
+            title: '可能的使用场景',
+            body: playbook.scenarios?.[0] || details.canDo || '这个项目适合先看用途，再判断能不能用到自己的工作里。',
+            code: '',
+            images: [],
+            source: '生成示意',
+          });
+        }
         return combined.slice(0, 2);
+      }
+
+      function generatedVisualText(repo, example) {
+        const details = projectDetails(repo);
+        const playbook = repoPlaybook(repo);
+        const features = repo.features || [];
+        const firstScenario = playbook.scenarios?.[0] || details.canDo || '把一个想法交给工具处理。';
+        const firstStep = playbook.steps?.[0] || '输入你的目标或素材。';
+        const output = details.canDo || example.body || '得到一个可以继续修改或使用的结果。';
+
+        let title = '生成示意图';
+        let input = firstStep;
+        let process = '工具根据你的目标自动处理。';
+        if (features.includes('AI Coding / Agent')) {
+          title = 'AI 写代码流程示意';
+          input = '输入需求、报错或项目目标';
+          process = 'AI 读取项目、拆任务、改代码';
+        } else if (features.includes('Web IDE / Browser Editor')) {
+          title = '网页里做项目示意';
+          input = '打开网页工作台并输入需求';
+          process = '在线编辑、预览、继续修改';
+        } else if (features.includes('Sandbox / Preview')) {
+          title = '运行预览流程示意';
+          input = '放入代码或让 AI 生成代码';
+          process = '在隔离环境里运行和看日志';
+        } else if (features.includes('MCP / Tool Calling')) {
+          title = 'AI 调工具流程示意';
+          input = '告诉 AI 要完成的任务';
+          process = 'AI 调用外部工具拿数据或执行动作';
+        } else if (features.includes('Low-code / No-code')) {
+          title = '低代码搭应用示意';
+          input = '选择模板、表单或数据源';
+          process = '拖拽组件并配置自动流程';
+        }
+
+        return {
+          title,
+          input: input.slice(0, 38),
+          process,
+          output: output.slice(0, 52),
+          scenario: firstScenario.slice(0, 48),
+        };
+      }
+
+      function renderGeneratedVisual(repo, example) {
+        const visual = generatedVisualText(repo, example);
+        return `
+          <div class="generated-example" role="img" aria-label="${escapeHtml(visual.title)}">
+            <div class="generated-top">
+              <span class="generated-title">${escapeHtml(visual.title)}</span>
+              <span class="generated-label">生成示意图 · 非原项目截图</span>
+            </div>
+            <div class="generated-canvas">
+              <section class="generated-panel">
+                <strong>输入 / 操作</strong>
+                <span>${escapeHtml(visual.input)}</span>
+              </section>
+              <div class="generated-arrow">→</div>
+              <section class="generated-panel">
+                <strong>可能看到的结果</strong>
+                <span>${escapeHtml(visual.output)}</span>
+                <div class="generated-output-lines" aria-hidden="true">
+                  <i></i><i></i><i></i>
+                </div>
+              </section>
+            </div>
+          </div>
+        `;
       }
 
       function renderExampleBlocks(repo) {
         const examples = repoExamples(repo);
         if (!examples.length) return '';
+        const hasRealImages = examples.some((example) => example.images?.length);
         return `
           <div class="example-list">
             ${examples
@@ -1780,6 +1966,7 @@
                           </div>`
                         : ''
                     }
+                    ${!hasRealImages && !example.images?.length ? renderGeneratedVisual(repo, example) : ''}
                     ${example.body ? `<p>${escapeHtml(example.body)}</p>` : ''}
                     ${example.code ? `<pre><code>${escapeHtml(example.code)}</code></pre>` : ''}
                   </details>
