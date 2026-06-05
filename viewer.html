@@ -1,0 +1,1770 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="GitHub 好项目日报浏览器，帮你发现大佬在看什么、最近有什么实用产品灵感。"
+    />
+    <title>GitHub 好项目雷达</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #111315;
+        --panel: #191d20;
+        --panel-2: #20262a;
+        --ink: #f3f5f2;
+        --muted: #aab3ad;
+        --line: rgba(255, 255, 255, 0.11);
+        --blue: #65c7f2;
+        --green: #8bd685;
+        --amber: #f0b85f;
+        --red: #ff7c70;
+        --shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        min-width: 320px;
+        margin: 0;
+        background:
+          linear-gradient(180deg, rgba(101, 199, 242, 0.09), transparent 320px),
+          linear-gradient(135deg, rgba(139, 214, 133, 0.07), transparent 360px),
+          var(--bg);
+        color: var(--ink);
+      }
+
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .shell {
+        width: min(1440px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 24px 0 42px;
+      }
+
+      .topbar {
+        position: sticky;
+        z-index: 10;
+        top: 0;
+        display: grid;
+        grid-template-columns: minmax(220px, 1fr) auto;
+        gap: 16px;
+        align-items: center;
+        padding: 14px 0 18px;
+        background: linear-gradient(180deg, rgba(17, 19, 21, 0.97), rgba(17, 19, 21, 0.82));
+        backdrop-filter: blur(16px);
+      }
+
+      .brand {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        min-width: 0;
+      }
+
+      .brand-mark {
+        width: 42px;
+        height: 42px;
+        display: grid;
+        flex: 0 0 auto;
+        place-items: center;
+        border-radius: 8px;
+        background: linear-gradient(135deg, var(--blue), var(--green));
+        color: #0f1415;
+        font-weight: 900;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(1.35rem, 2.4vw, 2.2rem);
+        line-height: 1.08;
+        letter-spacing: 0;
+      }
+
+      .subtitle {
+        margin: 5px 0 0;
+        color: var(--muted);
+        font-size: 0.94rem;
+      }
+
+      .top-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+
+      .icon-button,
+      .link-button {
+        min-height: 38px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--ink);
+        cursor: pointer;
+        text-decoration: none;
+      }
+
+      .icon-button {
+        width: 42px;
+      }
+
+      .link-button {
+        padding: 0 13px;
+        font-weight: 750;
+      }
+
+      .icon-button:hover,
+      .link-button:hover {
+        border-color: rgba(101, 199, 242, 0.62);
+        background: rgba(101, 199, 242, 0.12);
+      }
+
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 14px;
+      }
+
+      .metric {
+        min-height: 96px;
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+      }
+
+      .metric span {
+        display: block;
+        color: var(--muted);
+        font-size: 0.82rem;
+      }
+
+      .metric strong {
+        display: block;
+        margin-top: 7px;
+        color: #fff;
+        font-size: clamp(1.3rem, 2.5vw, 2rem);
+        line-height: 1;
+      }
+
+      .metric small {
+        display: block;
+        margin-top: 7px;
+        color: rgba(243, 245, 242, 0.66);
+      }
+
+      .controls {
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        gap: 10px;
+        align-items: center;
+        margin: 18px 0;
+      }
+
+      .search {
+        position: relative;
+      }
+
+      .search input,
+      select {
+        width: 100%;
+        height: 44px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #171b1e;
+        color: var(--ink);
+        outline: 0;
+      }
+
+      .search input {
+        padding: 0 14px 0 42px;
+      }
+
+      .search span {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        color: var(--muted);
+        transform: translateY(-50%);
+      }
+
+      select {
+        min-width: 166px;
+        padding: 0 12px;
+      }
+
+      .tabs {
+        display: inline-grid;
+        grid-auto-flow: column;
+        gap: 6px;
+        padding: 5px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .tabs button {
+        min-height: 34px;
+        min-width: 92px;
+        border: 0;
+        border-radius: 7px;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+      }
+
+      .tabs button[aria-selected="true"] {
+        background: #e9f1ea;
+        color: #111315;
+        font-weight: 850;
+      }
+
+      .content-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 360px;
+        gap: 16px;
+        align-items: start;
+      }
+
+      .list,
+      .side-panel {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(25, 29, 32, 0.82);
+        box-shadow: var(--shadow);
+      }
+
+      .list-header,
+      .side-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 16px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .list-header h2,
+      .side-header h2 {
+        margin: 0;
+        font-size: 1.02rem;
+        line-height: 1.2;
+      }
+
+      .count {
+        color: var(--muted);
+        font-size: 0.86rem;
+      }
+
+      .repo-list {
+        display: grid;
+      }
+
+      .repo-row {
+        display: grid;
+        grid-template-columns: 54px minmax(0, 1fr) auto;
+        gap: 14px;
+        padding: 16px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .repo-row:last-child {
+        border-bottom: 0;
+      }
+
+      .rank {
+        width: 42px;
+        height: 42px;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        background: rgba(101, 199, 242, 0.14);
+        color: var(--blue);
+        font-weight: 900;
+      }
+
+      .repo-main {
+        min-width: 0;
+      }
+
+      .repo-title {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        margin: 0;
+        font-size: 1rem;
+      }
+
+      .repo-title a {
+        color: #f8fbf8;
+        text-decoration: none;
+      }
+
+      .repo-title a:hover {
+        color: var(--blue);
+      }
+
+      .badge {
+        min-height: 24px;
+        display: inline-flex;
+        align-items: center;
+        padding: 0 8px;
+        border-radius: 8px;
+        background: rgba(139, 214, 133, 0.13);
+        color: #bdf2b8;
+        font-size: 0.76rem;
+        font-weight: 800;
+      }
+
+      .description {
+        margin: 8px 0 0;
+        color: rgba(243, 245, 242, 0.78);
+        line-height: 1.56;
+      }
+
+      .reason {
+        margin: 9px 0 0;
+        padding-left: 10px;
+        border-left: 3px solid rgba(139, 214, 133, 0.58);
+        color: #cce8c9;
+        line-height: 1.55;
+      }
+
+      .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .detail-item {
+        padding: 12px;
+        border: 1px solid rgba(101, 199, 242, 0.18);
+        border-radius: 8px;
+        background: rgba(101, 199, 242, 0.055);
+      }
+
+      .detail-item strong {
+        display: block;
+        margin-bottom: 7px;
+        color: #d9f4ff;
+        font-size: 0.82rem;
+      }
+
+      .detail-item p {
+        margin: 0;
+        color: rgba(243, 245, 242, 0.8);
+        line-height: 1.55;
+        font-size: 0.86rem;
+      }
+
+      .playbook {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .playbook-block {
+        padding: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.035);
+      }
+
+      .playbook-block h4 {
+        margin: 0 0 8px;
+        color: #f7faf5;
+        font-size: 0.82rem;
+        line-height: 1.2;
+      }
+
+      .playbook-block ul,
+      .playbook-block ol {
+        display: grid;
+        gap: 6px;
+        margin: 0;
+        padding-left: 18px;
+        color: rgba(243, 245, 242, 0.76);
+        line-height: 1.5;
+        font-size: 0.84rem;
+      }
+
+      .meta,
+      .features {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-top: 10px;
+      }
+
+      .meta span,
+      .features span {
+        min-height: 26px;
+        display: inline-flex;
+        align-items: center;
+        border-radius: 8px;
+        padding: 0 8px;
+        font-size: 0.78rem;
+      }
+
+      .meta span {
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: var(--muted);
+      }
+
+      .features span {
+        background: rgba(240, 184, 95, 0.13);
+        color: #ffd697;
+      }
+
+      .repo-score {
+        display: grid;
+        gap: 8px;
+        justify-items: end;
+        min-width: 124px;
+      }
+
+      .score {
+        text-align: right;
+      }
+
+      .score strong {
+        display: block;
+        color: #fff;
+        font-size: 1.05rem;
+      }
+
+      .score span {
+        color: var(--muted);
+        font-size: 0.76rem;
+      }
+
+      .small-link {
+        min-height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 10px;
+        border: 1px solid rgba(101, 199, 242, 0.38);
+        border-radius: 8px;
+        color: var(--blue);
+        text-decoration: none;
+        font-size: 0.82rem;
+        font-weight: 800;
+      }
+
+      .small-link:hover {
+        background: rgba(101, 199, 242, 0.12);
+      }
+
+      .side-panel {
+        position: sticky;
+        top: 104px;
+      }
+
+      .draft-list {
+        display: grid;
+        gap: 12px;
+        padding: 14px;
+      }
+
+      .draft {
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        background: var(--panel-2);
+        overflow: hidden;
+      }
+
+      .draft button {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px;
+        border: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        background: transparent;
+        color: var(--ink);
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .draft button strong {
+        overflow-wrap: anywhere;
+      }
+
+      .draft pre {
+        max-height: 420px;
+        margin: 0;
+        padding: 12px;
+        overflow: auto;
+        color: rgba(243, 245, 242, 0.82);
+        font: 0.82rem/1.58 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        white-space: pre-wrap;
+      }
+
+      .empty,
+      .error {
+        padding: 28px;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .error {
+        border: 1px solid rgba(255, 124, 112, 0.34);
+        border-radius: 8px;
+        background: rgba(255, 124, 112, 0.09);
+        color: #ffc0ba;
+      }
+
+      @media (max-width: 1080px) {
+        .summary-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .content-layout {
+          grid-template-columns: 1fr;
+        }
+
+        .side-panel {
+          position: static;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .shell {
+          width: min(100% - 22px, 1440px);
+          padding-top: 12px;
+        }
+
+        .topbar {
+          position: static;
+          grid-template-columns: 1fr;
+        }
+
+        .top-actions {
+          justify-content: flex-start;
+        }
+
+        .summary-grid,
+        .controls {
+          grid-template-columns: 1fr;
+        }
+
+        .tabs {
+          grid-auto-flow: row;
+        }
+
+        .tabs button {
+          min-width: 100%;
+        }
+
+        .repo-row {
+          grid-template-columns: 44px minmax(0, 1fr);
+        }
+
+        .repo-score {
+          grid-column: 2;
+          justify-items: start;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          width: 100%;
+        }
+
+        .playbook {
+          grid-template-columns: 1fr;
+        }
+
+        .detail-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .score {
+          text-align: left;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">榜</div>
+          <div>
+            <h1>GitHub 好项目雷达</h1>
+            <p class="subtitle" id="subtitle">正在读取日报数据...</p>
+          </div>
+        </div>
+        <div class="top-actions">
+          <button class="icon-button" id="reloadButton" type="button" title="重新读取" aria-label="重新读取">↻</button>
+          <a class="link-button" href="output/latest.md" target="_blank" rel="noreferrer">看原文</a>
+          <a class="link-button" href="output/latest.json" target="_blank" rel="noreferrer">原始数据</a>
+        </div>
+      </header>
+
+      <section class="summary-grid" id="summary" aria-label="今日概览"></section>
+
+      <section class="controls" aria-label="筛选控制">
+        <label class="search">
+          <span>⌕</span>
+          <input id="searchInput" type="search" placeholder="搜索项目名、用途、语言、关键词" autocomplete="off" />
+        </label>
+        <select id="sortSelect" aria-label="排序">
+          <option value="rank">按榜单排序</option>
+          <option value="stars">按收藏数排序</option>
+          <option value="velocity">按变火速度排序</option>
+          <option value="recent">按最近更新排序</option>
+        </select>
+        <div class="tabs" role="tablist" aria-label="榜单切换">
+          <button type="button" role="tab" aria-selected="true" data-tab="frontier">大佬在看</button>
+          <button type="button" role="tab" aria-selected="false" data-tab="product_ideas">产品灵感</button>
+          <button type="button" role="tab" aria-selected="false" data-tab="rising">正在变火</button>
+          <button type="button" role="tab" aria-selected="false" data-tab="all_time">经典项目</button>
+          <button type="button" role="tab" aria-selected="false" data-tab="drafts">发帖草稿</button>
+        </div>
+      </section>
+
+      <section class="content-layout">
+        <section class="list" aria-live="polite">
+          <div class="list-header">
+            <h2 id="listTitle">大佬在看榜</h2>
+            <span class="count" id="resultCount">0 个项目</span>
+          </div>
+          <div class="repo-list" id="repoList"></div>
+        </section>
+
+        <aside class="side-panel">
+          <div class="side-header">
+            <h2>小红书草稿</h2>
+            <span class="count" id="draftCount">0 篇</span>
+          </div>
+          <div class="draft-list" id="draftList"></div>
+        </aside>
+      </section>
+    </main>
+
+    <script>
+      const state = {
+        data: null,
+        activeTab: 'frontier',
+        query: '',
+        sort: 'rank',
+      };
+
+      const $ = (selector) => document.querySelector(selector);
+      const repoList = $('#repoList');
+      const draftList = $('#draftList');
+      const resultCount = $('#resultCount');
+      const draftCount = $('#draftCount');
+      const listTitle = $('#listTitle');
+      const subtitle = $('#subtitle');
+      const summary = $('#summary');
+
+      const featureText = {
+        'AI Coding / Agent': 'AI 帮你写代码',
+        'Web IDE / Browser Editor': '在网页里写代码',
+        'Sandbox / Preview': '能安全运行和预览',
+        'MCP / Tool Calling': '能让 AI 调用工具',
+        'Low-code / No-code': '少写代码也能搭应用',
+        'Deploy / Cloud': '能发布到云端',
+        Collaboration: '多人协作',
+        'Testing / Quality': '帮你检查代码质量',
+      };
+
+      const repoIntroText = {
+        'nexu-io/open-design':
+          '本地优先、开源的 Claude Design 替代方案。它是原生桌面应用，内置大量技能和设计系统，可生成网页、桌面、移动端原型、幻灯片、图片、视频和 HyperFrames，支持沙盒预览与 HTML、PDF、PPTX、MP4 导出，并可接入 Claude Code、OpenClaw、Codex、Cursor、OpenCode、Qwen、Copilot、Hermes、Kimi 等命令行工具。',
+        'superset-sh/superset':
+          '面向人工智能智能体时代的代码编辑器，可以在本机同时运行多路 Claude Code、Codex 等编码智能体。',
+        'affaan-m/ECC':
+          '智能体工作台性能优化系统，覆盖技能、直觉、记忆、安全和研究优先开发，面向 Claude Code、Codex、OpenCode、Cursor 等工具。',
+        'Lum1104/Understand-Anything':
+          '把代码转成可交互知识图谱的工具，支持探索、搜索和提问。它强调“能教学的图谱”而不是单纯炫技，适合用来理解代码库，并支持 Claude Code、Codex、Cursor、Copilot、Gemini 命令行等工具。',
+        'daytonaio/daytona':
+          '用于运行人工智能生成代码的安全、弹性基础设施，适合做代码执行沙盒、智能体运行环境和隔离开发工作区。',
+        'ComposioHQ/composio':
+          '为人工智能智能体提供上千个工具包、工具搜索、上下文管理、认证和沙盒工作台，帮助把用户意图转成真实动作。',
+        'sickn33/antigravity-awesome-skills':
+          '可安装的智能体技能库，收录大量面向 Claude Code、Cursor、Codex 命令行、Gemini 命令行、Antigravity 等工具的技能、插件、安装器、工作流和社区合集。',
+        'wshobson/agents':
+          '多工作台智能体插件市场，面向 Claude Code、Codex 命令行、Cursor、OpenCode 和 Gemini 命令行等工具。',
+        'rtk-ai/rtk':
+          '命令行代理工具，可在常见开发命令中减少大语言模型 60% 到 90% 的令牌消耗。单个 Rust 二进制文件，零依赖。',
+        'wanshuiyin/Auto-claude-code-research-in-sleep':
+          '轻量级自主研究技能集，用 Markdown 组织机器学习研究中的跨模型评审、想法发现和实验自动化。无框架锁定，可配合 Claude Code、Codex、OpenClaw 或其他大语言模型智能体。',
+        'Significant-Gravitas/AutoGPT':
+          'AutoGPT 的目标是让每个人都能使用并构建人工智能应用，提供通用工具，让使用者把精力放在真正重要的事情上。',
+        'yamadashy/repomix':
+          '把整个代码仓库打包成单个适合人工智能读取的文件，方便喂给 Claude、ChatGPT、DeepSeek、Perplexity、Gemini、Gemma、Llama、Grok 等大语言模型或其他人工智能工具。',
+        'nexu-io/html-anything':
+          '一个智能体式 HTML 编辑器：本地智能体负责写 HTML，你负责发布。支持 75 个技能与 9 种输出场景（杂志、演示文稿、海报、小红书/推文、原型、数据报告、Hyperframes），带沙盒预览、一键导出到微信、X、知乎、HTML、PNG，并可接入 Claude Code、Cursor、Codex、Gemini、Copilot、OpenCode、Qwen、Aider。',
+        'simonlin1212/a-stock-data':
+          'A 股全栈数据工具包：7 层架构、27 个端点、13 个数据源、零第三方依赖，面向人工智能编程助手使用。',
+        'esengine/DeepSeek-Reasonix':
+          '面向终端的 DeepSeek 原生人工智能编程智能体，围绕前缀缓存稳定性设计，适合长时间运行。',
+        'getagentseal/codeburn':
+          '查看人工智能编程消耗的令牌去向，为 Claude Code、Codex 和 Cursor 提供交互式终端成本看板。',
+        'opensquilla/opensquilla':
+          'OpenSquilla 是节省令牌的人工智能智能体，用同样预算获得更高的信息密度。',
+        'OpenOSINT/OpenOSINT':
+          '由人工智能驱动的开源情报智能体，提供交互式命令环境、模型上下文协议服务端和命令行工具，内置 16 个工具，支持 Claude、GPT-4 或本地模型，仅用于授权安全研究。',
+        'ultraworkers/claw-code':
+          '仓库终于开放了，曾以极快速度突破 10 万星标，使用 Rust 和 oh-my-codex 构建。',
+        'jdevalk/specification.website':
+          '网站规格说明：覆盖 HTML、可访问性、安全、搜索优化和智能体就绪度，平台无关、有来源，采用 MIT 协议。',
+        'withkynam/vibecode-pro-max-kit':
+          '给会遗忘的人工智能准备的记忆系统。面向氛围编程者、产品负责人、CEO 和实际构建者的规格驱动编码工作台，包含自改进上下文记忆、12 个智能体和 32 个技能，用来减少上下文腐化并交付功能。支持 Claude Code 与 Codex，适配任意技术栈。',
+        'alibaba/open-code-review':
+          '阿里巴巴规模验证过的代码评审工具：混合架构把确定性流水线与大语言模型智能体结合，支持精确到行的评论，内置微调规则集（空指针、线程安全、跨站脚本、SQL 注入），兼容 OpenAI 与 Anthropic。',
+        'AgriciDaniel/claude-obsidian':
+          '面向 Obsidian 与 Claude Code 的自组织人工智能第二大脑。放入任意资料后，Claude 会阅读、关联并整理成你拥有的 Markdown 知识图谱，适合人工智能笔记、个人知识管理，也可作为开源 Notion 替代方案。基于 Karpathy 的大语言模型 Wiki 思路。',
+        'Mouseww/anything-analyzer':
+          '全能协议分析工具：浏览器抓包、MITM 代理、指纹伪装、人工智能分析，并通过模型上下文协议服务端无缝对接智能体和集成开发环境。',
+        'crynta/terax-ai':
+          '轻量级（约 7MB）、终端优先、面向人工智能原生开发的工作区。',
+        'google-labs-code/design.md':
+          '一种用于向编码智能体描述视觉身份的格式规范。DESIGN.md 让智能体持续、结构化地理解设计系统。',
+        'DenisSergeevitch/agents-best-practices':
+          '面向 Codex、Claude Code 和智能体式工作台设计的厂商中立智能体技能。',
+        'strukto-ai/mirage':
+          '面向人工智能智能体的统一虚拟文件系统，适合做多智能体协作、文件上下文管理和沙盒工作流。',
+        'op7418/guizang-ppt-skill':
+          '用于生成精致 HTML 幻灯片的智能体技能，支持杂志风、瑞士版式、图片提示词、社交封面，以及低功耗演示运行时。',
+        'study8677/awesome-architecture':
+          '架构优先的系统设计学习资源，包含双语教程、架构模板和端到端案例，覆盖分布式系统、人工智能原生系统、检索增强生成、编码智能体和生产权衡。',
+        'reflex-dev/reflex':
+          '用纯 Python 构建网页应用的框架，适合快速做可交互产品原型和内部工具。',
+        'n8n-io/n8n':
+          '带原生人工智能能力的工作流自动化平台，可视化搭建与自定义代码结合，支持自托管或云端运行，并提供大量集成。',
+        'appsmithorg/appsmith':
+          '用于构建管理后台、内部工具和仪表盘的平台，可连接多种数据库和任意接口。',
+        'microsoft/vscode':
+          'Visual Studio Code，成熟的代码编辑器，也是很多网页编程、智能体编程和扩展生态的基础入口。',
+        'stablyai/orca':
+          '面向并行智能体团队的新一代集成开发环境，可用自己的订阅运行不同编码智能体，并支持桌面和移动端。',
+        'freestylefly/wesight':
+          '开源桌面人工智能智能体工作区，可一键配置 Claude Code、Codex、OpenClaw、Hermes Agent，并支持自定义大语言模型路由。',
+        'codecrafters-io/build-your-own-x':
+          '通过从零复刻你喜欢的技术来掌握编程。',
+        'sindresorhus/awesome':
+          '汇集各种有趣主题的精选清单。',
+        'freeCodeCamp/freeCodeCamp':
+          'freeCodeCamp.org 的开源代码库和课程体系，帮助用户免费学习数学、编程和计算机科学。',
+        'public-apis/public-apis':
+          '免费 API 的集合清单。',
+        'openclaw/openclaw':
+          '属于你自己的个人人工智能助手，支持任意操作系统和平台。',
+        'EbookFoundation/free-programming-books':
+          '可免费获取的编程书籍清单。',
+        'jwasham/coding-interview-university':
+          '成为软件工程师的完整计算机科学学习计划。',
+        'donnemartin/system-design-primer':
+          '学习如何设计大规模系统，并准备系统设计面试，包含 Anki 记忆卡片。',
+        'nilbuild/developer-roadmap':
+          '交互式路线图、指南和教育内容，帮助开发者在职业路径上成长。',
+        'vinta/awesome-python':
+          'Python 框架、库、工具和资源的主观精选清单。',
+        'torvalds/linux':
+          'Linux 内核源码树。',
+        'facebook/react':
+          '用于网页和原生用户界面的库。',
+        'practical-tutorials/project-based-learning':
+          '基于项目学习的教程精选清单。',
+        'awesome-selfhosted/awesome-selfhosted':
+          '可部署在自己服务器上的自由软件网络服务和网页应用清单。',
+      };
+
+      const repoPlaybookText = {
+        'nexu-io/open-design': {
+          scenarios: [
+            '用来观察“人工智能设计工具”如何从提示词走到原型、幻灯片和视频交付。',
+            '适合作为小红书选题：本地优先的 Claude Design 替代品，能否变成个人设计工作台。',
+            '适合产品经理、设计师和独立开发者快速做封面、原型、演示稿和产品概念验证。',
+          ],
+          steps: [
+            '先看仓库说明里的安装方式，确认本地桌面应用和命令行工具依赖。',
+            '选择一个设计系统或输出场景，例如网页原型、移动端原型、幻灯片或小红书封面。',
+            '输入产品想法，让智能体生成初版，再用沙盒预览检查布局、交互和文案。',
+            '导出为网页、图片、PDF、PPTX 或视频，挑一个最适合发小红书的视觉结果。',
+          ],
+        },
+        'nexu-io/html-anything': {
+          scenarios: [
+            '把一句产品想法变成可预览的 HTML 页面，适合做小红书封面、海报、落地页和数据报告。',
+            '观察 Web coding 如何从“写代码”变成“给智能体下任务并挑结果”。',
+            '适合每天做项目介绍时快速生成配图、演示页或视觉化案例。',
+          ],
+          steps: [
+            '按说明接入你正在用的编码助手，例如 Codex、Claude Code、Cursor 或 Qwen。',
+            '选择输出场景，例如小红书封面、推文图、原型、海报或报告。',
+            '输入项目主题和视觉要求，让本地智能体生成 HTML。',
+            '在沙盒里预览，修改文案和布局后导出图片或 HTML。',
+          ],
+        },
+        'superset-sh/superset': {
+          scenarios: [
+            '把本机变成多智能体代码工作台，同时调度多个编码智能体处理不同任务。',
+            '适合观察“人类开发者 + 多个编码智能体”的新型开发组织方式。',
+            '适合技术专家评估并行编码、任务拆分、智能体协作和本地工作流。',
+          ],
+          steps: [
+            '先阅读仓库说明，确认本机安装和支持的智能体工具。',
+            '准备一个真实代码仓库，把任务拆成修复、重构、测试、文档等子任务。',
+            '分别分配给不同智能体运行，观察输出、冲突和代码质量。',
+            '合并前人工审查差异，记录哪些任务适合并行智能体完成。',
+          ],
+        },
+        'esengine/DeepSeek-Reasonix': {
+          scenarios: [
+            '测试 DeepSeek 原生编码智能体在终端里长时间工作的表现。',
+            '适合关注推理模型、上下文稳定性和低成本编码智能体的人。',
+            '可以做选题：为什么“保持运行的终端智能体”可能改变开发节奏。',
+          ],
+          steps: [
+            '按说明安装命令行工具并配置 DeepSeek 相关凭据。',
+            '在一个小型仓库里提出明确任务，例如加测试、改接口或解释模块。',
+            '让它连续运行并观察上下文是否稳定、是否能持续推进。',
+            '记录生成代码、命令执行、错误恢复和人工介入次数。',
+          ],
+        },
+        'affaan-m/ECC': {
+          scenarios: [
+            '研究编码智能体的技能、记忆、安全和性能优化方法。',
+            '适合作为技术专家向内容：如何把智能体从“能用”调到“稳定好用”。',
+            '适合对比 Claude Code、Codex、Cursor、OpenCode 等工具的工作台设计。',
+          ],
+          steps: [
+            '先浏览仓库里的技能、记忆、安全和性能优化模块。',
+            '挑一个你常用的编码智能体，套用其中一个工作流或规则。',
+            '用同一个开发任务做对照，比较使用前后的产出质量和令牌消耗。',
+            '把有效规则整理成自己的提示词、技能或项目模板。',
+          ],
+        },
+        'Lum1104/Understand-Anything': {
+          scenarios: [
+            '把陌生代码库变成可搜索、可提问的知识图谱。',
+            '适合做项目拆解：一个开源项目到底有哪些模块、依赖和关键路径。',
+            '适合技术学习、代码审计和团队新人入门。',
+          ],
+          steps: [
+            '选择一个你想拆解的代码仓库。',
+            '按说明生成交互式知识图谱。',
+            '从入口文件、核心模块和数据流开始探索。',
+            '对图谱提问并整理成小红书里的“项目结构图 + 亮点解读”。',
+          ],
+        },
+        'daytonaio/daytona': {
+          scenarios: [
+            '给人工智能生成的代码提供安全隔离的运行环境。',
+            '适合观察智能体应用里“沙盒基础设施”为什么越来越重要。',
+            '适合开发代码解释器、自动修复、在线预览和评测系统。',
+          ],
+          steps: [
+            '阅读快速开始，启动一个隔离开发环境。',
+            '让智能体生成或修改一段代码，并放进沙盒运行。',
+            '观察依赖安装、命令执行、日志和失败恢复。',
+            '总结它对安全、弹性和多任务运行的帮助。',
+          ],
+        },
+        'ComposioHQ/composio': {
+          scenarios: [
+            '给智能体连接真实工具，例如表格、邮件、项目管理、代码仓库和浏览器任务。',
+            '适合观察“工具调用层”如何成为智能体应用的基础设施。',
+            '适合做产品点子：把一个普通流程自动化成智能体工作流。',
+          ],
+          steps: [
+            '选择一个要自动化的真实任务，例如整理线索、创建工单或同步数据。',
+            '在工具库里找到对应集成并配置认证。',
+            '写一个简单智能体流程，让模型根据意图调用工具。',
+            '检查权限、执行日志和失败时的人工确认点。',
+          ],
+        },
+        'sickn33/antigravity-awesome-skills': {
+          scenarios: [
+            '寻找可安装的智能体技能，快速扩展 Claude Code、Codex 或 Cursor 的能力。',
+            '适合观察前沿开发者正在沉淀哪些可复用工作流。',
+            '适合做小红书合集：最值得收藏的编码智能体技能库。',
+          ],
+          steps: [
+            '按技能分类浏览目录，先挑与你日常任务相关的技能。',
+            '使用安装器或手动方式把技能放进对应智能体工具。',
+            '用一个真实任务测试技能是否减少提示词和手动步骤。',
+            '把有效技能按写作、前端、后端、数据、部署等主题整理。',
+          ],
+        },
+        'wshobson/agents': {
+          scenarios: [
+            '把不同智能体工具里的插件和技能放到统一市场视角下观察。',
+            '适合研究“智能体生态”会不会像编辑器插件市场一样发展。',
+            '适合给技术专家做工具选型和工作流组合参考。',
+          ],
+          steps: [
+            '浏览市场目录，按你使用的工具筛选插件或技能。',
+            '挑一个高频任务插件，例如测试、重构、文档或项目分析。',
+            '安装到对应编码工具里并用真实仓库测试。',
+            '记录插件带来的效率提升、失败边界和适合人群。',
+          ],
+        },
+        'getagentseal/codeburn': {
+          scenarios: [
+            '查看 Claude Code、Codex、Cursor 等工具的令牌和成本流向。',
+            '适合做“人工智能编程到底花钱在哪里”的内容选题。',
+            '适合团队评估智能体使用成本、异常任务和优化空间。',
+          ],
+          steps: [
+            '按说明接入你使用的编码工具日志或成本数据。',
+            '运行几个常见任务，例如修复错误、生成测试、重构组件。',
+            '在终端看板里查看令牌消耗、成本和任务分布。',
+            '找出最耗费的环节，再优化提示词、上下文和任务拆分。',
+          ],
+        },
+        'rtk-ai/rtk': {
+          scenarios: [
+            '降低开发命令中的大语言模型令牌消耗。',
+            '适合关注成本优化、命令行代理和智能体工程效率的人。',
+            '适合做选题：同样的编码任务，怎样少花令牌。',
+          ],
+          steps: [
+            '安装单文件命令行工具并放到开发环境路径中。',
+            '选择几个常见开发命令作为测试样本。',
+            '通过代理执行命令并记录节省比例。',
+            '把节省明显的命令加入自己的智能体工作流。',
+          ],
+        },
+        'strukto-ai/mirage': {
+          scenarios: [
+            '给多个智能体提供统一虚拟文件系统，减少文件上下文混乱。',
+            '适合构建多智能体协作、沙盒编辑和长任务工作流。',
+            '适合观察“智能体记忆与文件层”如何从提示词走向基础设施。',
+          ],
+          steps: [
+            '阅读虚拟文件系统的挂载和访问方式。',
+            '准备一个包含多个文件的任务，让智能体通过统一接口读写。',
+            '观察文件版本、路径隔离和并发修改是否清晰。',
+            '把成功模式总结成多智能体项目模板。',
+          ],
+        },
+        'op7418/guizang-ppt-skill': {
+          scenarios: [
+            '用智能体生成高质量 HTML 幻灯片、社交封面和图片提示词。',
+            '适合把开源项目介绍做成更适合小红书传播的视觉稿。',
+            '适合内容创作者把技术选题快速转成演示页面。',
+          ],
+          steps: [
+            '把项目名称、目标读者和风格要求写成任务说明。',
+            '调用幻灯片技能生成 HTML 演示稿或社交封面。',
+            '检查版式、标题、截图位和关键信息层级。',
+            '导出图片或演示页，用作小红书封面和正文素材。',
+          ],
+        },
+        'withkynam/vibecode-pro-max-kit': {
+          scenarios: [
+            '给氛围编程和产品原型开发补上规格、记忆和上下文管理。',
+            '适合产品负责人把想法变成连续迭代的智能体工作台。',
+            '适合做选题：如何避免人工智能越写越乱、上下文越跑越偏。',
+          ],
+          steps: [
+            '先写清楚产品目标、用户场景和验收标准。',
+            '用工具包里的规格和记忆模板组织上下文。',
+            '让智能体按任务阶段生成、修改、检查代码。',
+            '每轮迭代后更新规格和记忆，避免上下文腐化。',
+          ],
+        },
+        'reflex-dev/reflex': {
+          scenarios: [
+            '用 Python 快速做一个可交互网页应用。',
+            '适合数据分析、内部工具、人工智能产品原型和个人项目展示。',
+            '适合不想写大量前端代码但想做网页产品的人。',
+          ],
+          steps: [
+            '安装框架并创建示例应用。',
+            '用 Python 写页面状态、组件和交互逻辑。',
+            '接入你的数据、模型接口或自动化流程。',
+            '本地预览后部署成可分享的网页应用。',
+          ],
+        },
+        'n8n-io/n8n': {
+          scenarios: [
+            '把多个工具串成自动化流程，例如内容采集、资料整理、发布提醒和数据同步。',
+            '适合做“普通人也能搭人工智能工作流”的产品选题。',
+            '适合团队把重复运营任务做成可视化自动化。',
+          ],
+          steps: [
+            '选择自托管或云端方式启动 n8n。',
+            '从触发器开始搭流程，例如定时、表单、网页请求或消息。',
+            '接入人工智能节点和外部工具节点。',
+            '运行一次完整流程，检查每一步输入、输出和失败重试。',
+          ],
+        },
+        'appsmithorg/appsmith': {
+          scenarios: [
+            '快速构建后台、内部工具、审批台、数据看板和运营面板。',
+            '适合把一个开源项目的数据源变成可操作的产品界面。',
+            '适合团队减少重复后台开发工作。',
+          ],
+          steps: [
+            '创建应用并连接数据库或接口。',
+            '拖拽表格、表单、按钮和图表组件。',
+            '绑定查询和操作逻辑。',
+            '设置权限后发布给团队使用。',
+          ],
+        },
+        'stablyai/orca': {
+          scenarios: [
+            '同时管理多路并行编码智能体，适合复杂项目拆分开发。',
+            '适合观察下一代集成开发环境如何支持智能体团队。',
+            '适合对比桌面端和移动端的智能体开发体验。',
+          ],
+          steps: [
+            '安装应用并连接你已有的编码智能体订阅。',
+            '把一个开发需求拆成多个任务分配给不同智能体。',
+            '观察每个智能体的分支、输出和冲突点。',
+            '人工审查后合并可用结果，并记录最适合并行的任务类型。',
+          ],
+        },
+        'freestylefly/wesight': {
+          scenarios: [
+            '在桌面工作区里统一配置 Claude Code、Codex、OpenClaw 和其他智能体。',
+            '适合有多模型、多工具切换需求的开发者。',
+            '适合做选题：个人如何搭建自己的人工智能开发控制台。',
+          ],
+          steps: [
+            '安装桌面工作区并配置模型路由。',
+            '添加常用智能体工具和默认项目目录。',
+            '用同一个任务切换不同模型或智能体执行。',
+            '比较速度、成本、代码质量和上下文保持能力。',
+          ],
+        },
+      };
+
+      const simpleIntroText = {
+        'nexu-io/open-design':
+          '可以把一句想法变成设计稿、网页原型、PPT、图片甚至视频。简单说，它像一个本地版 AI 设计助理，你告诉它想做什么，它帮你出视觉稿和可预览页面。',
+        'superset-sh/superset':
+          '一个给 AI 写代码用的编辑器。你可以同时叫多个 AI 去改代码、写测试、查问题，有点像给自己配了几个会写代码的助手。',
+        'affaan-m/ECC':
+          '一套让 AI 写代码更稳定的经验包。它会告诉你怎么给 AI 分任务、留记忆、加安全规则，避免 AI 越写越乱。',
+        'Lum1104/Understand-Anything':
+          '把复杂代码变成一张能点、能搜、能提问的图。适合看不懂一个大项目时，先让它帮你画出项目结构。',
+        'daytonaio/daytona':
+          '给 AI 生成的代码准备一个安全小房间。AI 写完代码后，可以先在里面跑一跑，避免直接把你的电脑环境搞乱。',
+        'ComposioHQ/composio':
+          '让 AI 不只是聊天，还能真的去操作工具，比如发邮件、查表格、建任务、连 GitHub。适合做自动化助手。',
+        'sickn33/antigravity-awesome-skills':
+          '一个 AI 技能合集。你可以理解成“给编码 AI 装插件”，装完后它更会写文档、改代码、做测试或整理项目。',
+        'wshobson/agents':
+          '也是一个 AI 插件和技能市场，帮你找到适合 Claude Code、Codex、Cursor 等工具的增强包。',
+        'rtk-ai/rtk':
+          '帮你省 AI 使用成本的小工具。它会减少模型使用量，也就是让同样的开发任务少花一点钱。',
+        'wanshuiyin/Auto-claude-code-research-in-sleep':
+          '让 AI 帮你做研究和实验。你把想研究的问题交给它，它可以帮你找想法、互相检查、安排实验。',
+        'Significant-Gravitas/AutoGPT':
+          '老牌 AI 自动做事项目。它代表一种思路：你给 AI 一个目标，它自己拆步骤、找工具、尝试完成。',
+        'yamadashy/repomix':
+          '把一个代码项目打包成一份 AI 更容易读懂的文件。适合你想让 ChatGPT、Claude、Codex 帮你分析整个项目时使用。',
+        'nexu-io/html-anything':
+          '把想法直接变成一个 HTML 页面。你可以拿它做小红书封面、海报、网页原型、报告图，重点是很快能看到效果。',
+        'simonlin1212/a-stock-data':
+          '一套给 AI 或开发者使用的 A 股数据工具。想做股票数据分析、行情看板、AI 投研小工具时可以参考。',
+        'esengine/DeepSeek-Reasonix':
+          '一个在终端里工作的 AI 编程助手，重点是接 DeepSeek，适合长时间帮你看代码、改代码、跑任务。',
+        'getagentseal/codeburn':
+          '帮你看 AI 写代码到底用了多少模型额度、花了多少钱。适合想控制 Claude Code、Codex、Cursor 使用成本的人。',
+        'opensquilla/opensquilla':
+          '一个主打省钱省模型额度的 AI 助手。简单说，就是希望用更少成本，让 AI 做出更聪明的判断。',
+        'OpenOSINT/OpenOSINT':
+          '一个用 AI 做公开信息分析的工具。适合安全研究、资料搜集和信息整理，但只能用于合法授权场景。',
+        'ultraworkers/claw-code':
+          '一个热度非常高的 AI 编程相关项目，适合观察大家为什么突然集中关注某类 AI 写代码工具。',
+        'jdevalk/specification.website':
+          '一份“怎样把网站需求写清楚”的说明书。它帮你把页面、安全、SEO、可访问性这些要求整理成 AI 能看懂的规格。',
+        'withkynam/vibecode-pro-max-kit':
+          '给“用 AI 边想边做产品”的人准备的工具包。它帮你保存需求、上下文和规则，避免 AI 做着做着忘了原来的目标。',
+        'alibaba/open-code-review':
+          '阿里开源的代码评审工具。可以理解成让 AI 和规则一起帮你挑代码问题，比如空指针、线程安全、SQL 注入等。',
+        'AgriciDaniel/claude-obsidian':
+          '把 Obsidian 笔记变成 AI 第二大脑。你丢进去资料，AI 帮你读、分类、链接，整理成自己的知识库。',
+        'Mouseww/anything-analyzer':
+          '一个网络请求分析工具。简单说，它帮你看浏览器和网站之间到底传了什么，也能接 AI 帮你解释。',
+        'crynta/terax-ai':
+          '一个很轻量的终端 AI 开发工作区。适合喜欢在命令行里让 AI 辅助写代码的人。',
+        'google-labs-code/design.md':
+          '一种给 AI 描述设计风格的文件。你把品牌颜色、字体、布局规则写进去，AI 做页面时就不容易跑偏。',
+        'DenisSergeevitch/agents-best-practices':
+          '一份 AI 编程助手经验清单。它告诉你怎么拆任务、写规则、让 AI 更稳定地帮你干活。',
+        'strukto-ai/mirage':
+          '给 AI 用的“虚拟文件柜”。多个 AI 同时改项目时，它能帮忙管理文件，减少互相弄乱。',
+        'op7418/guizang-ppt-skill':
+          '让 AI 帮你做漂亮 HTML PPT 和社交媒体封面。适合把技术内容快速变成可展示的视觉稿。',
+        'study8677/awesome-architecture':
+          '系统设计和架构学习资料合集。适合想学习分布式系统、AI 系统和项目架构的人。',
+        'reflex-dev/reflex':
+          '用 Python 就能做网页应用的框架。不会太多前端也能快速做一个看板、工具或小产品。',
+        'n8n-io/n8n':
+          '可视化自动化工具。你可以像搭积木一样把表格、邮件、AI、数据库串起来，自动完成重复工作。',
+        'appsmithorg/appsmith':
+          '快速搭后台和内部工具的平台。比如运营看板、审批系统、数据管理页面，都可以少写很多代码。',
+        'microsoft/vscode':
+          '大家很熟的 VS Code 编辑器。很多 AI 写代码插件、远程开发和网页编辑能力都围绕它展开。',
+        'stablyai/orca':
+          '一个能同时管理多个 AI 编程助手的工具。适合把一个大需求拆给多个 AI 并行做。',
+        'freestylefly/wesight':
+          '一个桌面版 AI 开发控制台。你可以在里面统一配置不同 AI 工具和模型，少来回切换。',
+        'codecrafters-io/build-your-own-x':
+          '教你从零做出数据库、Git、Docker 这类经典技术。适合想真正理解底层原理的人。',
+        'sindresorhus/awesome':
+          '各种优质资源合集的总目录。适合找灵感、找工具、找学习资料。',
+        'freeCodeCamp/freeCodeCamp':
+          '免费学编程的大型开源课程平台。适合入门编程和计算机基础。',
+        'public-apis/public-apis':
+          '免费 API 大合集。想做小产品但缺数据源，可以先来这里找接口。',
+        'openclaw/openclaw':
+          '一个个人 AI 助手项目，目标是让你在不同系统和平台上都有自己的 AI 助理。',
+        'EbookFoundation/free-programming-books':
+          '免费编程书籍合集。适合找系统学习资料。',
+        'jwasham/coding-interview-university':
+          '软件工程师面试学习路线。适合准备算法、计算机基础和大厂面试。',
+        'donnemartin/system-design-primer':
+          '系统设计入门资料。想理解高并发、大规模系统怎么设计，可以从这里开始。',
+        'nilbuild/developer-roadmap':
+          '开发者成长路线图。告诉你前端、后端、AI、运维等方向该学什么。',
+        'vinta/awesome-python':
+          'Python 工具和库合集。适合找 Python 做数据、爬虫、Web、AI 时能用的轮子。',
+        'torvalds/linux':
+          'Linux 操作系统内核源码。更适合系统底层和操作系统学习者。',
+        'facebook/react':
+          '非常流行的前端界面库，用来做网页和 App 界面。',
+        'practical-tutorials/project-based-learning':
+          '项目式学习教程合集。适合边做项目边学编程。',
+        'awesome-selfhosted/awesome-selfhosted':
+          '可以自己部署的软件合集。适合想搭个人服务、私有云和独立工具的人。',
+      };
+
+      const projectDetailText = {
+        'nexu-io/open-design': {
+          what: '一个本地运行的 AI 设计工具。你输入产品想法，它帮你生成网页原型、App 原型、PPT、封面图、视频等设计稿。',
+          canDo: '可以做小红书封面、产品介绍页、演示稿、网页/手机 App 原型，并且能预览和导出成常见文件。',
+          who: '适合不会设计但想快速做视觉稿的人，也适合产品经理、独立开发者、内容创作者。',
+        },
+        'superset-sh/superset': {
+          what: '一个能同时指挥多个 AI 写代码的代码编辑器。',
+          canDo: '可以把一个开发需求拆给多个 AI：一个改前端、一个写后端、一个写测试，最后你来检查和合并。',
+          who: '适合已经会写代码、想尝试“AI 团队帮我开发”的程序员和技术负责人。',
+        },
+        'esengine/DeepSeek-Reasonix': {
+          what: '一个接入 DeepSeek 的终端 AI 编程助手。',
+          canDo: '可以在命令行里帮你看代码、改代码、解释模块、跑一些开发任务，适合长时间跟着项目走。',
+          who: '适合喜欢用终端工作的开发者，也适合想试 DeepSeek 写代码能力的人。',
+        },
+        'affaan-m/ECC': {
+          what: '一套让 AI 写代码更稳的规则和方法包。',
+          canDo: '可以帮你设计任务拆分、记忆、规则、安全检查，让 Claude Code、Codex、Cursor 这类工具更不容易乱跑。',
+          who: '适合已经在重度使用 AI 写代码的人，尤其是想把 AI 编程流程标准化的人。',
+        },
+        'Lum1104/Understand-Anything': {
+          what: '一个把代码项目变成知识图谱的工具。',
+          canDo: '可以把一个陌生项目画成可点击的结构图，让你搜索模块、查看关系、向代码库提问。',
+          who: '适合想快速看懂开源项目的人，也适合团队新人学习项目结构。',
+        },
+        'daytonaio/daytona': {
+          what: '一个给 AI 运行代码的安全环境。',
+          canDo: 'AI 写出的代码可以先放在隔离环境里运行、测试、看日志，避免污染你的电脑。',
+          who: '适合做 AI 代码执行、在线编程、自动修复、代码评测等产品的人。',
+        },
+        'ComposioHQ/composio': {
+          what: '一个让 AI 连接真实工具的平台。',
+          canDo: '可以让 AI 操作表格、邮件、任务系统、GitHub 等工具，不只是回答问题，而是真的帮你办事。',
+          who: '适合想做 AI 助手、自动化流程、企业工具集成的人。',
+        },
+        'sickn33/antigravity-awesome-skills': {
+          what: '一个 AI 编程技能合集。',
+          canDo: '里面有很多可以安装给 Claude Code、Codex、Cursor 使用的技能，让 AI 更会写文档、修代码、做测试。',
+          who: '适合想给自己的 AI 编程工具“装插件”的人。',
+        },
+        'wshobson/agents': {
+          what: '一个 AI 插件和技能市场。',
+          canDo: '可以帮你找到适合不同 AI 编程工具的插件，比如项目分析、文档、测试、自动化脚本。',
+          who: '适合经常在 Claude Code、Codex、Cursor、OpenCode 之间切换的人。',
+        },
+        'getagentseal/codeburn': {
+          what: '一个查看 AI 编程花费的成本看板。',
+          canDo: '可以看到一次改代码、写测试、生成页面分别花了多少模型额度和多少钱。',
+          who: '适合经常用 AI 写代码、担心成本失控的人或团队。',
+        },
+        'rtk-ai/rtk': {
+          what: '一个帮你减少 AI 使用费用的命令行工具。',
+          canDo: '它会优化一些开发命令，让同样的 AI 编程任务少消耗模型额度。',
+          who: '适合每天大量用 AI 编程、想控制成本的开发者。',
+        },
+        'yamadashy/repomix': {
+          what: '一个把整个代码项目打包给 AI 看的工具。',
+          canDo: '它能把很多文件整理成一份 AI 更容易理解的内容，方便你让 ChatGPT、Claude、Codex 分析整个项目。',
+          who: '适合想让 AI 帮忙读大型项目、做代码审查或写项目说明的人。',
+        },
+        'nexu-io/html-anything': {
+          what: '一个让 AI 直接生成 HTML 页面的小工具。',
+          canDo: '可以快速做小红书封面、海报、落地页、数据报告和网页原型，并能预览效果。',
+          who: '适合内容创作者、独立开发者、产品经理，用来快速把想法变成能看的页面。',
+        },
+        'strukto-ai/mirage': {
+          what: '一个给 AI 使用的虚拟文件系统。',
+          canDo: '多个 AI 同时处理同一个项目时，它可以帮忙管理文件和上下文，减少互相改乱。',
+          who: '适合做多 AI 协作、代码沙盒、长任务自动化的人。',
+        },
+        'op7418/guizang-ppt-skill': {
+          what: '一个让 AI 生成漂亮 HTML 幻灯片和封面的技能。',
+          canDo: '可以把项目介绍、技术方案、内容脚本变成演示稿、社交封面或图片提示词。',
+          who: '适合做技术内容、小红书封面、课程材料和产品路演的人。',
+        },
+        'n8n-io/n8n': {
+          what: '一个像搭积木一样做自动化的工具。',
+          canDo: '可以把表格、邮件、AI、数据库、通知工具串起来，自动完成重复工作。',
+          who: '适合运营、内容创作者、独立开发者和小团队做自动化。',
+        },
+        'appsmithorg/appsmith': {
+          what: '一个快速做后台和内部工具的平台。',
+          canDo: '可以拖拽出表格、表单、看板，再连接数据库或接口，做成团队内部工具。',
+          who: '适合需要做管理后台、数据看板、审批系统的人。',
+        },
+        'reflex-dev/reflex': {
+          what: '一个用 Python 做网页应用的框架。',
+          canDo: '不用写太多前端，也能做交互页面、数据看板、AI 小工具。',
+          who: '适合会 Python、但不想深学前端的人。',
+        },
+        'stablyai/orca': {
+          what: '一个管理多个 AI 编程助手的开发工具。',
+          canDo: '可以把一个大需求拆给多个 AI 同时做，再由你检查结果。',
+          who: '适合想尝试“一个人指挥多个 AI 开发”的程序员。',
+        },
+        'freestylefly/wesight': {
+          what: '一个桌面版 AI 开发控制台。',
+          canDo: '可以统一配置 Claude Code、Codex、OpenClaw 等工具，减少来回切换。',
+          who: '适合同时使用多个 AI 编程工具的人。',
+        },
+      };
+
+      const simplePlaybookText = {
+        'nexu-io/open-design': {
+          scenarios: [
+            '把一个产品想法快速变成好看的页面、PPT 或封面图。',
+            '做小红书内容时，用它生成项目介绍图、产品原型图、视觉封面。',
+            '适合不会设计但想快速做出“看起来像样”的人。',
+          ],
+          steps: [
+            '先想清楚你要做什么图，比如“介绍一个 GitHub 项目的小红书封面”。',
+            '把主题、风格、尺寸和要出现的文字告诉它。',
+            '看预览效果，不满意就继续让它改颜色、布局和文案。',
+            '导出图片、网页或 PPT，用到笔记里。',
+          ],
+        },
+        'nexu-io/html-anything': {
+          scenarios: [
+            '把一句话变成一个能看的网页或海报。',
+            '适合每天介绍开源项目时快速做配图。',
+            '也适合做产品落地页、活动页、数据报告页的初稿。',
+          ],
+          steps: [
+            '写一句你想要的页面，比如“做一个介绍 AI 写代码工具的封面”。',
+            '选择要生成的类型，比如小红书封面、海报、网页原型。',
+            '让 AI 生成 HTML 页面并预览。',
+            '把不满意的地方继续告诉它修改，最后导出图片或网页。',
+          ],
+        },
+        'superset-sh/superset': {
+          scenarios: [
+            '一个人同时指挥多个 AI 写代码。',
+            '适合处理比较大的需求，比如一个 AI 写前端，一个 AI 写后端，一个 AI 写测试。',
+            '适合观察未来程序员是不是更像“AI 项目经理”。',
+          ],
+          steps: [
+            '准备一个代码项目和一个明确需求。',
+            '把需求拆成几个小任务。',
+            '分别交给不同 AI 助手去做。',
+            '最后你来检查结果、合并代码、决定哪些能用。',
+          ],
+        },
+        'getagentseal/codeburn': {
+          scenarios: [
+            '看看 AI 写代码到底花了多少钱。',
+            '适合经常用 Claude Code、Codex、Cursor 的人控制成本。',
+            '也适合做一期“AI 编程成本账单”内容。',
+          ],
+          steps: [
+            '接入你常用的 AI 编程工具。',
+            '跑几个真实任务，比如改 bug、写测试、生成页面。',
+            '查看每个任务用了多少模型额度、花了多少钱。',
+            '找出最烧钱的环节，减少无用资料或把任务拆小一点。',
+          ],
+        },
+        'n8n-io/n8n': {
+          scenarios: [
+            '把重复工作自动化，比如定时抓资料、整理表格、发通知。',
+            '适合不会写太多代码但想做 AI 自动流程的人。',
+            '也适合做运营、内容、数据同步类小工具。',
+          ],
+          steps: [
+            '选一个重复任务，比如“每天收集 GitHub 项目并发提醒”。',
+            '用可视化节点把触发器、AI、表格、通知工具连起来。',
+            '先手动跑一遍，看看每一步输出对不对。',
+            '没问题后改成定时自动运行。',
+          ],
+        },
+        'appsmithorg/appsmith': {
+          scenarios: [
+            '快速做一个后台页面或数据看板。',
+            '适合公司内部工具，比如审批、运营表、客户管理。',
+            '比从零开发页面更快，适合先验证需求。',
+          ],
+          steps: [
+            '连接数据库或接口。',
+            '拖拽表格、按钮、表单这些组件。',
+            '把按钮和查询逻辑绑起来。',
+            '发布给团队试用，再根据反馈调整。',
+          ],
+        },
+      };
+
+      const toChineseFeature = (feature) => featureText[feature] || feature;
+
+      function toChineseIntro(repo) {
+        if (simpleIntroText[repo.full_name]) return simpleIntroText[repo.full_name];
+        if (repoIntroText[repo.full_name]) return repoIntroText[repo.full_name];
+        const fallback = repo.description || repo.readme_excerpt || '';
+        if (/[\u4e00-\u9fff]/.test(fallback)) return fallback;
+        return '这个项目还没有整理成小白版说明，可以先点开仓库看原始介绍。';
+      }
+
+      function projectDetails(repo) {
+        if (projectDetailText[repo.full_name]) return projectDetailText[repo.full_name];
+        return {
+          what: '这个项目暂时还没有整理出可靠的具体用途，不能只按分类硬猜。',
+          canDo: '建议先点开仓库，看它的演示图、说明文档和最近提交，再决定要不要写。',
+          who: '适合先放进候选池，等补完项目详情后再做成小红书选题。',
+        };
+      }
+
+      function repoPlaybook(repo) {
+        if (simplePlaybookText[repo.full_name]) return simplePlaybookText[repo.full_name];
+
+        const features = repo.features || [];
+        if (features.includes('AI Coding / Agent')) {
+          return {
+            scenarios: [
+              '让 AI 帮你完成一部分写代码工作，比如改 bug、写测试、整理项目。',
+              '适合做“这个工具能不能真的帮普通人提高效率”的选题。',
+            ],
+            steps: [
+              '先找一个小项目，不要一上来就用复杂项目测试。',
+              '告诉 AI 你要它做什么，比如“帮我修这个报错”。',
+              '看它改了哪些文件，有没有乱改。',
+              '能跑通就记录下来，作为你的常用流程。',
+            ],
+          };
+        }
+
+        if (features.includes('Web IDE / Browser Editor')) {
+          return {
+            scenarios: [
+              '不用折腾复杂环境，直接在网页或应用里写代码、看效果。',
+              '适合做“以后写代码会不会越来越像在线办公”的选题。',
+            ],
+            steps: [
+              '打开演示页面或本地应用。',
+              '导入一个小项目。',
+              '改一段文字或样式，看页面能不能马上预览。',
+              '记录它比普通编辑器方便在哪里、不方便在哪里。',
+            ],
+          };
+        }
+
+        if (features.includes('Low-code / No-code')) {
+          return {
+            scenarios: [
+              '少写代码，像搭积木一样做一个小工具。',
+              '适合把脑子里的产品想法先做成能点的 demo。',
+            ],
+            steps: [
+              '先选一个简单场景，比如表单、看板、审批页。',
+              '准备一点示例数据。',
+              '拖拽组件搭页面。',
+              '发布给自己试用，看哪里还别扭。',
+            ],
+          };
+        }
+
+        if (features.includes('Sandbox / Preview')) {
+          return {
+            scenarios: [
+              '让代码先在安全环境里跑一跑，别直接影响你的电脑。',
+              '适合展示“AI 写完代码之后，马上看效果”的过程。',
+            ],
+            steps: [
+              '打开它提供的预览或运行环境。',
+              '放进去一段代码，或者让 AI 生成一段代码。',
+              '点击运行，看页面、日志和报错。',
+              '按报错继续修改，直到能正常跑。',
+            ],
+          };
+        }
+
+        return {
+          scenarios: [
+            '作为选题池，看看最近大家在关注什么新工具。',
+            '适合做项目介绍、工具推荐或同类产品对比。',
+          ],
+          steps: [
+            '先看它是干什么的、有没有演示图。',
+            '判断它解决的是谁的问题。',
+            '能安装就试一下，不能安装就先看截图和说明。',
+            '记录最适合做成小红书截图或标题的亮点。',
+          ],
+        };
+      }
+
+      const compact = (value) => {
+        const number = Number(value || 0);
+        if (number >= 100000000) return `${(number / 100000000).toFixed(1)}亿`;
+        if (number >= 10000) return `${(number / 10000).toFixed(1)}万`;
+        return String(Math.round(number));
+      };
+
+      const shortDate = (value) => (value ? String(value).slice(0, 10) : '未知');
+
+      const escapeHtml = (value) =>
+        String(value ?? '')
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#039;');
+
+      function collectDrafts(data) {
+        return (data.xhs_repos || []).map((repo, index) => {
+          const features = repo.features?.length ? repo.features.map(toChineseFeature) : ['开发者效率'];
+          const intro = toChineseIntro(repo);
+          const delta =
+            repo.delta_stars === null || repo.delta_stars === undefined
+              ? ''
+              : `，最近 ${repo.delta_days} 天新增 ${repo.delta_stars} 个收藏`;
+          const featureLines = features.slice(0, 4).map((feature) => `- ${feature}`).join('\n');
+          return {
+            title: `${repo.name}：好用工具选题`,
+            text: `封面文案：${repo.name}｜${features[0]}\n\n开头：\n今天刷到一个 GitHub 项目 ${repo.full_name}，适合关注 AI 工具和效率工具的朋友收藏。\n\n它是干什么的：\n${intro}\n\n核心功能：\n${featureLines}\n\n为什么现在值得看：\n目前 ${compact(repo.stars)} 个收藏，创建于 ${shortDate(repo.created_at)}，最近仍有更新${delta}。\n\n项目链接：\n${repo.html_url}\n\n标签：\n#GitHub #开源项目 #AI工具 #效率工具 #程序员工具 #开发者工具`,
+            repo,
+            index: index + 1,
+          };
+        });
+      }
+
+      function rankingReason(repo, tabName = state.activeTab) {
+        const features = repo.features?.length ? repo.features.map(toChineseFeature) : ['开发者效率'];
+        if (tabName === 'frontier') {
+          return `为什么值得看：它和「${features.slice(0, 2).join('、')}」有关。简单说，这类项目通常是 AI 圈和技术圈比较早开始研究的方向。`;
+        }
+        if (tabName === 'product_ideas' || tabName === 'drafts') {
+          return `为什么值得看：它不只是技术演示，更像一个可以拿来用、拿来改、拿来做内容的产品点子。`;
+        }
+        if (tabName === 'rising') {
+          return '为什么值得看：它最近涨得比较快，说明可能正在被更多人发现。';
+        }
+        return '为什么值得看：收藏的人很多，说明它已经被大量开发者验证过，适合当成经典案例来学习。';
+      }
+
+      function scoreInfo(repo) {
+        if (state.activeTab === 'frontier') {
+          return [Math.round(repo.scores?.frontier || 0), '大佬关注度'];
+        }
+        if (state.activeTab === 'product_ideas' || state.activeTab === 'drafts') {
+          return [Math.round(repo.scores?.product || 0), '灵感分'];
+        }
+        if (state.activeTab === 'all_time') {
+          return [compact(repo.stars), '总收藏'];
+        }
+        return [repo.star_velocity ?? 0, '每天新增收藏'];
+      }
+
+      function renderSummary(data) {
+        const allRepos = data.all_repos || [];
+        const frontier = data.frontier || [];
+        const productIdeas = data.product_ideas || [];
+        const rising = data.rising || [];
+        const allTime = data.all_time || [];
+        const drafts = data.xhs_repos || [];
+        const topStars = Math.max(0, ...allRepos.map((repo) => Number(repo.stars || 0)));
+        const featureSet = new Set(allRepos.flatMap((repo) => repo.features || []));
+        const latestPush = allRepos
+          .map((repo) => repo.pushed_at)
+          .filter(Boolean)
+          .sort()
+          .at(-1);
+
+        summary.innerHTML = [
+          ['日报日期', data.date || '未知', '今天的数据'],
+          ['候选项目', allRepos.length, '从 GitHub 找到的'],
+          ['大佬在看', frontier.length, 'AI 圈早期信号'],
+          ['产品灵感', productIdeas.length, '能拿来用或改造'],
+          ['正在变火', rising.length, '最近涨得快'],
+          ['经典项目', allTime.length, `最高 ${compact(topStars)} 个收藏`],
+          ['草稿', drafts.length, `${featureSet.size} 类工具类型`],
+        ]
+          .map(
+            ([label, value, note]) => `
+              <article class="metric">
+                <span>${escapeHtml(label)}</span>
+                <strong>${escapeHtml(value)}</strong>
+                <small>${escapeHtml(note)}</small>
+              </article>
+            `,
+          )
+          .join('');
+
+        subtitle.textContent = `日报日期 ${data.date || '未知'} · 最近项目更新 ${shortDate(latestPush)}`;
+      }
+
+      function getReposForTab() {
+        if (!state.data) return [];
+        if (state.activeTab === 'frontier') return state.data.frontier || [];
+        if (state.activeTab === 'product_ideas') return state.data.product_ideas || [];
+        if (state.activeTab === 'all_time') return state.data.all_time || [];
+        if (state.activeTab === 'drafts') return state.data.xhs_repos || [];
+        return state.data.rising || [];
+      }
+
+      function repoSearchText(repo) {
+        const details = projectDetails(repo);
+        return [
+          repo.full_name,
+          toChineseIntro(repo),
+          details.what,
+          details.canDo,
+          details.who,
+          repo.language,
+          repo.license,
+          rankingReason(repo),
+          ...(repo.features || []).map(toChineseFeature),
+          ...(repo.features || []),
+          ...(repo.topics || []),
+        ]
+          .join(' ')
+          .toLowerCase();
+      }
+
+      function sortedRepos(repos) {
+        const withRank = repos.map((repo, index) => ({ ...repo, _rank: index + 1 }));
+        const filtered = withRank.filter((repo) => repoSearchText(repo).includes(state.query));
+        if (state.sort === 'stars') {
+          return filtered.sort((a, b) => Number(b.stars || 0) - Number(a.stars || 0));
+        }
+        if (state.sort === 'velocity') {
+          return filtered.sort((a, b) => Number(b.star_velocity || 0) - Number(a.star_velocity || 0));
+        }
+        if (state.sort === 'recent') {
+          return filtered.sort((a, b) => String(b.pushed_at || '').localeCompare(String(a.pushed_at || '')));
+        }
+        return filtered.sort((a, b) => a._rank - b._rank);
+      }
+
+      function renderRepos() {
+        const repos = sortedRepos(getReposForTab());
+        const titleMap = {
+          frontier: '大佬在看榜',
+          product_ideas: '产品灵感榜',
+          rising: '正在变火榜',
+          all_time: '经典项目榜',
+          drafts: '发帖草稿关联项目',
+        };
+        listTitle.textContent = titleMap[state.activeTab];
+        resultCount.textContent = `${repos.length} 个项目`;
+
+        if (!repos.length) {
+          repoList.innerHTML = '<div class="empty">没有匹配的项目。</div>';
+          return;
+        }
+
+        repoList.innerHTML = repos
+          .map((repo) => {
+            const features = repo.features?.length ? repo.features.map(toChineseFeature) : ['待确认'];
+            const delta =
+              repo.delta_stars === null || repo.delta_stars === undefined
+                ? '还没有连续增长记录'
+                : `${repo.delta_days} 天新增 ${repo.delta_stars} 个收藏`;
+            const [scoreValue, scoreLabel] = scoreInfo(repo);
+            const playbook = repoPlaybook(repo);
+            const details = projectDetails(repo);
+            return `
+              <article class="repo-row">
+                <div class="rank">${String(repo._rank).padStart(2, '0')}</div>
+                <div class="repo-main">
+                  <h3 class="repo-title">
+                    <a href="${escapeHtml(repo.html_url)}" target="_blank" rel="noreferrer">${escapeHtml(repo.full_name)}</a>
+                    <span class="badge">${escapeHtml(repo.language || '未知语言')}</span>
+                  </h3>
+                  <p class="description">${escapeHtml(toChineseIntro(repo))}</p>
+                  <div class="detail-grid">
+                    <section class="detail-item">
+                      <strong>具体是什么</strong>
+                      <p>${escapeHtml(details.what)}</p>
+                    </section>
+                    <section class="detail-item">
+                      <strong>能做什么</strong>
+                      <p>${escapeHtml(details.canDo)}</p>
+                    </section>
+                    <section class="detail-item">
+                      <strong>适合谁用</strong>
+                      <p>${escapeHtml(details.who)}</p>
+                    </section>
+                  </div>
+                  <div class="playbook">
+                    <section class="playbook-block">
+                      <h4>可以怎么用</h4>
+                      <ul>
+                        ${playbook.scenarios.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
+                      </ul>
+                    </section>
+                    <section class="playbook-block">
+                      <h4>怎么试</h4>
+                      <ol>
+                        ${playbook.steps.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
+                      </ol>
+                    </section>
+                  </div>
+                  <div class="features">
+                    ${features.map((feature) => `<span>${escapeHtml(feature)}</span>`).join('')}
+                  </div>
+                  <div class="meta">
+                    <span>★ ${compact(repo.stars)} 收藏</span>
+                    <span>⑂ ${compact(repo.forks)} 次复制改造</span>
+                    <span>创建 ${shortDate(repo.created_at)}</span>
+                    <span>更新 ${shortDate(repo.pushed_at)}</span>
+                    <span>${escapeHtml(delta)}</span>
+                  </div>
+                </div>
+                <div class="repo-score">
+                  <div class="score">
+                    <strong>${escapeHtml(scoreValue)}</strong>
+                    <span>${escapeHtml(scoreLabel)}</span>
+                  </div>
+                  <a class="small-link" href="${escapeHtml(repo.html_url)}" target="_blank" rel="noreferrer">打开项目 ↗</a>
+                </div>
+              </article>
+            `;
+          })
+          .join('');
+      }
+
+      function renderDrafts() {
+        const drafts = collectDrafts(state.data || {});
+        draftCount.textContent = `${drafts.length} 篇`;
+        if (!drafts.length) {
+          draftList.innerHTML = '<div class="empty">暂无草稿。</div>';
+          return;
+        }
+
+        draftList.innerHTML = drafts
+          .map(
+            (draft) => `
+              <article class="draft">
+                <button type="button" data-copy="${draft.index}" title="复制草稿">
+                  <strong>${escapeHtml(draft.index)}. ${escapeHtml(draft.title)}</strong>
+                  <span>复制</span>
+                </button>
+                <pre>${escapeHtml(draft.text)}</pre>
+              </article>
+            `,
+          )
+          .join('');
+      }
+
+      function render() {
+        if (!state.data) return;
+        renderSummary(state.data);
+        renderRepos();
+        renderDrafts();
+      }
+
+      async function loadData() {
+        repoList.innerHTML = '<div class="empty">正在读取 output/latest.json...</div>';
+        try {
+          const response = await fetch('output/latest.json', { cache: 'no-store' });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          state.data = await response.json();
+          render();
+        } catch (error) {
+          summary.innerHTML = '';
+          subtitle.textContent = '没有读取到日报数据';
+          repoList.innerHTML = `
+            <div class="error">
+              读取 output/latest.json 失败：${escapeHtml(error.message)}<br />
+              请先运行 python3 scripts/github_xhs_daily.py run，然后用本地服务器打开这个页面。
+            </div>
+          `;
+          draftList.innerHTML = '<div class="empty">暂无草稿。</div>';
+        }
+      }
+
+      document.querySelectorAll('.tabs button').forEach((button) => {
+        button.addEventListener('click', () => {
+          state.activeTab = button.dataset.tab;
+          document.querySelectorAll('.tabs button').forEach((item) => {
+            item.setAttribute('aria-selected', String(item === button));
+          });
+          renderRepos();
+        });
+      });
+
+      $('#searchInput').addEventListener('input', (event) => {
+        state.query = event.target.value.trim().toLowerCase();
+        renderRepos();
+      });
+
+      $('#sortSelect').addEventListener('change', (event) => {
+        state.sort = event.target.value;
+        renderRepos();
+      });
+
+      $('#reloadButton').addEventListener('click', loadData);
+
+      draftList.addEventListener('click', async (event) => {
+        const button = event.target.closest('button[data-copy]');
+        if (!button) return;
+        const drafts = collectDrafts(state.data || {});
+        const draft = drafts.find((item) => String(item.index) === button.dataset.copy);
+        if (!draft) return;
+        await navigator.clipboard.writeText(draft.text);
+        const oldText = button.querySelector('span').textContent;
+        button.querySelector('span').textContent = '已复制';
+        setTimeout(() => {
+          button.querySelector('span').textContent = oldText;
+        }, 1200);
+      });
+
+      loadData();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,47 @@
+{
+  "timezone": "Asia/Shanghai",
+  "history_path": "data/repo_history.json",
+  "output_dir": "output",
+  "per_page": 40,
+  "pages": 1,
+  "frontier_limit": 15,
+  "product_limit": 15,
+  "top_limit": 15,
+  "rising_limit": 15,
+  "xhs_count": 5,
+  "max_readmes": 12,
+  "readme_excerpt_chars": 700,
+  "rising_max_age_days": 180,
+  "request_interval_seconds": 6.5,
+  "request_timeout_seconds": 60,
+  "retries": 2,
+  "all_time_queries": [
+    "stars:>=80000 archived:false",
+    "topic:developer-tools stars:>=10000 archived:false",
+    "web-ide stars:>=5000 archived:false",
+    "code-editor stars:>=5000 archived:false"
+  ],
+  "rising_queries": [
+    "created:>={date_60} stars:>=20 archived:false ai-coding",
+    "created:>={date_60} stars:>=20 archived:false coding-agent",
+    "created:>={date_60} stars:>=20 archived:false web-ide",
+    "created:>={date_60} stars:>=20 archived:false code-editor",
+    "created:>={date_60} stars:>=20 archived:false mcp"
+  ],
+  "frontier_queries": [
+    "created:>={date_90} stars:>=50 archived:false coding-agent",
+    "created:>={date_90} stars:>=50 archived:false mcp server",
+    "created:>={date_90} stars:>=50 archived:false claude-code",
+    "created:>={date_90} stars:>=50 archived:false cursor ide",
+    "created:>={date_90} stars:>=50 archived:false agent framework",
+    "pushed:>={date_14} stars:>=1000 archived:false ai agent developer-tools"
+  ],
+  "product_queries": [
+    "created:>={date_90} stars:>=30 archived:false web app ai coding",
+    "created:>={date_90} stars:>=30 archived:false app builder ai",
+    "created:>={date_90} stars:>=30 archived:false prototype ai",
+    "created:>={date_90} stars:>=30 archived:false html editor agent",
+    "created:>={date_90} stars:>=30 archived:false design coding agent",
+    "created:>={date_90} stars:>=30 archived:false dashboard ai tool"
+  ]
+}
