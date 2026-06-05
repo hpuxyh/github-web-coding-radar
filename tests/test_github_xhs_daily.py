@@ -28,6 +28,39 @@ class GithubXhsDailyTests(unittest.TestCase):
         self.assertIn("Web IDE / Browser Editor", features)
         self.assertIn("Sandbox / Preview", features)
 
+    def test_extract_readme_examples_from_usage_section(self):
+        readme = """
+# Demo Project
+
+Some intro text.
+
+## Quick start
+
+Run this command to create your first app:
+
+```bash
+npx demo create my-app
+cd my-app
+```
+
+Open the preview and change the prompt.
+
+### Advanced options
+
+Only read this when you need custom settings.
+
+## License
+
+MIT
+"""
+        examples = daily.extract_readme_examples(readme)
+        self.assertEqual(len(examples), 1)
+        self.assertEqual(examples[0]["title"], "Quick start")
+        self.assertIn("create your first app", examples[0]["body"])
+        self.assertNotIn("Advanced options", examples[0]["body"])
+        self.assertIn("npx demo create my-app", examples[0]["code"])
+        self.assertEqual(examples[0]["source"], "README")
+
     def test_score_repo_uses_history_delta(self):
         run_date = dt.date(2026, 6, 5)
         history = {

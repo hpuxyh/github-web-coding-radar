@@ -419,6 +419,130 @@ def first_readme_excerpt(text: str | None, max_chars: int) -> str:
     return excerpt[:max_chars].strip()
 
 
+EXAMPLE_HEADING_KEYWORDS = [
+    "quick start",
+    "quickstart",
+    "getting started",
+    "usage",
+    "example",
+    "examples",
+    "demo",
+    "try it",
+    "how to use",
+    "run",
+    "快速开始",
+    "开始使用",
+    "使用方法",
+    "用法",
+    "示例",
+    "例子",
+    "演示",
+]
+
+
+def heading_parts(line: str) -> tuple[int, str] | None:
+    match = re.match(r"^(#{1,6})\s+(.+?)\s*$", line.strip())
+    if not match:
+        return None
+    title = clean_markdown(match.group(2)).strip()
+    return len(match.group(1)), title
+
+
+def looks_like_example_heading(title: str) -> bool:
+    normalized = title.lower()
+    return any(keyword in normalized for keyword in EXAMPLE_HEADING_KEYWORDS)
+
+
+def clean_example_text(line: str) -> str:
+    line = line.strip()
+    line = re.sub(r"^[-*+]\s+", "", line)
+    line = re.sub(r"^\d+[.)]\s+", "", line)
+    line = clean_markdown(line)
+    return line.strip()
+
+
+def compact_example_body(lines: list[str], max_chars: int = 260) -> str:
+    cleaned: list[str] = []
+    for raw_line in lines:
+        line = raw_line.strip()
+        if not line or line.startswith("```"):
+            continue
+        if heading_parts(line):
+            continue
+        if re.search(r"!\[[^\]]*\]\([^)]+\)|<img|badge|shields|\.svg|\.png|\.gif", line, re.I):
+            continue
+        text = clean_example_text(line)
+        if text:
+            cleaned.append(text)
+        if sum(len(item) for item in cleaned) >= max_chars:
+            break
+    body = " ".join(cleaned)
+    return body[:max_chars].strip()
+
+
+def extract_first_code_block(lines: list[str], max_chars: int = 360) -> str:
+    in_block = False
+    code_lines: list[str] = []
+    for raw_line in lines:
+        line = raw_line.rstrip()
+        if line.strip().startswith("```"):
+            if in_block and code_lines:
+                break
+            in_block = not in_block
+            continue
+        if in_block:
+            if line.strip():
+                code_lines.append(line)
+            if sum(len(item) for item in code_lines) >= max_chars:
+                break
+    code = "\n".join(code_lines).strip()
+    return code[:max_chars].strip()
+
+
+def extract_readme_examples(text: str | None, limit: int = 2) -> list[dict[str, str]]:
+    if not text:
+        return []
+
+    lines = text.splitlines()
+    examples: list[dict[str, str]] = []
+    for index, line in enumerate(lines):
+        heading = heading_parts(line)
+        if not heading:
+            continue
+        level, title = heading
+        if level == 1:
+            continue
+        if not looks_like_example_heading(title):
+            continue
+
+        section_lines: list[str] = []
+        for following in lines[index + 1 :]:
+            next_heading = heading_parts(following)
+            if next_heading and next_heading[0] <= level:
+                break
+            section_lines.append(following)
+            if len(section_lines) >= 36:
+                break
+
+        body = compact_example_body(section_lines)
+        code = extract_first_code_block(section_lines)
+        if not body and not code:
+            continue
+
+        examples.append(
+            {
+                "title": title[:60],
+                "body": body,
+                "code": code,
+                "source": "README",
+            }
+        )
+        if len(examples) >= limit:
+            break
+
+    return examples
+
+
 def normalize_repo(item: dict[str, Any], source: str, query: str) -> dict[str, Any]:
     owner = item.get("owner") or {}
     license_info = item.get("license") or {}
@@ -444,6 +568,7 @@ def normalize_repo(item: dict[str, Any], source: str, query: str) -> dict[str, A
         "sources": [source],
         "queries": [query],
         "readme_excerpt": "",
+        "examples": [],
         "features": [],
         "scores": {},
         "notes": [],
@@ -904,9 +1029,9 @@ def enrich_repositories(
 
     for repo in repos:
         if repo["full_name"] in readme_targets:
-            repo["readme_excerpt"] = first_readme_excerpt(
-                client.get_readme_text(repo["full_name"]), readme_chars
-            )
+            readme_text = client.get_readme_text(repo["full_name"])
+            repo["readme_excerpt"] = first_readme_excerpt(readme_text, readme_chars)
+            repo["examples"] = extract_readme_examples(readme_text)
         repo["features"] = infer_features(repo)
         score_repo(repo, history, run_date)
 

@@ -468,6 +468,12 @@
         overflow: hidden;
       }
 
+      .example-list {
+        display: grid;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
       .example > summary {
         display: flex;
         align-items: center;
@@ -486,7 +492,7 @@
 
       .example > summary::after {
         content: "▸";
-        margin-left: auto;
+        margin-left: 4px;
         transition: transform 0.18s ease;
       }
 
@@ -513,6 +519,30 @@
         color: #3a4a43;
         line-height: 1.6;
         font-size: 0.88rem;
+      }
+
+      .example-source {
+        margin-left: auto;
+        color: var(--muted);
+        font-size: 0.75rem;
+        font-weight: 650;
+      }
+
+      .example pre {
+        margin: 0;
+        padding: 11px 13px 12px;
+        border-top: 1px solid rgba(33, 181, 115, 0.14);
+        background: rgba(255, 255, 255, 0.74);
+        color: #23342d;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-size: 0.8rem;
+        line-height: 1.5;
+      }
+
+      .example code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
       }
 
       .edge {
@@ -1644,6 +1674,59 @@
           .replaceAll('"', '&quot;')
           .replaceAll("'", '&#039;');
 
+      function normalizeExampleEntry(entry) {
+        if (!entry) return null;
+        if (typeof entry === 'string') {
+          return { title: '举个例子', body: entry, code: '', source: '简化示例' };
+        }
+        const title = String(entry.title || entry.name || '项目里的示例').trim();
+        const body = String(entry.body || entry.text || entry.description || '').trim();
+        const code = String(entry.code || '').trim();
+        const source = String(entry.source || 'README').trim();
+        if (!body && !code) return null;
+        return { title, body, code, source };
+      }
+
+      function repoExamples(repo) {
+        const extracted = Array.isArray(repo.examples)
+          ? repo.examples.map(normalizeExampleEntry).filter(Boolean)
+          : [];
+        const manual = normalizeExampleEntry(projectExampleText[repo.full_name]);
+        const combined = [];
+        if (manual) combined.push(manual);
+        for (const example of extracted) {
+          const repeated = combined.some(
+            (item) => item.body === example.body || (item.code && item.code === example.code),
+          );
+          if (!repeated) combined.push(example);
+        }
+        return combined.slice(0, 2);
+      }
+
+      function renderExampleBlocks(repo) {
+        const examples = repoExamples(repo);
+        if (!examples.length) return '';
+        return `
+          <div class="example-list">
+            ${examples
+              .map(
+                (example, index) => `
+                  <details class="example" ${index === 0 ? 'open' : ''}>
+                    <summary>
+                      <span class="example-tag">${index === 0 ? '项目里的示例' : '更多示例'}</span>
+                      <span>${escapeHtml(example.title || '点开看具体用法')}</span>
+                      <span class="example-source">${escapeHtml(example.source || 'README')}</span>
+                    </summary>
+                    ${example.body ? `<p>${escapeHtml(example.body)}</p>` : ''}
+                    ${example.code ? `<pre><code>${escapeHtml(example.code)}</code></pre>` : ''}
+                  </details>
+                `,
+              )
+              .join('')}
+          </div>
+        `;
+      }
+
       function collectDrafts(data) {
         return (data.xhs_repos || []).map((repo, index) => {
           const features = repo.features?.length ? repo.features.map(toChineseFeature) : ['开发者效率'];
@@ -1748,6 +1831,7 @@
           details.what,
           details.canDo,
           details.who,
+          ...repoExamples(repo).flatMap((example) => [example.title, example.body, example.code]),
           repo.language,
           repo.license,
           rankingReason(repo),
@@ -1796,18 +1880,17 @@
             const features = repo.features?.length ? repo.features.map(toChineseFeature) : ['待确认'];
             const playbook = repoPlaybook(repo);
             const details = projectDetails(repo);
-            const example = projectExampleText[repo.full_name];
             const edge = projectEdgeText[repo.full_name];
             return `
               <article class="repo-row">
                 <div class="rank">${String(repo._rank).padStart(2, '0')}</div>
                 <div class="repo-main">
                   <h3 class="repo-title">
-                    <span class="repo-name">项目 ${repo._rank}</span>
+                    <span class="repo-name">${escapeHtml(repo.full_name || `项目 ${repo._rank}`)}</span>
                     <span class="badge">${escapeHtml(heatBadge(repo))}</span>
                   </h3>
                   <p class="description">${escapeHtml(toChineseIntro(repo))}</p>
-                  ${example ? `<details class="example"><summary><span class="example-tag">举个例子</span>点开看它具体怎么用</summary><p>${escapeHtml(example)}</p></details>` : ''}
+                  ${renderExampleBlocks(repo)}
                   <div class="detail-grid">
                     <section class="detail-item">
                       <strong>这是什么</strong>
