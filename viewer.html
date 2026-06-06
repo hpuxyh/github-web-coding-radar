@@ -1810,6 +1810,104 @@
           .replaceAll('"', '&quot;')
           .replaceAll("'", '&#039;');
 
+      const friendlyProjectNameText = {
+        'nexu-io/open-design': 'AI 设计助手',
+        'superset-sh/superset': 'AI 代码工作台',
+        'daytonaio/daytona': 'AI 代码安全运行箱',
+        'Lum1104/Understand-Anything': '代码看懂助手',
+        'ComposioHQ/composio': 'AI 工具连接器',
+        'zhayujie/CowAgent': 'AI 自动办事助手',
+        'esengine/DeepSeek-Reasonix': '省钱版 AI 编程助手',
+        'sickn33/antigravity-awesome-skills': 'AI 技能库',
+        'wshobson/agents': 'AI 插件市场',
+        'rtk-ai/rtk': 'AI 费用节省工具',
+        'getagentseal/codeburn': 'AI 编程账单管家',
+        'bytedance/deer-flow': 'AI 研究和写作助手',
+        'can1357/oh-my-pi': '终端里的 AI 编程助手',
+        'alirezarezvani/claude-skills': 'AI 技能合集',
+        'jeecgboot/JeecgBoot': '低代码搭系统工具',
+        'nexu-io/html-anything': '一句话生成网页工具',
+        'op7418/guizang-social-card-skill': '小红书封面生成技能',
+        'DenisSergeevitch/agents-best-practices': 'AI 助手最佳实践包',
+        'nexu-io/html-video': '网页变视频工具',
+        'op7418/guizang-ppt-skill': 'AI 做 PPT 技能',
+        'withkynam/vibecode-pro-max-kit': 'AI 编程记忆助手',
+        'appsmithorg/appsmith': '内部工具搭建器',
+        'study8677/awesome-architecture': '架构学习资料库',
+        'OpenCoworkAI/open-codesign': '开源 AI 设计助手',
+        'reflex-dev/reflex': 'Python 做网页应用工具',
+        'EKKOLearnAI/hermes-web-ui': 'AI 助手管理面板',
+        'MediatorSpeak/dota2-gameplay-tools': '游戏数据可视化工具',
+        'safishamsi/graphify': 'AI 编程技能助手',
+        'stablyai/orca': '多 AI 编程工作台',
+        'refinedev/refine': '后台系统开发框架',
+        'HKUDS/Vibe-Trading': 'AI 模拟交易助手',
+        'wanshuiyin/Auto-claude-code-research-in-sleep': '睡觉也能做研究的 AI 助手',
+        'MemPalace/mempalace': 'AI 长期记忆工具',
+        'rohitg00/ai-engineering-from-scratch': 'AI 工程实战教程',
+        'open-multi-agent/open-multi-agent': '多 AI 分工协作工具',
+        'NateBJones-Projects/OB1': '个人知识大脑',
+        'lintsinghua/claude-code-book': 'Claude Code 原理书',
+        'crynta/terax-ai': '轻量级终端 AI 开发环境',
+        'Gitlawb/openclaude': '可换模型的 AI 编程助手',
+        'jackwener/OpenCLI': '把网站变成命令的工具',
+        'walkinglabs/learn-harness-engineering': 'AI 工程入门教程',
+        'heygen-com/hyperframes': '用网页代码做视频',
+        'google-antigravity/antigravity-sdk-python': 'Google AI 智能体开发包',
+        'JCodesMore/ai-website-cloner-template': 'AI 克隆网站模板',
+        'jnMetaCode/superpowers-zh': '中文 AI 编程技能包',
+        'affaan-m/ECC': 'AI 编程流程优化包',
+        'Significant-Gravitas/AutoGPT': '自动任务 AI 助手',
+        'NousResearch/hermes-agent': '会成长的 AI 助手',
+        'huggingface/transformers': '大模型工具箱',
+        'ollama/ollama': '本地跑大模型工具',
+        'f/prompts.chat': 'AI 提示词大全',
+        'langgenius/dify': 'AI 工作流搭建平台',
+        'langchain-ai/langchain': 'AI 应用开发平台',
+        'open-webui/open-webui': '本地 AI 聊天界面',
+        'firecrawl/firecrawl': '网页抓取工具',
+        'rasbt/LLMs-from-scratch': '从零学大模型教程',
+        'browser-use/browser-use': 'AI 操作网页工具',
+        'puppeteer/puppeteer': '浏览器自动化工具',
+        'vllm-project/vllm': '大模型加速服务',
+        'TauricResearch/TradingAgents': 'AI 金融交易框架',
+      };
+
+      function featureBasedName(repo) {
+        const features = repo.features || [];
+        if (features.includes('Low-code / No-code')) return '不用写代码的搭应用工具';
+        if (features.includes('Web IDE / Browser Editor')) return '网页里的写代码工具';
+        if (features.includes('Sandbox / Preview')) return '代码运行和预览工具';
+        if (features.includes('MCP / Tool Calling')) return 'AI 工具连接器';
+        if (features.includes('AI Coding / Agent')) return 'AI 编程助手';
+        if (features.includes('Deploy / Cloud')) return '一键发布工具';
+        if (features.includes('Testing / Quality')) return '代码检查工具';
+        return '值得看看的一款工具';
+      }
+
+      function cleanFriendlyName(value) {
+        return String(value || '')
+          .replace(/^这是?一个/, '')
+          .replace(/^这是?一套/, '')
+          .replace(/^这是?一本/, '')
+          .replace(/^一个/, '')
+          .replace(/^一套/, '')
+          .replace(/^一本/, '')
+          .replace(/[。.!！；;：:].*$/, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
+
+      function displayProjectName(repo) {
+        if (friendlyProjectNameText[repo.full_name]) return friendlyProjectNameText[repo.full_name];
+        const details = projectDetails(repo);
+        const fromDetails = cleanFriendlyName(details.what);
+        if (fromDetails && /[\u4e00-\u9fff]/.test(fromDetails)) {
+          return fromDetails.length > 18 ? `${fromDetails.slice(0, 18)}…` : fromDetails;
+        }
+        return featureBasedName(repo);
+      }
+
       function normalizeExampleEntry(entry) {
         if (!entry) return null;
         if (typeof entry === 'string') {
@@ -1981,14 +2079,15 @@
         return (data.xhs_repos || []).map((repo, index) => {
           const features = repo.features?.length ? repo.features.map(toChineseFeature) : ['开发者效率'];
           const intro = toChineseIntro(repo);
+          const friendlyName = displayProjectName(repo);
           const delta =
             repo.delta_stars === null || repo.delta_stars === undefined
               ? ''
               : `，最近 ${repo.delta_days} 天新增 ${repo.delta_stars} 个收藏`;
           const featureLines = features.slice(0, 4).map((feature) => `- ${feature}`).join('\n');
           return {
-            title: `${repo.name}：好用工具选题`,
-            text: `封面文案：${repo.name}｜${features[0]}\n\n开头：\n今天刷到一个 GitHub 项目 ${repo.full_name}，适合关注 AI 工具和效率工具的朋友收藏。\n\n它是干什么的：\n${intro}\n\n核心功能：\n${featureLines}\n\n为什么现在值得看：\n目前 ${compact(repo.stars)} 个收藏，创建于 ${shortDate(repo.created_at)}，最近仍有更新${delta}。\n\n项目链接：\n${repo.html_url}\n\n标签：\n#GitHub #开源项目 #AI工具 #效率工具 #程序员工具 #开发者工具`,
+            title: `${friendlyName}：好用工具选题`,
+            text: `封面文案：${friendlyName}｜${features[0]}\n\n开头：\n今天刷到一个开源项目「${friendlyName}」，适合关注 AI 工具和效率工具的朋友收藏。\n\n它是干什么的：\n${intro}\n\n核心功能：\n${featureLines}\n\n为什么现在值得看：\n目前 ${compact(repo.stars)} 个收藏，创建于 ${shortDate(repo.created_at)}，最近仍有更新${delta}。\n\n项目链接：\n${repo.html_url}\n\n标签：\n#开源项目 #AI工具 #效率工具 #程序员工具 #开发者工具`,
             repo,
             index: index + 1,
           };
@@ -2076,6 +2175,7 @@
       function repoSearchText(repo) {
         const details = projectDetails(repo);
         return [
+          displayProjectName(repo),
           repo.full_name,
           toChineseIntro(repo),
           details.what,
@@ -2136,12 +2236,13 @@
             const playbook = repoPlaybook(repo);
             const details = projectDetails(repo);
             const edge = projectEdgeText[repo.full_name];
+            const friendlyName = displayProjectName(repo);
             return `
               <article class="repo-row">
                 <div class="rank">${String(repo._rank).padStart(2, '0')}</div>
                 <div class="repo-main">
                   <h3 class="repo-title">
-                    <span class="repo-name">${escapeHtml(repo.full_name || `项目 ${repo._rank}`)}</span>
+                    <span class="repo-name">${escapeHtml(friendlyName || `项目 ${repo._rank}`)}</span>
                     <span class="badge">${escapeHtml(heatBadge(repo))}</span>
                   </h3>
                   <p class="description">${escapeHtml(toChineseIntro(repo))}</p>
