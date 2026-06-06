@@ -29,7 +29,7 @@ export const projects = [
     status: '可以使用',
     publishedAt: '2026-06-06',
     repoUrl: 'https://github.com/hpuxyh/github-web-coding-radar',
-    liveUrl: 'https://hpuxyh.github.io/github-web-coding-radar/',
+    liveUrl: 'https://github-web-coding-radar.pages.dev/',
     problem:
       '每天网上都会冒出很多新工具，一个个找很费时间，也很容易错过真正有意思的项目。',
     preview: {
