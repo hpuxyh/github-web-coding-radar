@@ -21,6 +21,33 @@ export const githubSnapshot = {
 
 export const projects = [
   {
+    id: 'github-remix-community',
+    name: 'GitHub 项目改造社区',
+    repoName: 'github-web-coding-radar',
+    type: '项目升级说明',
+    category: 'content',
+    status: '已发布说明页',
+    publishedAt: '2026-06-07',
+    repoUrl: 'https://github.com/hpuxyh/github-web-coding-radar',
+    liveUrl: './remix-community.html',
+    problem:
+      '小白和 web coding 玩家能看到很多 GitHub 项目，但经常不知道哪个能改、怎么跑、怎么改、怎么展示。',
+    preview: {
+      title: '项目改造社区',
+      subtitle: '从发现项目到改造成作品',
+      items: ['项目发现', '小白解释', '改造包', '作品展示'],
+    },
+    summary:
+      '这个方向把每日项目雷达升级成“发现项目 + 小白改造 + 作品展示”的社区。',
+    details:
+      '页面讲清楚为什么做、增长在哪里、为什么值得做、为什么能做出来，以及第一版应该先提供哪些能力。',
+    techIntro:
+      '背后先复用已有的项目发现、README 摘要、中文解释和静态发布流程，再逐步增加可改造指数、改造包和作品提交。',
+    tags: ['小白改造', 'GitHub 项目', '作品展示', '可行性说明'],
+    accent: '#1d6fae',
+    featured: true,
+  },
+  {
     id: 'expert-sources-radar',
     name: '人物关注项目雷达',
     repoName: 'github-web-coding-radar',
@@ -246,6 +273,15 @@ export const projects = [
 ];
 
 export const repoCatalog = [
+  {
+    name: 'GitHub 项目改造社区',
+    description: '把 GitHub 项目转成小白能理解、能改造、能展示的作品。',
+    language: '产品说明',
+    updatedAt: '2026-06-07',
+    kind: '我的项目',
+    repoUrl: './remix-community.html',
+    highlighted: true,
+  },
   {
     name: '每日好项目雷达',
     description: '每天帮你找值得关注的新项目。',
