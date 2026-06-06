@@ -68,7 +68,7 @@
         z-index: 10;
         top: 0;
         display: grid;
-        grid-template-columns: minmax(220px, 1fr) auto;
+        grid-template-columns: minmax(220px, 1fr);
         gap: 16px;
         align-items: center;
         padding: 14px 0 18px;
@@ -106,46 +106,6 @@
         margin: 5px 0 0;
         color: var(--muted);
         font-size: 0.94rem;
-      }
-
-      .top-actions {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-        gap: 8px;
-      }
-
-      .icon-button,
-      .link-button {
-        min-height: 38px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        border: 1px solid var(--line);
-        border-radius: 10px;
-        background: var(--panel);
-        color: var(--ink);
-        cursor: pointer;
-        text-decoration: none;
-        box-shadow: 0 1px 2px rgba(31, 70, 50, 0.05);
-        transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
-      }
-
-      .icon-button {
-        width: 42px;
-      }
-
-      .link-button {
-        padding: 0 13px;
-        font-weight: 750;
-      }
-
-      .icon-button:hover,
-      .link-button:hover {
-        border-color: rgba(33, 181, 115, 0.55);
-        background: rgba(33, 181, 115, 0.10);
-        transform: translateY(-1px);
       }
 
       .summary-grid {
@@ -870,10 +830,6 @@
           grid-template-columns: 1fr;
         }
 
-        .top-actions {
-          justify-content: flex-start;
-        }
-
         .summary-grid,
         .controls {
           grid-template-columns: 1fr;
@@ -921,11 +877,6 @@
             <h1>每天帮你找好项目</h1>
             <p class="subtitle" id="subtitle">正在读取日报数据...</p>
           </div>
-        </div>
-        <div class="top-actions">
-          <button class="icon-button" id="reloadButton" type="button" title="重新读取" aria-label="重新读取">↻</button>
-          <a class="link-button" href="output/latest.md" target="_blank" rel="noreferrer">看原文</a>
-          <a class="link-button" href="output/latest.json" target="_blank" rel="noreferrer">原始数据</a>
         </div>
       </header>
 
@@ -2386,8 +2337,6 @@
         state.sort = event.target.value;
         renderRepos();
       });
-
-      $('#reloadButton').addEventListener('click', loadData);
 
       draftList.addEventListener('click', async (event) => {
         const button = event.target.closest('button[data-copy]');
