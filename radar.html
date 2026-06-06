@@ -390,37 +390,63 @@
 
       .beginner-difficulty {
         margin-top: 12px;
-        padding: 12px;
         border: 1px solid rgba(214, 145, 42, 0.22);
         border-radius: 11px;
         background: rgba(214, 145, 42, 0.06);
+        overflow: hidden;
       }
 
-      .beginner-heading {
+      .beginner-summary {
         display: flex;
-        align-items: baseline;
+        align-items: center;
         justify-content: space-between;
-        gap: 10px;
-        margin-bottom: 10px;
+        gap: 12px;
+        padding: 12px;
+        list-style: none;
+        cursor: pointer;
       }
 
-      .beginner-heading h4 {
-        margin: 0;
+      .beginner-summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .beginner-title {
         color: #7a4a12;
         font-size: 0.88rem;
+        font-weight: 850;
         line-height: 1.2;
       }
 
-      .beginner-heading span {
-        color: #7a6351;
-        font-size: 0.76rem;
-        font-weight: 700;
+      .beginner-summary-meta {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 6px;
+        margin-left: auto;
+      }
+
+      .beginner-summary::after {
+        content: "⌄";
+        flex: 0 0 auto;
+        color: #8a560f;
+        font-size: 1.05rem;
+        line-height: 1;
+        transition: transform 0.18s ease;
+      }
+
+      .beginner-difficulty[open] .beginner-summary::after {
+        transform: rotate(180deg);
+      }
+
+      .beginner-difficulty[open] .beginner-summary {
+        border-bottom: 1px solid rgba(214, 145, 42, 0.16);
       }
 
       .difficulty-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 10px;
+        padding: 10px;
       }
 
       .difficulty-item {
@@ -462,6 +488,11 @@
       .difficulty-level.level-5 {
         background: rgba(224, 90, 79, 0.12);
         color: #a13a2f;
+      }
+
+      .difficulty-level.overall {
+        background: rgba(122, 74, 18, 0.12);
+        color: #7a4a12;
       }
 
       .difficulty-item p {
@@ -978,9 +1009,12 @@
           grid-template-columns: 1fr;
         }
 
-        .beginner-heading {
+        .beginner-summary {
           align-items: flex-start;
-          flex-direction: column;
+        }
+
+        .beginner-summary-meta {
+          justify-content: flex-start;
         }
 
         .detail-grid {
@@ -2337,6 +2371,8 @@
 
       function renderDifficultyBlock(repo) {
         const difficulty = beginnerDifficulty(repo);
+        const overallLevel = Math.max(difficulty.install.level, difficulty.use.level);
+        const overallLabel = difficultyLabels[overallLevel];
         const renderItem = (title, item) => `
           <section class="difficulty-item">
             <div class="difficulty-top">
@@ -2350,16 +2386,20 @@
           </section>
         `;
         return `
-          <section class="beginner-difficulty">
-            <div class="beginner-heading">
-              <h4>纯小白上手难度</h4>
-              <span>安装部署 + 功能操作</span>
-            </div>
+          <details class="beginner-difficulty">
+            <summary class="beginner-summary">
+              <span class="beginner-title">纯小白上手难度</span>
+              <span class="beginner-summary-meta">
+                <span class="difficulty-level overall level-${overallLevel}">总体：${escapeHtml(overallLabel)}</span>
+                <span class="difficulty-level level-${difficulty.install.level}">安装：${escapeHtml(difficulty.install.label)}</span>
+                <span class="difficulty-level level-${difficulty.use.level}">操作：${escapeHtml(difficulty.use.label)}</span>
+              </span>
+            </summary>
             <div class="difficulty-grid">
               ${renderItem('安装部署复杂度', difficulty.install)}
               ${renderItem('功能操作难度', difficulty.use)}
             </div>
-          </section>
+          </details>
         `;
       }
 
