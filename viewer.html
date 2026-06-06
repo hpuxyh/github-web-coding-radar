@@ -434,34 +434,22 @@
         margin-top: 10px;
       }
 
-      .example > summary {
+      .example-header {
         display: flex;
         align-items: center;
         gap: 8px;
         padding: 10px 12px;
-        list-style: none;
-        cursor: pointer;
+        border-bottom: 1px solid rgba(33, 181, 115, 0.2);
         color: #1f7a52;
         font-weight: 700;
         font-size: 0.88rem;
       }
 
-      .example > summary::-webkit-details-marker {
-        display: none;
-      }
-
-      .example > summary::after {
-        content: "▸";
-        margin-left: 4px;
-        transition: transform 0.18s ease;
-      }
-
-      .example[open] > summary::after {
-        transform: rotate(90deg);
-      }
-
-      .example[open] > summary {
-        border-bottom: 1px solid rgba(33, 181, 115, 0.2);
+      .example-title {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
       .example-tag {
@@ -615,13 +603,6 @@
           min-height: 18px;
           transform: rotate(90deg);
         }
-      }
-
-      .example-source {
-        margin-left: auto;
-        color: var(--muted);
-        font-size: 0.75rem;
-        font-weight: 650;
       }
 
       .example pre {
@@ -1913,7 +1894,7 @@
             source: '生成示意',
           });
         }
-        return combined.slice(0, 2);
+        return combined.slice(0, 1);
       }
 
       function generatedVisualText(repo, example) {
@@ -1987,41 +1968,35 @@
       function renderExampleBlocks(repo) {
         const examples = repoExamples(repo);
         if (!examples.length) return '';
-        const hasRealImages = examples.some((example) => example.images?.length);
+        const example = examples[0];
+        const hasRealImages = Boolean(example.images?.length);
         return `
           <div class="example-list">
-            ${examples
-              .map(
-                (example, index) => `
-                  <details class="example" ${index === 0 ? 'open' : ''}>
-                    <summary>
-                      <span class="example-tag">${index === 0 ? '项目里的示例' : '更多示例'}</span>
-                      <span>${escapeHtml(example.title || '点开看具体用法')}</span>
-                      <span class="example-source">${escapeHtml(example.source || 'README')}</span>
-                    </summary>
-                    ${
-                      example.images?.length
-                        ? `<div class="example-media">
-                            ${example.images
-                              .map(
-                                (image) => `
-                                  <figure>
-                                    <img src="${escapeHtml(image.url)}" alt="${escapeHtml(image.alt || '项目示例图')}" loading="${index === 0 ? 'eager' : 'lazy'}" decoding="async" referrerpolicy="no-referrer" onerror="this.closest('figure').hidden = true" />
-                                    <figcaption>${escapeHtml(image.alt || '项目示例图')}</figcaption>
-                                  </figure>
-                                `,
-                              )
-                              .join('')}
-                          </div>`
-                        : ''
-                    }
-                    ${!hasRealImages && !example.images?.length ? renderGeneratedVisual(repo, example) : ''}
-                    ${example.body ? `<p>${escapeHtml(example.body)}</p>` : ''}
-                    ${example.code ? `<pre><code>${escapeHtml(example.code)}</code></pre>` : ''}
-                  </details>
-                `,
-              )
-              .join('')}
+            <section class="example">
+              <div class="example-header">
+                <span class="example-tag">项目示例</span>
+                <span class="example-title">${escapeHtml(example.title || '具体用法')}</span>
+              </div>
+              ${
+                example.images?.length
+                  ? `<div class="example-media">
+                      ${example.images
+                        .map(
+                          (image) => `
+                            <figure>
+                              <img src="${escapeHtml(image.url)}" alt="${escapeHtml(image.alt || '项目示例图')}" loading="eager" decoding="async" referrerpolicy="no-referrer" onerror="this.closest('figure').hidden = true" />
+                              <figcaption>${escapeHtml(image.alt || '项目示例图')}</figcaption>
+                            </figure>
+                          `,
+                        )
+                        .join('')}
+                    </div>`
+                  : ''
+              }
+              ${!hasRealImages && !example.images?.length ? renderGeneratedVisual(repo, example) : ''}
+              ${example.body ? `<p>${escapeHtml(example.body)}</p>` : ''}
+              ${example.code ? `<pre><code>${escapeHtml(example.code)}</code></pre>` : ''}
+            </section>
           </div>
         `;
       }
