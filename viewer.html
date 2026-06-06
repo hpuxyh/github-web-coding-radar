@@ -1776,8 +1776,13 @@
 
       const shortDate = (value) => (value ? String(value).slice(0, 10) : '未知');
 
-      const escapeHtml = (value) =>
+      const stripEmoji = (value) =>
         String(value ?? '')
+          .replace(/[\u{1F1E6}-\u{1F1FF}\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]\uFE0F?/gu, '')
+          .replace(/[\uFE0F\u200D]/g, '');
+
+      const escapeHtml = (value) =>
+        stripEmoji(value)
           .replaceAll('&', '&amp;')
           .replaceAll('<', '&lt;')
           .replaceAll('>', '&gt;')
@@ -2045,9 +2050,9 @@
 
       function collectDrafts(data) {
         return (data.xhs_repos || []).map((repo, index) => {
-          const features = repo.features?.length ? repo.features.map(toChineseFeature) : ['开发者效率'];
-          const intro = toChineseIntro(repo);
-          const friendlyName = displayProjectName(repo);
+          const features = repo.features?.length ? repo.features.map((feature) => stripEmoji(toChineseFeature(feature))) : ['开发者效率'];
+          const intro = stripEmoji(toChineseIntro(repo));
+          const friendlyName = stripEmoji(displayProjectName(repo));
           const delta =
             repo.delta_stars === null || repo.delta_stars === undefined
               ? ''
@@ -2077,10 +2082,10 @@
       }
 
       function heatBadge(repo, tabName = state.activeTab) {
-        if (tabName === 'frontier') return '🔥 早期信号';
-        if (tabName === 'product_ideas' || tabName === 'drafts') return '💡 产品灵感';
-        if (tabName === 'all_time') return '⭐ 经典之作';
-        return '📈 正在变火';
+        if (tabName === 'frontier') return '早期信号';
+        if (tabName === 'product_ideas' || tabName === 'drafts') return '产品灵感';
+        if (tabName === 'all_time') return '经典之作';
+        return '正在变火';
       }
 
       // 把更新时间说成人话：最近更新过就标“还在更新”，否则给一个大概时间。
@@ -2268,14 +2273,14 @@
                     </div>
                   </details>
                   ${edge ? `<section class="edge">
-                    <h4>✦ 它强在哪？为什么 Codex、Claude Code 替不了</h4>
+                    <h4>它强在哪？为什么 Codex、Claude Code 替不了</h4>
                     <ul>${edge.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
                   </section>` : ''}
                   <div class="features">
                     ${features.map((feature) => `<span>${escapeHtml(feature)}</span>`).join('')}
                   </div>
                   <div class="meta">
-                    <span>❤️ ${compact(repo.stars)} 人收藏</span>
+                    <span>${compact(repo.stars)} 人收藏</span>
                     <span>${escapeHtml(freshnessText(repo))}</span>
                   </div>
                 </div>
