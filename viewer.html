@@ -5,23 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="GitHub 好项目日报浏览器，帮你发现大佬在看什么、最近有什么实用产品灵感。"
+      content="每天帮你找好项目，自动筛出 AI 前沿趋势、实用产品灵感和热门开源项目。"
     />
-    <title>GitHub 好项目雷达</title>
+    <title>每天帮你找好项目</title>
     <style>
       :root {
-        color-scheme: dark;
-        --bg: #111315;
-        --panel: #191d20;
-        --panel-2: #20262a;
-        --ink: #f3f5f2;
-        --muted: #aab3ad;
-        --line: rgba(255, 255, 255, 0.11);
-        --blue: #65c7f2;
-        --green: #8bd685;
-        --amber: #f0b85f;
-        --red: #ff7c70;
-        --shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+        color-scheme: light;
+        --bg: #f3f9f5;
+        --panel: #ffffff;
+        --panel-2: #f1f7f3;
+        --ink: #1f2d28;
+        --muted: #6c7d76;
+        --line: rgba(24, 60, 44, 0.10);
+        --blue: #2b9fd6;
+        --green: #21b573;
+        --amber: #d6912a;
+        --red: #e05a4f;
+        --shadow: 0 12px 32px rgba(31, 70, 50, 0.08);
+        --radius: 14px;
         font-family:
           Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
           "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
@@ -39,10 +40,11 @@
         min-width: 320px;
         margin: 0;
         background:
-          linear-gradient(180deg, rgba(101, 199, 242, 0.09), transparent 320px),
-          linear-gradient(135deg, rgba(139, 214, 133, 0.07), transparent 360px),
+          radial-gradient(1100px 520px at 12% -8%, rgba(33, 181, 115, 0.12), transparent 60%),
+          radial-gradient(900px 480px at 92% -6%, rgba(43, 159, 214, 0.12), transparent 60%),
           var(--bg);
         color: var(--ink);
+        -webkit-font-smoothing: antialiased;
       }
 
       button,
@@ -66,12 +68,12 @@
         z-index: 10;
         top: 0;
         display: grid;
-        grid-template-columns: minmax(220px, 1fr) auto;
+        grid-template-columns: minmax(220px, 1fr);
         gap: 16px;
         align-items: center;
         padding: 14px 0 18px;
-        background: linear-gradient(180deg, rgba(17, 19, 21, 0.97), rgba(17, 19, 21, 0.82));
-        backdrop-filter: blur(16px);
+        background: linear-gradient(180deg, rgba(243, 249, 245, 0.96), rgba(243, 249, 245, 0.72));
+        backdrop-filter: blur(14px);
       }
 
       .brand {
@@ -106,43 +108,6 @@
         font-size: 0.94rem;
       }
 
-      .top-actions {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-        gap: 8px;
-      }
-
-      .icon-button,
-      .link-button {
-        min-height: 38px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.06);
-        color: var(--ink);
-        cursor: pointer;
-        text-decoration: none;
-      }
-
-      .icon-button {
-        width: 42px;
-      }
-
-      .link-button {
-        padding: 0 13px;
-        font-weight: 750;
-      }
-
-      .icon-button:hover,
-      .link-button:hover {
-        border-color: rgba(101, 199, 242, 0.62);
-        background: rgba(101, 199, 242, 0.12);
-      }
-
       .summary-grid {
         display: grid;
         grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -154,8 +119,15 @@
         min-height: 96px;
         padding: 16px;
         border: 1px solid var(--line);
-        border-radius: 8px;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+        border-radius: var(--radius);
+        background: linear-gradient(180deg, #ffffff, #f3faf6);
+        box-shadow: var(--shadow);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+      }
+
+      .metric:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 16px 36px rgba(31, 70, 50, 0.12);
       }
 
       .metric span {
@@ -167,7 +139,7 @@
       .metric strong {
         display: block;
         margin-top: 7px;
-        color: #fff;
+        color: var(--ink);
         font-size: clamp(1.3rem, 2.5vw, 2rem);
         line-height: 1;
       }
@@ -175,7 +147,7 @@
       .metric small {
         display: block;
         margin-top: 7px;
-        color: rgba(243, 245, 242, 0.66);
+        color: var(--muted);
       }
 
       .controls {
@@ -195,10 +167,18 @@
         width: 100%;
         height: 44px;
         border: 1px solid var(--line);
-        border-radius: 8px;
-        background: #171b1e;
+        border-radius: 11px;
+        background: var(--panel);
         color: var(--ink);
         outline: 0;
+        box-shadow: 0 1px 2px rgba(31, 70, 50, 0.05);
+        transition: border-color 0.18s ease, box-shadow 0.18s ease;
+      }
+
+      .search input:focus,
+      select:focus {
+        border-color: rgba(33, 181, 115, 0.6);
+        box-shadow: 0 0 0 3px rgba(33, 181, 115, 0.14);
       }
 
       .search input {
@@ -224,29 +204,38 @@
         gap: 6px;
         padding: 5px;
         border: 1px solid var(--line);
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.04);
+        border-radius: 12px;
+        background: var(--panel);
+        box-shadow: 0 1px 2px rgba(31, 70, 50, 0.05);
       }
 
       .tabs button {
         min-height: 34px;
         min-width: 92px;
         border: 0;
-        border-radius: 7px;
+        border-radius: 9px;
         background: transparent;
         color: var(--muted);
         cursor: pointer;
+        font-weight: 650;
+        transition: background 0.18s ease, color 0.18s ease;
+      }
+
+      .tabs button:hover {
+        background: rgba(33, 181, 115, 0.08);
+        color: var(--ink);
       }
 
       .tabs button[aria-selected="true"] {
-        background: #e9f1ea;
-        color: #111315;
-        font-weight: 850;
+        background: linear-gradient(135deg, var(--green), var(--blue));
+        color: #ffffff;
+        font-weight: 800;
+        box-shadow: 0 4px 12px rgba(33, 181, 115, 0.28);
       }
 
       .content-layout {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) 360px;
+        grid-template-columns: minmax(0, 1fr);
         gap: 16px;
         align-items: start;
       }
@@ -254,9 +243,10 @@
       .list,
       .side-panel {
         border: 1px solid var(--line);
-        border-radius: 8px;
-        background: rgba(25, 29, 32, 0.82);
+        border-radius: var(--radius);
+        background: var(--panel);
         box-shadow: var(--shadow);
+        overflow: hidden;
       }
 
       .list-header,
@@ -291,6 +281,11 @@
         gap: 14px;
         padding: 16px;
         border-bottom: 1px solid var(--line);
+        transition: background 0.16s ease;
+      }
+
+      .repo-row:hover {
+        background: rgba(33, 181, 115, 0.045);
       }
 
       .repo-row:last-child {
@@ -302,9 +297,9 @@
         height: 42px;
         display: grid;
         place-items: center;
-        border-radius: 8px;
-        background: rgba(101, 199, 242, 0.14);
-        color: var(--blue);
+        border-radius: 11px;
+        background: linear-gradient(135deg, rgba(33, 181, 115, 0.16), rgba(43, 159, 214, 0.16));
+        color: #197a52;
         font-weight: 900;
       }
 
@@ -322,12 +317,19 @@
       }
 
       .repo-title a {
-        color: #f8fbf8;
+        color: var(--ink);
         text-decoration: none;
+        font-weight: 750;
       }
 
       .repo-title a:hover {
-        color: var(--blue);
+        color: var(--green);
+      }
+
+      .repo-name {
+        color: var(--ink);
+        font-weight: 800;
+        font-size: 1.04rem;
       }
 
       .badge {
@@ -335,24 +337,26 @@
         display: inline-flex;
         align-items: center;
         padding: 0 8px;
-        border-radius: 8px;
-        background: rgba(139, 214, 133, 0.13);
-        color: #bdf2b8;
+        border-radius: 999px;
+        background: rgba(33, 181, 115, 0.12);
+        color: #157a4d;
         font-size: 0.76rem;
         font-weight: 800;
       }
 
       .description {
         margin: 8px 0 0;
-        color: rgba(243, 245, 242, 0.78);
+        color: #41524b;
         line-height: 1.56;
       }
 
       .reason {
         margin: 9px 0 0;
-        padding-left: 10px;
-        border-left: 3px solid rgba(139, 214, 133, 0.58);
-        color: #cce8c9;
+        padding: 8px 12px;
+        border-left: 3px solid var(--green);
+        border-radius: 0 10px 10px 0;
+        background: rgba(33, 181, 115, 0.07);
+        color: #2c6f4e;
         line-height: 1.55;
       }
 
@@ -365,42 +369,270 @@
 
       .detail-item {
         padding: 12px;
-        border: 1px solid rgba(101, 199, 242, 0.18);
-        border-radius: 8px;
-        background: rgba(101, 199, 242, 0.055);
+        border: 1px solid rgba(43, 159, 214, 0.2);
+        border-radius: 11px;
+        background: rgba(43, 159, 214, 0.06);
       }
 
       .detail-item strong {
         display: block;
         margin-bottom: 7px;
-        color: #d9f4ff;
+        color: #1d6f97;
         font-size: 0.82rem;
       }
 
       .detail-item p {
         margin: 0;
-        color: rgba(243, 245, 242, 0.8);
+        color: #44544c;
         line-height: 1.55;
         font-size: 0.86rem;
+      }
+
+      .expert-signals {
+        margin-top: 12px;
+        padding: 12px;
+        border: 1px solid rgba(33, 181, 115, 0.2);
+        border-radius: 11px;
+        background: rgba(33, 181, 115, 0.06);
+      }
+
+      .expert-signals-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .expert-signals-header strong {
+        color: #12734d;
+        font-size: 0.88rem;
+      }
+
+      .expert-signals-header span {
+        color: #61736c;
+        font-size: 0.8rem;
+        font-weight: 750;
+      }
+
+      .expert-signals p {
+        margin: 8px 0 0;
+        color: #40584d;
+        line-height: 1.55;
+        font-size: 0.86rem;
+      }
+
+      .expert-signal-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 10px;
+      }
+
+      .expert-signal-list a,
+      .expert-signal-list span {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        min-height: 25px;
+        padding: 0 8px;
+        border: 1px solid rgba(33, 181, 115, 0.2);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.72);
+        color: #176f4b;
+        text-decoration: none;
+        font-size: 0.78rem;
+        font-weight: 760;
+      }
+
+      .expert-signal-list a:hover {
+        border-color: rgba(33, 181, 115, 0.45);
+        color: #0f7a50;
+      }
+
+      .beginner-difficulty {
+        margin-top: 12px;
+        border: 1px solid rgba(214, 145, 42, 0.22);
+        border-radius: 11px;
+        background: rgba(214, 145, 42, 0.06);
+        overflow: hidden;
+      }
+
+      .beginner-summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px;
+        list-style: none;
+        cursor: pointer;
+      }
+
+      .beginner-summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .beginner-title {
+        color: #7a4a12;
+        font-size: 0.88rem;
+        font-weight: 850;
+        line-height: 1.2;
+      }
+
+      .beginner-summary-meta {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 6px;
+        margin-left: auto;
+      }
+
+      .beginner-summary::after {
+        content: "⌄";
+        flex: 0 0 auto;
+        color: #8a560f;
+        font-size: 1.05rem;
+        line-height: 1;
+        transition: transform 0.18s ease;
+      }
+
+      .beginner-difficulty[open] .beginner-summary::after {
+        transform: rotate(180deg);
+      }
+
+      .beginner-difficulty[open] .beginner-summary {
+        border-bottom: 1px solid rgba(214, 145, 42, 0.16);
+      }
+
+      .difficulty-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        padding: 10px;
+      }
+
+      .difficulty-item {
+        padding: 11px 12px;
+        border: 1px solid rgba(214, 145, 42, 0.18);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.74);
+      }
+
+      .difficulty-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 7px;
+      }
+
+      .difficulty-top strong {
+        color: var(--ink);
+        font-size: 0.82rem;
+      }
+
+      .difficulty-level {
+        flex: 0 0 auto;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: rgba(33, 181, 115, 0.12);
+        color: #157a4d;
+        font-size: 0.74rem;
+        font-weight: 850;
+      }
+
+      .difficulty-level.level-3 {
+        background: rgba(214, 145, 42, 0.15);
+        color: #8a560f;
+      }
+
+      .difficulty-level.level-4,
+      .difficulty-level.level-5 {
+        background: rgba(224, 90, 79, 0.12);
+        color: #a13a2f;
+      }
+
+      .difficulty-level.overall {
+        background: rgba(122, 74, 18, 0.12);
+        color: #7a4a12;
+      }
+
+      .difficulty-item p {
+        margin: 0;
+        color: #465750;
+        line-height: 1.52;
+        font-size: 0.84rem;
+      }
+
+      .difficulty-item ul {
+        display: grid;
+        gap: 5px;
+        margin: 8px 0 0;
+        padding-left: 18px;
+        color: #647269;
+        line-height: 1.44;
+        font-size: 0.78rem;
+      }
+
+      .usage-details {
+        margin-top: 12px;
+        border: 1px solid rgba(33, 181, 115, 0.24);
+        border-radius: 11px;
+        background: rgba(33, 181, 115, 0.04);
+        overflow: hidden;
+      }
+
+      .usage-summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 14px;
+        list-style: none;
+        cursor: pointer;
+        color: #147a54;
+        font-size: 0.92rem;
+        font-weight: 850;
+      }
+
+      .usage-summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .usage-summary::after {
+        content: "⌄";
+        flex: 0 0 auto;
+        font-size: 1.1rem;
+        line-height: 1;
+        transition: transform 0.18s ease;
+      }
+
+      .usage-details[open] .usage-summary::after {
+        transform: rotate(180deg);
+      }
+
+      .usage-details[open] .usage-summary {
+        border-bottom: 1px solid rgba(33, 181, 115, 0.16);
       }
 
       .playbook {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 10px;
-        margin-top: 12px;
+        margin: 0;
+        padding: 10px;
       }
 
       .playbook-block {
         padding: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.035);
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        background: var(--panel-2);
       }
 
       .playbook-block h4 {
         margin: 0 0 8px;
-        color: #f7faf5;
+        color: var(--ink);
         font-size: 0.82rem;
         line-height: 1.2;
       }
@@ -411,9 +643,237 @@
         gap: 6px;
         margin: 0;
         padding-left: 18px;
-        color: rgba(243, 245, 242, 0.76);
+        color: #4a5a52;
         line-height: 1.5;
         font-size: 0.84rem;
+      }
+
+      .example {
+        margin: 10px 0 0;
+        border: 1px solid rgba(33, 181, 115, 0.28);
+        border-radius: 11px;
+        background: rgba(33, 181, 115, 0.05);
+        overflow: hidden;
+      }
+
+      .example-list {
+        display: grid;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .example-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        border-bottom: 1px solid rgba(33, 181, 115, 0.2);
+        color: #1f7a52;
+        font-weight: 700;
+        font-size: 0.88rem;
+      }
+
+      .example-title {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .example-tag {
+        padding: 1px 9px;
+        border-radius: 999px;
+        background: var(--green);
+        color: #fff;
+        font-size: 0.74rem;
+        font-weight: 800;
+      }
+
+      .example p {
+        margin: 0;
+        padding: 11px 13px;
+        color: #3a4a43;
+        line-height: 1.6;
+        font-size: 0.88rem;
+      }
+
+      .example-media {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 10px;
+        padding: 12px 13px 2px;
+      }
+
+      .example-media figure {
+        margin: 0;
+        border: 1px solid rgba(33, 181, 115, 0.16);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.72);
+        overflow: hidden;
+      }
+
+      .example-media img {
+        display: block;
+        width: 100%;
+        max-height: 260px;
+        object-fit: contain;
+        background: #ffffff;
+      }
+
+      .example-media figcaption {
+        padding: 7px 9px;
+        color: var(--muted);
+        font-size: 0.76rem;
+        line-height: 1.35;
+      }
+
+      .generated-example {
+        margin: 12px 13px 2px;
+        border: 1px solid rgba(43, 159, 214, 0.18);
+        border-radius: 12px;
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(241, 247, 243, 0.92)),
+          radial-gradient(circle at 18% 12%, rgba(33, 181, 115, 0.18), transparent 32%),
+          radial-gradient(circle at 88% 18%, rgba(43, 159, 214, 0.18), transparent 34%);
+        overflow: hidden;
+      }
+
+      .generated-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 12px;
+        border-bottom: 1px solid rgba(43, 159, 214, 0.12);
+      }
+
+      .generated-title {
+        color: var(--ink);
+        font-weight: 850;
+        font-size: 0.88rem;
+      }
+
+      .generated-label {
+        flex: 0 0 auto;
+        border-radius: 999px;
+        padding: 2px 8px;
+        background: rgba(43, 159, 214, 0.12);
+        color: #216f97;
+        font-size: 0.72rem;
+        font-weight: 800;
+      }
+
+      .generated-canvas {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 34px minmax(0, 1fr);
+        gap: 10px;
+        align-items: stretch;
+        padding: 12px;
+      }
+
+      .generated-panel {
+        min-height: 112px;
+        padding: 11px;
+        border: 1px solid rgba(24, 60, 44, 0.1);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.76);
+        box-shadow: 0 8px 18px rgba(31, 70, 50, 0.07);
+      }
+
+      .generated-panel strong {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--muted);
+        font-size: 0.74rem;
+      }
+
+      .generated-panel span {
+        display: block;
+        color: #263c32;
+        font-size: 0.86rem;
+        line-height: 1.45;
+      }
+
+      .generated-arrow {
+        display: grid;
+        place-items: center;
+        color: #1f7a52;
+        font-weight: 950;
+      }
+
+      .generated-output-lines {
+        display: grid;
+        gap: 7px;
+        margin-top: 8px;
+      }
+
+      .generated-output-lines i {
+        display: block;
+        height: 8px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(33, 181, 115, 0.45), rgba(43, 159, 214, 0.32));
+      }
+
+      .generated-output-lines i:nth-child(2) {
+        width: 78%;
+      }
+
+      .generated-output-lines i:nth-child(3) {
+        width: 56%;
+      }
+
+      @media (max-width: 680px) {
+        .generated-canvas {
+          grid-template-columns: 1fr;
+        }
+
+        .generated-arrow {
+          min-height: 18px;
+          transform: rotate(90deg);
+        }
+      }
+
+      .example pre {
+        margin: 0;
+        padding: 11px 13px 12px;
+        border-top: 1px solid rgba(33, 181, 115, 0.14);
+        background: rgba(255, 255, 255, 0.74);
+        color: #23342d;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-size: 0.8rem;
+        line-height: 1.5;
+      }
+
+      .example code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      }
+
+      .edge {
+        margin: 12px 0 0;
+        padding: 12px 14px;
+        border: 1px solid rgba(214, 145, 42, 0.28);
+        border-left: 4px solid var(--amber);
+        border-radius: 11px;
+        background: rgba(214, 145, 42, 0.06);
+      }
+
+      .edge h4 {
+        margin: 0 0 8px;
+        color: #9a6614;
+        font-size: 0.88rem;
+        line-height: 1.3;
+      }
+
+      .edge ul {
+        display: grid;
+        gap: 6px;
+        margin: 0;
+        padding-left: 18px;
+        color: #6a5326;
+        line-height: 1.55;
+        font-size: 0.86rem;
       }
 
       .meta,
@@ -429,26 +889,29 @@
         min-height: 26px;
         display: inline-flex;
         align-items: center;
-        border-radius: 8px;
-        padding: 0 8px;
+        border-radius: 999px;
+        padding: 0 10px;
         font-size: 0.78rem;
       }
 
       .meta span {
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        border: 1px solid var(--line);
+        background: var(--panel-2);
         color: var(--muted);
       }
 
       .features span {
-        background: rgba(240, 184, 95, 0.13);
-        color: #ffd697;
+        background: rgba(214, 145, 42, 0.13);
+        color: #9a6614;
       }
 
       .repo-score {
         display: grid;
         gap: 8px;
         justify-items: end;
-        min-width: 124px;
+        align-content: start;
+        align-items: start;
+        min-width: 96px;
       }
 
       .score {
@@ -457,7 +920,7 @@
 
       .score strong {
         display: block;
-        color: #fff;
+        color: var(--ink);
         font-size: 1.05rem;
       }
 
@@ -471,20 +934,22 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 0 10px;
-        border: 1px solid rgba(101, 199, 242, 0.38);
-        border-radius: 8px;
-        color: var(--blue);
+        padding: 0 12px;
+        border: 1px solid rgba(33, 181, 115, 0.4);
+        border-radius: 999px;
+        color: #157a4d;
         text-decoration: none;
         font-size: 0.82rem;
         font-weight: 800;
+        transition: background 0.18s ease;
       }
 
       .small-link:hover {
-        background: rgba(101, 199, 242, 0.12);
+        background: rgba(33, 181, 115, 0.12);
       }
 
       .side-panel {
+        display: none;
         position: sticky;
         top: 104px;
       }
@@ -496,8 +961,8 @@
       }
 
       .draft {
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 8px;
+        border: 1px solid var(--line);
+        border-radius: 11px;
         background: var(--panel-2);
         overflow: hidden;
       }
@@ -509,11 +974,16 @@
         gap: 12px;
         padding: 12px;
         border: 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        border-bottom: 1px solid var(--line);
         background: transparent;
         color: var(--ink);
         text-align: left;
         cursor: pointer;
+        transition: background 0.16s ease;
+      }
+
+      .draft button:hover {
+        background: rgba(33, 181, 115, 0.07);
       }
 
       .draft button strong {
@@ -525,7 +995,7 @@
         margin: 0;
         padding: 12px;
         overflow: auto;
-        color: rgba(243, 245, 242, 0.82);
+        color: #3a4a43;
         font: 0.82rem/1.58 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
         white-space: pre-wrap;
       }
@@ -538,10 +1008,10 @@
       }
 
       .error {
-        border: 1px solid rgba(255, 124, 112, 0.34);
-        border-radius: 8px;
-        background: rgba(255, 124, 112, 0.09);
-        color: #ffc0ba;
+        border: 1px solid rgba(224, 90, 79, 0.34);
+        border-radius: 11px;
+        background: rgba(224, 90, 79, 0.08);
+        color: #b23a2f;
       }
 
       @media (max-width: 1080px) {
@@ -567,10 +1037,6 @@
         .topbar {
           position: static;
           grid-template-columns: 1fr;
-        }
-
-        .top-actions {
-          justify-content: flex-start;
         }
 
         .summary-grid,
@@ -601,6 +1067,18 @@
           grid-template-columns: 1fr;
         }
 
+        .difficulty-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .beginner-summary {
+          align-items: flex-start;
+        }
+
+        .beginner-summary-meta {
+          justify-content: flex-start;
+        }
+
         .detail-grid {
           grid-template-columns: 1fr;
         }
@@ -617,14 +1095,9 @@
         <div class="brand">
           <div class="brand-mark">榜</div>
           <div>
-            <h1>GitHub 好项目雷达</h1>
+            <h1>每天帮你找好项目</h1>
             <p class="subtitle" id="subtitle">正在读取日报数据...</p>
           </div>
-        </div>
-        <div class="top-actions">
-          <button class="icon-button" id="reloadButton" type="button" title="重新读取" aria-label="重新读取">↻</button>
-          <a class="link-button" href="output/latest.md" target="_blank" rel="noreferrer">看原文</a>
-          <a class="link-button" href="output/latest.json" target="_blank" rel="noreferrer">原始数据</a>
         </div>
       </header>
 
@@ -633,7 +1106,7 @@
       <section class="controls" aria-label="筛选控制">
         <label class="search">
           <span>⌕</span>
-          <input id="searchInput" type="search" placeholder="搜索项目名、用途、语言、关键词" autocomplete="off" />
+          <input id="searchInput" type="search" placeholder="搜索用途、适合人群、关键词" autocomplete="off" />
         </label>
         <select id="sortSelect" aria-label="排序">
           <option value="rank">按榜单排序</option>
@@ -646,7 +1119,7 @@
           <button type="button" role="tab" aria-selected="false" data-tab="product_ideas">产品灵感</button>
           <button type="button" role="tab" aria-selected="false" data-tab="rising">正在变火</button>
           <button type="button" role="tab" aria-selected="false" data-tab="all_time">经典项目</button>
-          <button type="button" role="tab" aria-selected="false" data-tab="drafts">发帖草稿</button>
+          <button type="button" role="tab" aria-selected="false" data-tab="drafts" style="display: none">发帖草稿</button>
         </div>
       </section>
 
@@ -1350,6 +1823,51 @@
         },
       };
 
+      // 一个具体的「输入 → 结果」例子，点开即看，不用跳转。
+      const projectExampleText = {
+        'nexu-io/open-design':
+          '你对它说：「帮我做一张《3 步用 AI 写代码》的小红书竖版封面，主色薄荷绿」。它会直接给你一张排好版的封面图，外加一个能预览的网页版本，文字、配色你都能当场改，满意了一键导出。',
+        'nexu-io/html-anything':
+          '你说：「做一张『今天读了 3 本书』的图文海报」。它直接生成一个 HTML 页面，打开就能看到成品，想换字、换色、换排版改两下就行，截图就能发。',
+        'superset-sh/superset':
+          '你提一个需求「给网站加登录功能」，它同时派出几个 AI：一个写前端页面、一个写后端接口、一个补测试，你只需要最后检查和合并，相当于一个人指挥一支小团队。',
+        'esengine/DeepSeek-Reasonix':
+          '在终端里输入「帮我看下这个报错并修掉」，它接 DeepSeek 一路读代码、定位问题、改完再跑一遍，全程在命令行里，适合挂着让它慢慢干。',
+        'getagentseal/codeburn':
+          '你用 AI 改了一下午代码，打开它一看：今天一共花了 ¥12.7，其中「重构那个模块」单独烧了 ¥6，立刻知道钱花在哪、哪一步最贵。',
+        'Lum1104/Understand-Anything':
+          '丢进一个看不懂的开源项目，它画出一张可点击的结构图：点某个模块就高亮它和谁有关系，还能直接问「这个功能从哪进来的」。',
+      };
+
+      // 为什么通用编码工具（Codex / Claude Code）替代不了它——基于各自定位，不夸大。
+      const projectEdgeText = {
+        'nexu-io/open-design': [
+          '它给的是「能直接用的视觉成品」——封面、原型、PPT、甚至视频；Codex、Claude Code 给的是代码，你还得自己跑起来才看得到东西。',
+          '它是冲着「不会写代码的人」设计的，描述想法就出图；通用编码工具默认你懂开发、看得懂终端。',
+          '所见即所得、可当场预览改稿；通用 agent 偏文本和命令行，改个配色都要绕一圈。',
+        ],
+        'nexu-io/html-anything': [
+          '一句话直接产出「打开就是成品」的 HTML 页面；通用工具通常给你一段代码，还要你自己运行、预览。',
+          '专门为「快速出图、出页面」调过，做封面海报又快又顺手；通用 agent 是写工程代码的,不是做视觉的。',
+        ],
+        'superset-sh/superset': [
+          '能让多个 AI 在同一个项目上并行干活、各管一块;Codex、Claude Code 基本是「一个 AI 一次做一件事」。',
+          '把「拆活、分工、汇总」这套团队流程内置了;通用工具要你自己手动来回切换、自己当调度员。',
+        ],
+        'esengine/DeepSeek-Reasonix': [
+          '绑定 DeepSeek，能用更便宜的模型扛长时间任务;Codex、Claude Code 多半锁定自家模型，跑久了更贵。',
+          '原生在终端里长跑，适合「挂机式」改代码;通用工具更偏一问一答的交互。',
+        ],
+        'getagentseal/codeburn': [
+          '它专门把「每个 AI 任务花了多少额度、多少钱」摊开给你看;Codex、Claude Code 自己一般不告诉你单笔成本。',
+          '能帮你揪出最烧钱的环节去优化;通用工具用着用着账单就上去了,你却不知道贵在哪。',
+        ],
+        'Lum1104/Understand-Anything': [
+          '它把整个项目变成一张能点、能搜、能提问的地图;通用 agent 能读代码,但不会给你一张可导航的全局结构图。',
+          '适合「先看懂再动手」;通用工具更擅长改某个文件,对庞大陌生项目的全貌不够直观。',
+        ],
+      };
+
       const toChineseFeature = (feature) => featureText[feature] || feature;
 
       function toChineseIntro(repo) {
@@ -1456,26 +1974,509 @@
 
       const shortDate = (value) => (value ? String(value).slice(0, 10) : '未知');
 
-      const escapeHtml = (value) =>
+      const stripEmoji = (value) =>
         String(value ?? '')
+          .replace(/[\u{1F1E6}-\u{1F1FF}\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]\uFE0F?/gu, '')
+          .replace(/[\uFE0F\u200D]/g, '');
+
+      const escapeHtml = (value) =>
+        stripEmoji(value)
           .replaceAll('&', '&amp;')
           .replaceAll('<', '&lt;')
           .replaceAll('>', '&gt;')
           .replaceAll('"', '&quot;')
           .replaceAll("'", '&#039;');
 
+      const difficultyLabels = {
+        1: '很低',
+        2: '较低',
+        3: '中等',
+        4: '较高',
+        5: '高',
+      };
+
+      const installSummaries = {
+        1: '基本是打开网页、下载应用或看在线演示就能试，不需要自己搭服务。',
+        2: '通常照着文档走就能开始，可能需要下载应用或准备一个账号。',
+        3: '需要安装依赖、配置账号或 API Key，纯小白要耐心照步骤来。',
+        4: '需要命令行、环境变量、依赖服务或本地运行环境，最好有人带着装。',
+        5: '偏工程基础设施，通常要懂部署、权限、运行环境和报错排查。',
+      };
+
+      const usageSummaries = {
+        1: '功能更像普通软件，点按钮、输入需求或看结果就能上手。',
+        2: '照示例改文字、改参数就能用，主要难点是把自己的需求说清楚。',
+        3: '需要理解项目、文件、提示词或配置之间的关系，适合边试边学。',
+        4: '要会看日志、改配置、处理报错，纯小白容易卡在细节里。',
+        5: '主要面向工程师深度使用，小白更适合先看演示、截图和案例。',
+      };
+
+      const clampDifficulty = (score) => Math.max(1, Math.min(5, Math.round(score)));
+
+      function uniquePush(list, text) {
+        if (text && !list.includes(text)) list.push(text);
+      }
+
+      function repoSignalText(repo) {
+        return stripEmoji(
+          [
+            repo.full_name,
+            repo.name,
+            repo.description,
+            repo.readme_excerpt,
+            repo.homepage,
+            repo.language,
+            ...(repo.features || []),
+            ...(repo.topics || []),
+          ]
+            .filter(Boolean)
+            .join(' ')
+            .toLowerCase(),
+        );
+      }
+
+      function difficultyDefaults(score, type) {
+        if (score <= 2 && type === 'install') {
+          return ['有现成入口或较清晰文档，先试用比自己部署更现实。', '不需要一开始理解完整工程结构。'];
+        }
+        if (score <= 2) {
+          return ['更偏可视化或直接输入需求，学习成本相对低。', '先照项目示例做一遍，就能判断有没有用。'];
+        }
+        if (score === 3 && type === 'install') {
+          return ['大概率要跟着 README 安装依赖或准备账号。', '遇到报错时可能需要搜索或请技术同学帮忙。'];
+        }
+        if (score === 3) {
+          return ['要先理解它解决的具体场景，再照示例操作。', '适合从一个很小的任务开始试，不要直接上复杂项目。'];
+        }
+        if (type === 'install') {
+          return ['不是普通下载即用工具，部署前要看清依赖和运行环境。', '纯小白建议先看在线演示或截图，再决定是否投入安装。'];
+        }
+        return ['使用时常会碰到配置、日志、权限或报错。', '更适合有开发经验的人深度使用，小白可以先当案例学习。'];
+      }
+
+      function beginnerDifficulty(repo) {
+        const features = repo.features || [];
+        const text = repoSignalText(repo);
+        const language = String(repo.language || '').toLowerCase();
+        const installReasons = [];
+        const useReasons = [];
+        let installScore = 3;
+        let useScore = 3;
+
+        const hasOnlineEntry = Boolean(repo.homepage) || /\b(demo|preview|playground|website|web app|browser|vercel|netlify|streamlit|github\.io)\b/.test(text);
+        const hasPackagedEntry = /\b(download|desktop app|native desktop|macos|windows|linux|appimage|release)\b/.test(text);
+        const isVisualNoCodeTool =
+          features.includes('Low-code / No-code') ||
+          /\b(no-code|low-code|template|prototype|design|visual|screenshot|slides|poster|desktop app|html artifacts)\b/.test(text);
+        const hasFriendlyEntry = hasOnlineEntry || hasPackagedEntry;
+        if (hasOnlineEntry) {
+          installScore -= 1;
+          uniquePush(installReasons, '有官网、演示或在线入口，可以先看效果再决定要不要部署。');
+        }
+
+        if (hasPackagedEntry) {
+          installScore -= 1;
+          uniquePush(installReasons, '更像下载安装使用的工具，比自己搭服务友好。');
+        }
+
+        if (features.includes('Low-code / No-code')) {
+          installScore -= 1;
+          useScore -= 1;
+          uniquePush(installReasons, '偏低代码或无代码，通常不需要先懂完整工程。');
+          uniquePush(useReasons, '功能更像搭积木，重点是选模板、填内容、看结果。');
+        }
+
+        if (features.includes('Web IDE / Browser Editor')) {
+          installScore -= 1;
+          useScore -= 0.5;
+          uniquePush(installReasons, '有网页编辑或浏览器工作台，启动门槛比本地工程低。');
+          uniquePush(useReasons, '可以在界面里编辑和预览，适合从小改动开始试。');
+        }
+
+        if (features.includes('AI Coding / Agent')) {
+          installScore += isVisualNoCodeTool ? 0.3 : 1;
+          useScore += isVisualNoCodeTool ? 0.5 : 1;
+          uniquePush(installReasons, '涉及 AI 编程智能体，常要配置模型、项目目录或权限。');
+          uniquePush(useReasons, '要会描述任务、检查改动，并判断 AI 有没有乱改。');
+        }
+
+        if (features.includes('MCP / Tool Calling')) {
+          installScore += isVisualNoCodeTool ? 0.4 : 1;
+          useScore += isVisualNoCodeTool ? 0.5 : 1;
+          uniquePush(installReasons, '涉及工具调用或 MCP，通常要配置外部工具和连接方式。');
+          uniquePush(useReasons, '使用时要理解工具权限、输入输出和失败原因。');
+        }
+
+        if (features.includes('Sandbox / Preview')) {
+          installScore += isVisualNoCodeTool ? 0.3 : 1;
+          useScore += isVisualNoCodeTool ? 0.2 : 0.5;
+          uniquePush(installReasons, '带沙盒或预览环境，安装时可能要准备运行环境。');
+          uniquePush(useReasons, '要看运行结果、日志或报错，不能只看按钮。');
+        }
+
+        if (features.includes('Deploy / Cloud')) {
+          installScore += 1.5;
+          useScore += 1;
+          uniquePush(installReasons, '涉及云端发布或部署，纯小白会遇到账号、权限和环境问题。');
+          uniquePush(useReasons, '真正用起来要理解发布流程、配置和线上状态。');
+        }
+
+        if (features.includes('Testing / Quality')) {
+          useScore += 0.5;
+          uniquePush(useReasons, '测试和质量工具通常要看报告、规则或失败原因。');
+        }
+
+        if (/\b(cli|terminal|command line|api key|env|docker|kubernetes|self-host|server|proxy|runtime|database|oauth|auth|rag|vector|infrastructure|framework)\b/.test(text)) {
+          installScore += isVisualNoCodeTool ? 0.3 : 1;
+          useScore += isVisualNoCodeTool ? 0.2 : 0.5;
+          uniquePush(installReasons, '文档或标签里出现命令行、服务、密钥或部署词，安装不会特别傻瓜。');
+          uniquePush(useReasons, '操作时可能要处理配置、命令、权限或服务状态。');
+        }
+
+        if (isVisualNoCodeTool) {
+          useScore -= 1;
+          uniquePush(useReasons, '更偏原型、设计或模板，具体功能通常能用视觉结果判断。');
+        }
+
+        if (['rust', 'go', 'java', 'c++', 'c', 'swift'].includes(language) && !hasFriendlyEntry) {
+          installScore += 1;
+          uniquePush(installReasons, '底层语言或原生应用项目，对本地环境更挑。');
+        } else if (['typescript', 'javascript', 'python'].includes(language) && !hasFriendlyEntry) {
+          installScore += 0.5;
+          uniquePush(installReasons, '需要常见开发环境，比如 Node.js 或 Python。');
+        } else if (!language || language === 'html') {
+          installScore -= 0.5;
+          uniquePush(installReasons, '语言门槛不明显，先看页面或示例更容易。');
+        }
+
+        const installLevel = clampDifficulty(installScore);
+        const useLevel = clampDifficulty(useScore);
+        const installFinalReasons = installReasons.length ? installReasons.slice(0, 2) : difficultyDefaults(installLevel, 'install');
+        const useFinalReasons = useReasons.length ? useReasons.slice(0, 2) : difficultyDefaults(useLevel, 'use');
+
+        return {
+          install: {
+            level: installLevel,
+            label: difficultyLabels[installLevel],
+            summary: installSummaries[installLevel],
+            reasons: installFinalReasons,
+          },
+          use: {
+            level: useLevel,
+            label: difficultyLabels[useLevel],
+            summary: usageSummaries[useLevel],
+            reasons: useFinalReasons,
+          },
+        };
+      }
+
+      const friendlyProjectNameText = {
+        'nexu-io/open-design': 'AI 设计助手',
+        'superset-sh/superset': 'AI 代码工作台',
+        'daytonaio/daytona': 'AI 代码安全运行箱',
+        'Lum1104/Understand-Anything': '代码看懂助手',
+        'ComposioHQ/composio': 'AI 工具连接器',
+        'zhayujie/CowAgent': 'AI 自动办事助手',
+        'esengine/DeepSeek-Reasonix': '省钱版 AI 编程助手',
+        'sickn33/antigravity-awesome-skills': 'AI 技能库',
+        'wshobson/agents': 'AI 插件市场',
+        'rtk-ai/rtk': 'AI 费用节省工具',
+        'getagentseal/codeburn': 'AI 编程账单管家',
+        'bytedance/deer-flow': 'AI 研究和写作助手',
+        'can1357/oh-my-pi': '终端里的 AI 编程助手',
+        'alirezarezvani/claude-skills': 'AI 技能合集',
+        'jeecgboot/JeecgBoot': '低代码搭系统工具',
+        'nexu-io/html-anything': '一句话生成网页工具',
+        'op7418/guizang-social-card-skill': '小红书封面生成技能',
+        'DenisSergeevitch/agents-best-practices': 'AI 助手最佳实践包',
+        'nexu-io/html-video': '网页变视频工具',
+        'op7418/guizang-ppt-skill': 'AI 做 PPT 技能',
+        'withkynam/vibecode-pro-max-kit': 'AI 编程记忆助手',
+        'appsmithorg/appsmith': '内部工具搭建器',
+        'study8677/awesome-architecture': '架构学习资料库',
+        'OpenCoworkAI/open-codesign': '开源 AI 设计助手',
+        'reflex-dev/reflex': 'Python 做网页应用工具',
+        'EKKOLearnAI/hermes-web-ui': 'AI 助手管理面板',
+        'MediatorSpeak/dota2-gameplay-tools': '游戏数据可视化工具',
+        'safishamsi/graphify': 'AI 编程技能助手',
+        'stablyai/orca': '多 AI 编程工作台',
+        'refinedev/refine': '后台系统开发框架',
+        'HKUDS/Vibe-Trading': 'AI 模拟交易助手',
+        'wanshuiyin/Auto-claude-code-research-in-sleep': '睡觉也能做研究的 AI 助手',
+        'MemPalace/mempalace': 'AI 长期记忆工具',
+        'rohitg00/ai-engineering-from-scratch': 'AI 工程实战教程',
+        'open-multi-agent/open-multi-agent': '多 AI 分工协作工具',
+        'NateBJones-Projects/OB1': '个人知识大脑',
+        'lintsinghua/claude-code-book': 'Claude Code 原理书',
+        'crynta/terax-ai': '轻量级终端 AI 开发环境',
+        'Gitlawb/openclaude': '可换模型的 AI 编程助手',
+        'jackwener/OpenCLI': '把网站变成命令的工具',
+        'walkinglabs/learn-harness-engineering': 'AI 工程入门教程',
+        'heygen-com/hyperframes': '用网页代码做视频',
+        'google-antigravity/antigravity-sdk-python': 'Google AI 智能体开发包',
+        'JCodesMore/ai-website-cloner-template': 'AI 克隆网站模板',
+        'jnMetaCode/superpowers-zh': '中文 AI 编程技能包',
+        'affaan-m/ECC': 'AI 编程流程优化包',
+        'Significant-Gravitas/AutoGPT': '自动任务 AI 助手',
+        'NousResearch/hermes-agent': '会成长的 AI 助手',
+        'huggingface/transformers': '大模型工具箱',
+        'ollama/ollama': '本地跑大模型工具',
+        'f/prompts.chat': 'AI 提示词大全',
+        'langgenius/dify': 'AI 工作流搭建平台',
+        'langchain-ai/langchain': 'AI 应用开发平台',
+        'open-webui/open-webui': '本地 AI 聊天界面',
+        'firecrawl/firecrawl': '网页抓取工具',
+        'rasbt/LLMs-from-scratch': '从零学大模型教程',
+        'browser-use/browser-use': 'AI 操作网页工具',
+        'puppeteer/puppeteer': '浏览器自动化工具',
+        'vllm-project/vllm': '大模型加速服务',
+        'TauricResearch/TradingAgents': 'AI 金融交易框架',
+      };
+
+      function featureBasedName(repo) {
+        const features = repo.features || [];
+        if (features.includes('Low-code / No-code')) return '不用写代码的搭应用工具';
+        if (features.includes('Web IDE / Browser Editor')) return '网页里的写代码工具';
+        if (features.includes('Sandbox / Preview')) return '代码运行和预览工具';
+        if (features.includes('MCP / Tool Calling')) return 'AI 工具连接器';
+        if (features.includes('AI Coding / Agent')) return 'AI 编程助手';
+        if (features.includes('Deploy / Cloud')) return '一键发布工具';
+        if (features.includes('Testing / Quality')) return '代码检查工具';
+        return '值得看看的一款工具';
+      }
+
+      function cleanFriendlyName(value) {
+        return String(value || '')
+          .replace(/^这是?一个/, '')
+          .replace(/^这是?一套/, '')
+          .replace(/^这是?一本/, '')
+          .replace(/^一个/, '')
+          .replace(/^一套/, '')
+          .replace(/^一本/, '')
+          .replace(/[。.!！；;：:].*$/, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
+
+      function displayProjectName(repo) {
+        if (friendlyProjectNameText[repo.full_name]) return friendlyProjectNameText[repo.full_name];
+        const details = projectDetails(repo);
+        const fromDetails = cleanFriendlyName(details.what);
+        if (fromDetails && /[\u4e00-\u9fff]/.test(fromDetails)) {
+          return fromDetails.length > 18 ? `${fromDetails.slice(0, 18)}…` : fromDetails;
+        }
+        return featureBasedName(repo);
+      }
+
+      function normalizeExampleEntry(entry) {
+        if (!entry) return null;
+        if (typeof entry === 'string') {
+          return { title: '举个例子', body: entry, code: '', images: [], source: '简化示例' };
+        }
+        const title = String(entry.title || entry.name || '项目里的示例').trim();
+        const body = String(entry.body || entry.text || entry.description || '').trim();
+        const code = String(entry.code || '').trim();
+        const images = Array.isArray(entry.images)
+          ? entry.images
+              .map((image) => ({
+                url: String(image?.url || '').trim(),
+                alt: String(image?.alt || '项目示例图').trim(),
+              }))
+              .filter((image) => image.url)
+              .slice(0, 2)
+          : [];
+        const source = String(entry.source || 'README').trim();
+        if (!body && !code && !images.length) return null;
+        return { title, body, code, images, source };
+      }
+
+      function repoExamples(repo) {
+        const extracted = Array.isArray(repo.examples)
+          ? repo.examples.map(normalizeExampleEntry).filter(Boolean)
+          : [];
+        const manual = normalizeExampleEntry(projectExampleText[repo.full_name]);
+        const combined = [];
+        if (manual) {
+          if (!manual.images.length && extracted[0]?.images?.length) {
+            manual.images = extracted[0].images;
+          }
+          combined.push(manual);
+        }
+        for (const example of extracted) {
+          const repeated = combined.some(
+            (item) =>
+              item.body === example.body ||
+              (item.code && item.code === example.code) ||
+              (item.images?.[0]?.url && item.images[0].url === example.images?.[0]?.url),
+          );
+          if (!repeated) combined.push(example);
+        }
+        if (!combined.length) {
+          const details = projectDetails(repo);
+          const playbook = repoPlaybook(repo);
+          combined.push({
+            title: '可能的使用场景',
+            body: playbook.scenarios?.[0] || details.canDo || '这个项目适合先看用途，再判断能不能用到自己的工作里。',
+            code: '',
+            images: [],
+            source: '生成示意',
+          });
+        }
+        return combined.slice(0, 1);
+      }
+
+      function generatedVisualText(repo, example) {
+        const details = projectDetails(repo);
+        const playbook = repoPlaybook(repo);
+        const features = repo.features || [];
+        const firstScenario = playbook.scenarios?.[0] || details.canDo || '把一个想法交给工具处理。';
+        const firstStep = playbook.steps?.[0] || '输入你的目标或素材。';
+        const output = details.canDo || example.body || '得到一个可以继续修改或使用的结果。';
+
+        let title = '生成示意图';
+        let input = firstStep;
+        let process = '工具根据你的目标自动处理。';
+        if (features.includes('AI Coding / Agent')) {
+          title = 'AI 写代码流程示意';
+          input = '输入需求、报错或项目目标';
+          process = 'AI 读取项目、拆任务、改代码';
+        } else if (features.includes('Web IDE / Browser Editor')) {
+          title = '网页里做项目示意';
+          input = '打开网页工作台并输入需求';
+          process = '在线编辑、预览、继续修改';
+        } else if (features.includes('Sandbox / Preview')) {
+          title = '运行预览流程示意';
+          input = '放入代码或让 AI 生成代码';
+          process = '在隔离环境里运行和看日志';
+        } else if (features.includes('MCP / Tool Calling')) {
+          title = 'AI 调工具流程示意';
+          input = '告诉 AI 要完成的任务';
+          process = 'AI 调用外部工具拿数据或执行动作';
+        } else if (features.includes('Low-code / No-code')) {
+          title = '低代码搭应用示意';
+          input = '选择模板、表单或数据源';
+          process = '拖拽组件并配置自动流程';
+        }
+
+        return {
+          title,
+          input: input.slice(0, 38),
+          process,
+          output: output.slice(0, 52),
+          scenario: firstScenario.slice(0, 48),
+        };
+      }
+
+      function renderGeneratedVisual(repo, example) {
+        const visual = generatedVisualText(repo, example);
+        return `
+          <div class="generated-example" role="img" aria-label="${escapeHtml(visual.title)}">
+            <div class="generated-top">
+              <span class="generated-title">${escapeHtml(visual.title)}</span>
+              <span class="generated-label">生成示意图 · 非原项目截图</span>
+            </div>
+            <div class="generated-canvas">
+              <section class="generated-panel">
+                <strong>输入 / 操作</strong>
+                <span>${escapeHtml(visual.input)}</span>
+              </section>
+              <div class="generated-arrow">→</div>
+              <section class="generated-panel">
+                <strong>可能看到的结果</strong>
+                <span>${escapeHtml(visual.output)}</span>
+                <div class="generated-output-lines" aria-hidden="true">
+                  <i></i><i></i><i></i>
+                </div>
+              </section>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderExampleBlocks(repo) {
+        const examples = repoExamples(repo);
+        if (!examples.length) return '';
+        const example = examples[0];
+        const hasRealImages = Boolean(example.images?.length);
+        return `
+          <div class="example-list">
+            <section class="example">
+              <div class="example-header">
+                <span class="example-tag">项目示例</span>
+                <span class="example-title">${escapeHtml(example.title || '具体用法')}</span>
+              </div>
+              ${
+                example.images?.length
+                  ? `<div class="example-media">
+                      ${example.images
+                        .map(
+                          (image) => `
+                            <figure>
+                              <img src="${escapeHtml(image.url)}" alt="${escapeHtml(image.alt || '项目示例图')}" loading="eager" decoding="async" referrerpolicy="no-referrer" onerror="this.closest('figure').hidden = true" />
+                              <figcaption>${escapeHtml(image.alt || '项目示例图')}</figcaption>
+                            </figure>
+                          `,
+                        )
+                        .join('')}
+                    </div>`
+                  : ''
+              }
+              ${!hasRealImages && !example.images?.length ? renderGeneratedVisual(repo, example) : ''}
+              ${example.body ? `<p>${escapeHtml(example.body)}</p>` : ''}
+              ${example.code ? `<pre><code>${escapeHtml(example.code)}</code></pre>` : ''}
+            </section>
+          </div>
+        `;
+      }
+
+      function renderDifficultyBlock(repo) {
+        const difficulty = beginnerDifficulty(repo);
+        const overallLevel = Math.max(difficulty.install.level, difficulty.use.level);
+        const overallLabel = difficultyLabels[overallLevel];
+        const renderItem = (title, item) => `
+          <section class="difficulty-item">
+            <div class="difficulty-top">
+              <strong>${escapeHtml(title)}</strong>
+              <span class="difficulty-level level-${item.level}">${escapeHtml(item.label)}</span>
+            </div>
+            <p>${escapeHtml(item.summary)}</p>
+            <ul>
+              ${item.reasons.map((reason) => `<li>${escapeHtml(reason)}</li>`).join('')}
+            </ul>
+          </section>
+        `;
+        return `
+          <details class="beginner-difficulty">
+            <summary class="beginner-summary">
+              <span class="beginner-title">纯小白上手难度</span>
+              <span class="beginner-summary-meta">
+                <span class="difficulty-level overall level-${overallLevel}">总体：${escapeHtml(overallLabel)}</span>
+                <span class="difficulty-level level-${difficulty.install.level}">安装：${escapeHtml(difficulty.install.label)}</span>
+                <span class="difficulty-level level-${difficulty.use.level}">操作：${escapeHtml(difficulty.use.label)}</span>
+              </span>
+            </summary>
+            <div class="difficulty-grid">
+              ${renderItem('安装部署复杂度', difficulty.install)}
+              ${renderItem('功能操作难度', difficulty.use)}
+            </div>
+          </details>
+        `;
+      }
+
       function collectDrafts(data) {
         return (data.xhs_repos || []).map((repo, index) => {
-          const features = repo.features?.length ? repo.features.map(toChineseFeature) : ['开发者效率'];
-          const intro = toChineseIntro(repo);
+          const features = repo.features?.length ? repo.features.map((feature) => stripEmoji(toChineseFeature(feature))) : ['开发者效率'];
+          const intro = stripEmoji(toChineseIntro(repo));
+          const friendlyName = stripEmoji(displayProjectName(repo));
+          const difficulty = beginnerDifficulty(repo);
           const delta =
             repo.delta_stars === null || repo.delta_stars === undefined
               ? ''
               : `，最近 ${repo.delta_days} 天新增 ${repo.delta_stars} 个收藏`;
           const featureLines = features.slice(0, 4).map((feature) => `- ${feature}`).join('\n');
           return {
-            title: `${repo.name}：好用工具选题`,
-            text: `封面文案：${repo.name}｜${features[0]}\n\n开头：\n今天刷到一个 GitHub 项目 ${repo.full_name}，适合关注 AI 工具和效率工具的朋友收藏。\n\n它是干什么的：\n${intro}\n\n核心功能：\n${featureLines}\n\n为什么现在值得看：\n目前 ${compact(repo.stars)} 个收藏，创建于 ${shortDate(repo.created_at)}，最近仍有更新${delta}。\n\n项目链接：\n${repo.html_url}\n\n标签：\n#GitHub #开源项目 #AI工具 #效率工具 #程序员工具 #开发者工具`,
+            title: `${friendlyName}：好用工具选题`,
+            text: `封面文案：${friendlyName}｜${features[0]}\n\n开头：\n今天刷到一个开源项目「${friendlyName}」，适合关注 AI 工具和效率工具的朋友收藏。\n\n它是干什么的：\n${intro}\n\n核心功能：\n${featureLines}\n\n小白上手难度：\n- 安装部署：${difficulty.install.label}，${difficulty.install.summary}\n- 功能操作：${difficulty.use.label}，${difficulty.use.summary}\n\n为什么现在值得看：\n目前 ${compact(repo.stars)} 个收藏，创建于 ${shortDate(repo.created_at)}，最近仍有更新${delta}。\n\n项目链接：\n${repo.html_url}\n\n标签：\n#开源项目 #AI工具 #效率工具 #程序员工具 #开发者工具`,
             repo,
             index: index + 1,
           };
@@ -1496,28 +2497,75 @@
         return '为什么值得看：收藏的人很多，说明它已经被大量开发者验证过，适合当成经典案例来学习。';
       }
 
-      function scoreInfo(repo) {
-        if (state.activeTab === 'frontier') {
-          return [Math.round(repo.scores?.frontier || 0), '大佬关注度'];
-        }
-        if (state.activeTab === 'product_ideas' || state.activeTab === 'drafts') {
-          return [Math.round(repo.scores?.product || 0), '灵感分'];
-        }
-        if (state.activeTab === 'all_time') {
-          return [compact(repo.stars), '总收藏'];
-        }
-        return [repo.star_velocity ?? 0, '每天新增收藏'];
+      function heatBadge(repo, tabName = state.activeTab) {
+        if (tabName === 'frontier') return '早期信号';
+        if (tabName === 'product_ideas' || tabName === 'drafts') return '产品灵感';
+        if (tabName === 'all_time') return '经典之作';
+        return '正在变火';
+      }
+
+      // 把更新时间说成人话：最近更新过就标“还在更新”，否则给一个大概时间。
+      function freshnessText(repo) {
+        if (!repo.pushed_at) return '更新时间未知';
+        const days = Math.floor((Date.now() - new Date(repo.pushed_at).getTime()) / 86400000);
+        if (days <= 14) return '最近还在更新';
+        if (days <= 60) return '近期有更新';
+        const ym = String(repo.pushed_at).slice(0, 7);
+        return `最近更新 ${ym}`;
+      }
+
+      function expertSignals(repo) {
+        return Array.isArray(repo.expert_signals) ? repo.expert_signals.filter(Boolean) : [];
+      }
+
+      function expertSignalSummaryText(repo) {
+        const signals = expertSignals(repo);
+        if (!signals.length) return '';
+        const experts = [...new Set(signals.map((item) => item.expert_name || item.expert_id).filter(Boolean))];
+        const categories = [...new Set(signals.map((item) => item.category_label || item.category).filter(Boolean))];
+        const sources = [...new Set(signals.map((item) => item.source_label || item.source).filter(Boolean))];
+        const expertText =
+          experts.length > 3 ? `${experts.slice(0, 3).join('、')} 等 ${experts.length} 个观察源` : experts.join('、');
+        return `${expertText} 通过${sources.slice(0, 2).join('、')}关注到它，覆盖${categories.slice(0, 2).join('、')}。`;
+      }
+
+      function renderExpertSignals(repo) {
+        const signals = expertSignals(repo);
+        if (!signals.length) return '';
+        const summaryText = repo.lens?.expert_summary || expertSignalSummaryText(repo);
+        const signalTags = signals.slice(0, 5).map((signal) => {
+          const label = `${signal.expert_name || signal.expert_id || '观察源'}：${signal.source_label || '公开信号'}`;
+          if (signal.url) {
+            return `<a href="${escapeHtml(signal.url)}" target="_blank" rel="noreferrer">${escapeHtml(label)}</a>`;
+          }
+          return `<span>${escapeHtml(label)}</span>`;
+        });
+        return `
+          <section class="expert-signals">
+            <div class="expert-signals-header">
+              <strong>人物/专家信号</strong>
+              <span>${signals.length} 条公开信号</span>
+            </div>
+            <p>${escapeHtml(summaryText)}</p>
+            <div class="expert-signal-list">
+              ${signalTags.join('')}
+            </div>
+          </section>
+        `;
       }
 
       function renderSummary(data) {
         const allRepos = data.all_repos || [];
-        const frontier = data.frontier || [];
-        const productIdeas = data.product_ideas || [];
-        const rising = data.rising || [];
-        const allTime = data.all_time || [];
+        const rankings = exclusiveRankings(data);
+        const frontier = rankings.frontier;
+        const productIdeas = rankings.product_ideas;
+        const rising = rankings.rising;
+        const allTime = rankings.all_time;
         const drafts = data.xhs_repos || [];
         const topStars = Math.max(0, ...allRepos.map((repo) => Number(repo.stars || 0)));
         const featureSet = new Set(allRepos.flatMap((repo) => repo.features || []));
+        const expertSignalList = allRepos.flatMap((repo) => expertSignals(repo));
+        const expertCount = new Set(expertSignalList.map((signal) => signal.expert_id || signal.expert_name).filter(Boolean)).size;
         const latestPush = allRepos
           .map((repo) => repo.pushed_at)
           .filter(Boolean)
@@ -1531,6 +2579,7 @@
           ['产品灵感', productIdeas.length, '能拿来用或改造'],
           ['正在变火', rising.length, '最近涨得快'],
           ['经典项目', allTime.length, `最高 ${compact(topStars)} 个收藏`],
+          ['人物信号', expertSignalList.length, `${expertCount} 个观察源`],
           ['草稿', drafts.length, `${featureSet.size} 类工具类型`],
         ]
           .map(
@@ -1547,26 +2596,68 @@
         subtitle.textContent = `日报日期 ${data.date || '未知'} · 最近项目更新 ${shortDate(latestPush)}`;
       }
 
+      function exclusiveRankings(data) {
+        const seen = new Set();
+        const take = (repos = []) =>
+          repos.filter((repo) => {
+            const key = repo.full_name || repo.html_url || repo.name;
+            if (!key) return true;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+          });
+
+        return {
+          frontier: take(data.frontier || []),
+          product_ideas: take(data.product_ideas || []),
+          rising: take(data.rising || []),
+          all_time: take(data.all_time || []),
+        };
+      }
+
       function getReposForTab() {
         if (!state.data) return [];
-        if (state.activeTab === 'frontier') return state.data.frontier || [];
-        if (state.activeTab === 'product_ideas') return state.data.product_ideas || [];
-        if (state.activeTab === 'all_time') return state.data.all_time || [];
+        const rankings = exclusiveRankings(state.data);
+        if (state.activeTab === 'frontier') return rankings.frontier;
+        if (state.activeTab === 'product_ideas') return rankings.product_ideas;
+        if (state.activeTab === 'all_time') return rankings.all_time;
         if (state.activeTab === 'drafts') return state.data.xhs_repos || [];
-        return state.data.rising || [];
+        return rankings.rising;
       }
 
       function repoSearchText(repo) {
         const details = projectDetails(repo);
+        const difficulty = beginnerDifficulty(repo);
         return [
+          displayProjectName(repo),
           repo.full_name,
           toChineseIntro(repo),
           details.what,
           details.canDo,
           details.who,
+          ...repoExamples(repo).flatMap((example) => [
+            example.title,
+            example.body,
+            example.code,
+            ...(example.images || []).map((image) => image.alt),
+          ]),
           repo.language,
           repo.license,
           rankingReason(repo),
+          difficulty.install.label,
+          difficulty.install.summary,
+          ...difficulty.install.reasons,
+          difficulty.use.label,
+          difficulty.use.summary,
+          ...difficulty.use.reasons,
+          expertSignalSummaryText(repo),
+          ...expertSignals(repo).flatMap((signal) => [
+            signal.expert_name,
+            signal.expert_id,
+            signal.category_label,
+            signal.source_label,
+            signal.note,
+          ]),
           ...(repo.features || []).map(toChineseFeature),
           ...(repo.features || []),
           ...(repo.topics || []),
@@ -1610,67 +2701,67 @@
         repoList.innerHTML = repos
           .map((repo) => {
             const features = repo.features?.length ? repo.features.map(toChineseFeature) : ['待确认'];
-            const delta =
-              repo.delta_stars === null || repo.delta_stars === undefined
-                ? '还没有连续增长记录'
-                : `${repo.delta_days} 天新增 ${repo.delta_stars} 个收藏`;
-            const [scoreValue, scoreLabel] = scoreInfo(repo);
             const playbook = repoPlaybook(repo);
             const details = projectDetails(repo);
+            const edge = projectEdgeText[repo.full_name];
+            const friendlyName = displayProjectName(repo);
             return `
               <article class="repo-row">
                 <div class="rank">${String(repo._rank).padStart(2, '0')}</div>
                 <div class="repo-main">
                   <h3 class="repo-title">
-                    <a href="${escapeHtml(repo.html_url)}" target="_blank" rel="noreferrer">${escapeHtml(repo.full_name)}</a>
-                    <span class="badge">${escapeHtml(repo.language || '未知语言')}</span>
+                    <span class="repo-name">${escapeHtml(friendlyName || `项目 ${repo._rank}`)}</span>
+                    <span class="badge">${escapeHtml(heatBadge(repo))}</span>
                   </h3>
                   <p class="description">${escapeHtml(toChineseIntro(repo))}</p>
+                  ${renderExampleBlocks(repo)}
                   <div class="detail-grid">
                     <section class="detail-item">
-                      <strong>具体是什么</strong>
+                      <strong>这是什么</strong>
                       <p>${escapeHtml(details.what)}</p>
                     </section>
                     <section class="detail-item">
-                      <strong>能做什么</strong>
+                      <strong>能帮你做什么</strong>
                       <p>${escapeHtml(details.canDo)}</p>
                     </section>
                     <section class="detail-item">
-                      <strong>适合谁用</strong>
+                      <strong>适合谁</strong>
                       <p>${escapeHtml(details.who)}</p>
                     </section>
                   </div>
-                  <div class="playbook">
-                    <section class="playbook-block">
-                      <h4>可以怎么用</h4>
-                      <ul>
-                        ${playbook.scenarios.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
-                      </ul>
-                    </section>
-                    <section class="playbook-block">
-                      <h4>怎么试</h4>
-                      <ol>
-                        ${playbook.steps.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
-                      </ol>
-                    </section>
-                  </div>
+                  ${renderExpertSignals(repo)}
+                  ${renderDifficultyBlock(repo)}
+                  <details class="usage-details">
+                    <summary class="usage-summary">点开看具体怎么用</summary>
+                    <div class="playbook">
+                      <section class="playbook-block">
+                        <h4>可以怎么用</h4>
+                        <ul>
+                          ${playbook.scenarios.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
+                        </ul>
+                      </section>
+                      <section class="playbook-block">
+                        <h4>上手步骤</h4>
+                        <ol>
+                          ${playbook.steps.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
+                        </ol>
+                      </section>
+                    </div>
+                  </details>
+                  ${edge ? `<section class="edge">
+                    <h4>它强在哪？为什么 Codex、Claude Code 替不了</h4>
+                    <ul>${edge.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
+                  </section>` : ''}
                   <div class="features">
                     ${features.map((feature) => `<span>${escapeHtml(feature)}</span>`).join('')}
                   </div>
                   <div class="meta">
-                    <span>★ ${compact(repo.stars)} 收藏</span>
-                    <span>⑂ ${compact(repo.forks)} 次复制改造</span>
-                    <span>创建 ${shortDate(repo.created_at)}</span>
-                    <span>更新 ${shortDate(repo.pushed_at)}</span>
-                    <span>${escapeHtml(delta)}</span>
+                    <span>${compact(repo.stars)} 人收藏</span>
+                    <span>${escapeHtml(freshnessText(repo))}</span>
                   </div>
                 </div>
                 <div class="repo-score">
-                  <div class="score">
-                    <strong>${escapeHtml(scoreValue)}</strong>
-                    <span>${escapeHtml(scoreLabel)}</span>
-                  </div>
-                  <a class="small-link" href="${escapeHtml(repo.html_url)}" target="_blank" rel="noreferrer">打开项目 ↗</a>
+                  <a class="small-link" href="${escapeHtml(repo.html_url)}" target="_blank" rel="noreferrer">去看看 ↗</a>
                 </div>
               </article>
             `;
@@ -1747,8 +2838,6 @@
         state.sort = event.target.value;
         renderRepos();
       });
-
-      $('#reloadButton').addEventListener('click', loadData);
 
       draftList.addEventListener('click', async (event) => {
         const button = event.target.closest('button[data-copy]');

@@ -5,8 +5,6 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "funding:build": "python3 scripts/build_funding_weekly.py",
-    "funding:candidates": "python3 scripts/discover_funding_candidates.py",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0"
   },

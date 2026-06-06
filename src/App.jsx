@@ -2,30 +2,18 @@ import React, { useMemo, useState } from 'react';
 import {
   ArrowDown,
   ArrowUpRight,
-  BadgeDollarSign,
-  BarChart3,
   BookOpen,
-  BriefcaseBusiness,
   CalendarDays,
-  CheckCircle2,
   Code2,
-  Database,
   ExternalLink,
-  FileClock,
   GitFork,
   Github,
-  Globe2,
   Layers3,
-  LineChart,
   Rocket,
   Search,
-  ShieldCheck,
   Sparkles,
-  TrendingUp,
 } from 'lucide-react';
 import { assets, githubSnapshot, profile, projects, repoCatalog } from './data/projects.js';
-import { fundingRadar } from './data/fundingRadar.js';
-import { fundingWeeklySnapshot } from './data/fundingWeeklySnapshot.js';
 
 const filters = [
   { id: 'all', label: '全部' },
@@ -42,18 +30,6 @@ const dateFormatter = new Intl.DateTimeFormat('zh-CN', {
 
 function formatDate(date) {
   return dateFormatter.format(new Date(`${date}T00:00:00`));
-}
-
-function formatUsd(value) {
-  if (!value) return '待确认';
-  if (value >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(1)}B`;
-  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(0)}M`;
-  return `$${Math.round(value).toLocaleString('en-US')}`;
-}
-
-function formatCount(value, emptyText = '待确认') {
-  if (!value) return emptyText;
-  return Number(value).toLocaleString('zh-CN');
 }
 
 function openExternal(url) {
@@ -109,10 +85,6 @@ function App() {
               <Rocket size={18} aria-hidden="true" />
               看项目
             </a>
-            <a className="secondary-action" href="#funding">
-              <LineChart size={18} aria-hidden="true" />
-              融资周报
-            </a>
             <button
               className="icon-action"
               type="button"
@@ -139,12 +111,10 @@ function App() {
             </div>
           </dl>
         </div>
-        <a className="scroll-cue" href="#funding" aria-label="跳到融资周报">
+        <a className="scroll-cue" href="#projects" aria-label="跳到项目区">
           <ArrowDown size={18} aria-hidden="true" />
         </a>
       </section>
-
-      <FundingRadarSection />
 
       <section className="section-band project-band" id="projects">
         <div className="section-inner">
@@ -253,7 +223,6 @@ function Header() {
         <span>{profile.handle}</span>
       </a>
       <nav aria-label="主导航">
-        <a href="#funding">融资周报</a>
         <a href="#projects">项目</a>
         <a href="#catalog">更多</a>
         <a href="#timeline">顺序</a>
@@ -262,196 +231,6 @@ function Header() {
         </a>
       </nav>
     </header>
-  );
-}
-
-function FundingRadarSection() {
-  const snapshot = fundingWeeklySnapshot;
-  const metrics = snapshot.metrics;
-  const maxTrend = Math.max(...snapshot.trends.map((item) => item.events), 1);
-  const watchlistTotal =
-    metrics.watchlistCompanies ||
-    Object.values(snapshot.watchlistCounts || {}).reduce((total, count) => total + count, 0);
-
-  const statCards = [
-    {
-      label: '本周确认融资',
-      value: formatCount(metrics.events),
-      detail: '只统计人工确认事件',
-      icon: CheckCircle2,
-      tone: '#21a67a',
-    },
-    {
-      label: '披露金额',
-      value: formatUsd(metrics.amountUsd),
-      detail: '未披露金额不计入总额',
-      icon: BadgeDollarSign,
-      tone: '#2f80ed',
-    },
-    {
-      label: '中美事件',
-      value: `${formatCount(metrics.chinaEvents, '0')} / ${formatCount(metrics.usEvents, '0')}`,
-      detail: '中国 / 美国',
-      icon: Globe2,
-      tone: '#ff7a59',
-    },
-    {
-      label: '候选新闻',
-      value: formatCount(snapshot.candidateStats.count, '0'),
-      detail: '自动抓取，等待筛选',
-      icon: FileClock,
-      tone: '#8b5cf6',
-    },
-  ];
-
-  return (
-    <section className="section-band funding-band" id="funding">
-      <div className="section-inner funding-inner">
-        <SectionHeading
-          kicker={fundingRadar.kicker}
-          title={fundingRadar.title}
-          copy={fundingRadar.description}
-        />
-
-        <div className="funding-topline">
-          <div className="funding-intro">
-            <span className="funding-pill">
-              <CalendarDays size={15} aria-hidden="true" />
-              {snapshot.week.label} · {formatDate(snapshot.week.start)} - {formatDate(snapshot.week.end)}
-            </span>
-            <h3>{fundingRadar.subtitle}</h3>
-            <p>{snapshot.status === 'empty' ? fundingRadar.verdictWhenEmpty : '本周快照已更新。'}</p>
-            <div className="funding-rules" aria-label="统计规则">
-              {fundingRadar.qualityRules.map((rule) => (
-                <span key={rule}>
-                  <ShieldCheck size={14} aria-hidden="true" />
-                  {rule}
-                </span>
-              ))}
-            </div>
-            {snapshot.candidateStats.errors?.length > 0 && (
-              <div className="funding-source-note">
-                <FileClock size={16} aria-hidden="true" />
-                候选源本次没有稳定返回，已记录 {snapshot.candidateStats.errors.length} 条源错误。
-              </div>
-            )}
-          </div>
-
-          <div className="funding-score">
-            <span>观察池</span>
-            <strong>{watchlistTotal}</strong>
-            <p>
-              CN {snapshot.watchlistCounts.CN || 0} · US {snapshot.watchlistCounts.US || 0}
-            </p>
-          </div>
-        </div>
-
-        <div className="funding-stat-grid">
-          {statCards.map((card) => {
-            const Icon = card.icon;
-            return (
-              <div className="funding-stat" key={card.label} style={{ '--tone': card.tone }}>
-                <span className="funding-stat-icon">
-                  <Icon size={19} aria-hidden="true" />
-                </span>
-                <span>{card.label}</span>
-                <strong>{card.value}</strong>
-                <em>{card.detail}</em>
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="funding-grid">
-          <div className="funding-panel">
-            <div className="panel-title">
-              <BarChart3 size={19} aria-hidden="true" />
-              <h3>12 周事件趋势</h3>
-            </div>
-            <div className="trend-bars" aria-label="过去 12 周融资事件趋势">
-              {snapshot.trends.map((item) => (
-                <div className="trend-bar" key={item.week}>
-                  <i style={{ '--bar-height': `${Math.max(8, (item.events / maxTrend) * 100)}%` }} />
-                  <span>{item.label}</span>
-                  <strong>{item.events}</strong>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="funding-panel">
-            <div className="panel-title">
-              <Database size={19} aria-hidden="true" />
-              <h3>数据管线</h3>
-            </div>
-            <div className="pipeline-list">
-              {fundingRadar.sourcePipelines.map((item, index) => (
-                <div className="pipeline-row" key={item.label}>
-                  <span>{String(index + 1).padStart(2, '0')}</span>
-                  <div>
-                    <strong>{item.label}</strong>
-                    <em>{item.status}</em>
-                    <p>{item.detail}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="funding-grid lower">
-          <div className="funding-panel">
-            <div className="panel-title">
-              <BriefcaseBusiness size={19} aria-hidden="true" />
-              <h3>本周 Top Deals</h3>
-            </div>
-            {snapshot.topDeals.length > 0 ? (
-              <div className="deal-list">
-                {snapshot.topDeals.map((deal) => (
-                  <a
-                    className="deal-row"
-                    href={deal.sourceUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    key={`${deal.company}-${deal.eventDate}`}
-                  >
-                    <span>{deal.country}</span>
-                    <strong>{deal.company}</strong>
-                    <em>{deal.round || '未标注轮次'}</em>
-                    <b>{formatUsd(deal.amountUsd)}</b>
-                    <ArrowUpRight size={16} aria-hidden="true" />
-                  </a>
-                ))}
-              </div>
-            ) : (
-              <div className="funding-empty">
-                <FileClock size={24} aria-hidden="true" />
-                <p>本周还没有确认事件进入公开统计。</p>
-              </div>
-            )}
-          </div>
-
-          <div className="funding-panel">
-            <div className="panel-title">
-              <TrendingUp size={19} aria-hidden="true" />
-              <h3>重点赛道</h3>
-            </div>
-            <div className="sector-grid">
-              {fundingRadar.sectors.map((sector) => {
-                const current = snapshot.sectorBreakdown.find((item) => item.label === sector.id);
-                return (
-                  <div className="sector-row" key={sector.id} style={{ '--sector': sector.accent }}>
-                    <span>{sector.label}</span>
-                    <strong>{current?.events || 0}</strong>
-                    <em>{formatUsd(current?.amountUsd || 0)}</em>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
   );
 }
 

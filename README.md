@@ -1,33 +1,18 @@
-# 我的项目合集
+# 每天帮你找好项目
 
-这是一个项目展示页，用来把我做过的项目集中放在一起。
+这个仓库现在有两层用途：
 
-每个重点项目会说明三件事：
+- 项目合集页：把我的重点项目、可使用页面和更多项目入口集中展示。
+- 项目雷达工具：每天从公开项目里筛选值得关注的新工具，方便做产品灵感和内容选题。
 
-- 它是做什么的。
-- 它解决什么问题。
-- 可以点哪里直接使用，或者点哪里查看代码。
+公开页面会尽量用白话解释每个项目能做什么，少放技术名词。
 
-页面分成三块：
-
-- 融资周报：中美 AI 硬件/机器人投融资雷达。
-- 先看这些项目：适合对外介绍的重点项目。
-- 全部项目入口：更多公开项目、参考资料和早期练习。
-- 更新顺序：按时间看看最近先做了什么。
-
-整理日期：2026-06-06。
-
-## 怎么运行
-
-第一次打开前安装依赖：
-
-```bash
-npm install
-```
+## 公开页面
 
 本地预览：
 
 ```bash
+npm install
 npm run dev
 ```
 
@@ -37,52 +22,57 @@ npm run dev
 npm run build
 ```
 
-## 融资周报怎么维护
+发布成公开网页时：
 
-这个项目里已经放了一个轻量周报管线：
+- 构建命令：`npm run build`
+- 输出目录：`dist`
 
-```text
-公开新闻候选 -> 人工确认融资事件 -> 生成周报快照 -> 静态网站展示
-```
+## 项目雷达
 
-常用命令：
+如果你只是想看当前榜单，不想安装爬虫、配置 token 或运行脚本，可以打开仓库里的 `radar.html`。这是完整静态版，已经内置一份榜单数据。
+
+生成当天数据：
 
 ```bash
-npm run funding:candidates
-npm run funding:build
-npm run build
+python3 scripts/github_xhs_daily.py run
 ```
 
-数据入口：
+生成结果在：
+
+- `output/latest.md`
+- `output/latest.json`
+- `output/YYYY-MM-DD/github-web-coding-daily.md`
+- `output/YYYY-MM-DD/repos.json`
+
+本地浏览旧版雷达页：
+
+```bash
+make view
+```
+
+然后打开：
 
 ```text
-data/funding/manual_events.csv
-data/funding/watchlist.json
-data/funding/candidate_queries.json
-src/data/fundingWeeklySnapshot.js
+http://127.0.0.1:8787/viewer.html
 ```
 
-维护方式：
+## 配置项目雷达
 
-- 先运行 `npm run funding:candidates` 抓取公开候选新闻。
-- 人工确认后，把真实融资事件写入 `data/funding/manual_events.csv`，并把 `include_in_report` 填成 `true`。
-- 再运行 `npm run funding:build`，脚本会更新前端读取的周报快照。
-- 当前公开页面只统计确认事件，候选新闻不会直接进入金额和事件数。
+编辑 `config/github_xhs_config.json`：
 
-自动化已经放在 `.github/workflows/funding-weekly.yml`：每周一北京时间 09:00 抓候选、生成快照并构建。公开发布时，可以把仓库接到 Cloudflare Pages，构建命令填 `npm run build`，输出目录填 `dist`。
+- `all_time_queries`：历史高星榜搜索。
+- `rising_queries`：新项目潜力榜搜索。
+- `xhs_count`：每天生成几篇小红书草稿。
+- `expert_sources`：人物/专家观察源。支持公开 GitHub stars、手工配置的公开推文链接和项目引用。
 
-## 怎么更新内容
+人物/专家观察源的详细字段、隐私边界、速率限制和评分权重见 [docs/expert-observation-sources.md](docs/expert-observation-sources.md)。
+
+## 更新项目合集
 
 主要改这个文件：
 
 ```text
 src/data/projects.js
 ```
-
-常改的地方：
-
-- `profile`：页面顶部的介绍。
-- `projects`：重点项目卡片。
-- `repoCatalog`：更多项目入口。
 
 写项目介绍时尽量少用技术词，优先回答：这个东西能帮用户做什么。
