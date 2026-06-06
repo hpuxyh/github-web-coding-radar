@@ -15,11 +15,38 @@ export const profile = {
 };
 
 export const githubSnapshot = {
-  capturedAt: '2026-06-06',
+  capturedAt: '2026-06-07',
   sourceUrl: 'https://github.com/hpuxyh?tab=repositories',
 };
 
 export const projects = [
+  {
+    id: 'expert-sources-radar',
+    name: '人物关注项目雷达',
+    repoName: 'github-web-coding-radar',
+    type: '趋势观察工具',
+    category: 'content',
+    status: '可以使用',
+    publishedAt: '2026-06-07',
+    repoUrl: 'https://github.com/hpuxyh/github-web-coding-radar',
+    liveUrl: 'https://github-web-coding-radar.pages.dev/?v=expert-sources-6b964f3',
+    problem:
+      '只看项目热度还不够，有些早期线索要看哪些人正在关注、引用和讨论。',
+    preview: {
+      title: '人物信号清单',
+      subtitle: '看谁在关注什么项目',
+      items: ['人物信号', '前沿趋势', '产品灵感', '内容选题'],
+    },
+    summary:
+      '它会把公开的人物关注信号和项目热度放在一起，帮你判断哪些项目值得提前看。',
+    details:
+      '适合用来做更细的选题：哪些项目被关键人物提到、为什么值得观察、适合写成什么内容。',
+    techIntro:
+      '背后做法是先收集公开关注线索，再和项目热度、更新情况一起整理成网页榜单。',
+    tags: ['人物信号', '趋势观察', '项目选题', '提前发现'],
+    accent: '#d94686',
+    featured: true,
+  },
   {
     id: 'github-web-coding-radar',
     name: '每日好项目雷达',
