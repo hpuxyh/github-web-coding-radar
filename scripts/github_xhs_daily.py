@@ -193,6 +193,35 @@ FEATURE_LABEL_ZH = {
     "Testing / Quality": "测试 / 质量",
 }
 
+EXPERT_CATEGORY_LABEL_ZH = {
+    "ai_engineer": "AI 工程师",
+    "open_source_author": "开源作者",
+    "investor_product_expert": "投资人 / 产品专家",
+}
+
+EXPERT_SIGNAL_LABEL_ZH = {
+    "github_star": "GitHub 公开收藏",
+    "tweet_link": "公开推文 / 帖子",
+    "project_reference": "项目引用",
+}
+
+DEFAULT_EXPERT_SOURCE_WEIGHTS = {
+    "github_star": 1.0,
+    "tweet_link": 1.2,
+    "project_reference": 1.1,
+}
+
+DEFAULT_EXPERT_CATEGORY_WEIGHTS = {
+    "ai_engineer": 1.35,
+    "open_source_author": 1.25,
+    "investor_product_expert": 1.1,
+}
+
+GITHUB_REPO_URL_RE = re.compile(
+    r"github\.com[/:](?P<owner>[A-Za-z0-9-]+)/(?P<repo>[A-Za-z0-9_.-]+)",
+    re.I,
+)
+
 
 @dataclass(frozen=True)
 class RunPaths:
@@ -218,7 +247,12 @@ class GitHubClient:
         self.retries = max(0, retries)
         self._last_request_at = 0.0
 
-    def request_json(self, path: str, params: dict[str, Any] | None = None) -> Any:
+    def request_json(
+        self,
+        path: str,
+        params: dict[str, Any] | None = None,
+        accept: str = "application/vnd.github+json",
+    ) -> Any:
         if params:
             query = urllib.parse.urlencode(params)
             url = f"{API_ROOT}{path}?{query}"
@@ -230,7 +264,7 @@ class GitHubClient:
             time.sleep(self.request_interval - elapsed)
 
         headers = {
-            "Accept": "application/vnd.github+json",
+            "Accept": accept,
             "User-Agent": USER_AGENT,
             "X-GitHub-Api-Version": "2022-11-28",
         }
@@ -290,6 +324,32 @@ class GitHubClient:
             )
             repos.extend(result.get("items", []))
         return repos
+
+    def get_repository(self, full_name: str) -> dict[str, Any] | None:
+        encoded_name = urllib.parse.quote(full_name, safe="/")
+        try:
+            return self.request_json(f"/repos/{encoded_name}")
+        except GithubApiError:
+            return None
+
+    def list_starred_repositories(
+        self,
+        username: str,
+        per_page: int = 30,
+        pages: int = 1,
+    ) -> list[dict[str, Any]]:
+        encoded_user = urllib.parse.quote(username, safe="")
+        starred: list[dict[str, Any]] = []
+        for page in range(1, pages + 1):
+            data = self.request_json(
+                f"/users/{encoded_user}/starred",
+                {"per_page": per_page, "page": page},
+                accept="application/vnd.github.star+json",
+            )
+            if not isinstance(data, list):
+                continue
+            starred.extend(data)
+        return starred
 
     def get_readme_text(self, full_name: str) -> str | None:
         encoded_name = urllib.parse.quote(full_name, safe="/")
@@ -376,6 +436,106 @@ def render_query(template: str, run_date: dt.date) -> str:
         "date_365": format_date(run_date, 365),
     }
     return template.format(**context)
+
+
+def is_probable_full_name(value: str) -> bool:
+    return bool(re.match(r"^[A-Za-z0-9-]+/[A-Za-z0-9_.-]+$", value.strip()))
+
+
+def normalize_full_name(value: str) -> str:
+    owner, repo = value.strip().strip("/").split("/", 1)
+    repo = repo.removesuffix(".git")
+    return f"{owner}/{repo}"
+
+
+def extract_repo_full_names_from_text(value: str | None) -> list[str]:
+    if not value:
+        return []
+
+    names: list[str] = []
+    seen: set[str] = set()
+
+    def add(candidate: str) -> None:
+        if not is_probable_full_name(candidate):
+            return
+        full_name = normalize_full_name(candidate)
+        repo_name = full_name.split("/", 1)[1].lower()
+        if repo_name in {
+            "settings",
+            "topics",
+            "collections",
+            "explore",
+            "marketplace",
+            "search",
+            "login",
+            "signup",
+        }:
+            return
+        if full_name not in seen:
+            seen.add(full_name)
+            names.append(full_name)
+
+    for match in GITHUB_REPO_URL_RE.finditer(value):
+        add(f"{match.group('owner')}/{match.group('repo')}")
+
+    for token in re.findall(r"(?<![@\w.-])([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)(?![\w.-])", value):
+        add(token)
+
+    return names
+
+
+def as_list(value: Any) -> list[Any]:
+    if value is None:
+        return []
+    if isinstance(value, list):
+        return value
+    return [value]
+
+
+def expert_category_label(category: str) -> str:
+    return EXPERT_CATEGORY_LABEL_ZH.get(category, category or "未分类专家")
+
+
+def expert_signal_label(source: str) -> str:
+    return EXPERT_SIGNAL_LABEL_ZH.get(source, source or "专家信号")
+
+
+def expert_source_weight(config: dict[str, Any], source: str) -> float:
+    weights = config.get("weights") or {}
+    return float(weights.get(source, DEFAULT_EXPERT_SOURCE_WEIGHTS.get(source, 1.0)))
+
+
+def expert_category_weight(config: dict[str, Any], category: str) -> float:
+    weights = config.get("category_weights") or {}
+    return float(weights.get(category, DEFAULT_EXPERT_CATEGORY_WEIGHTS.get(category, 1.0)))
+
+
+def expert_total_weight(config: dict[str, Any], expert: dict[str, Any], source: str) -> float:
+    category = str(expert.get("category") or "")
+    base = float(expert.get("weight", 1.0))
+    return round(
+        base * expert_category_weight(config, category) * expert_source_weight(config, source),
+        3,
+    )
+
+
+def signal_key(signal: dict[str, Any]) -> tuple[str, str, str, str]:
+    return (
+        str(signal.get("expert_id") or ""),
+        str(signal.get("source") or ""),
+        str(signal.get("repo") or ""),
+        str(signal.get("url") or ""),
+    )
+
+
+def attach_expert_signal(repo: dict[str, Any], signal: dict[str, Any]) -> None:
+    signal.setdefault("category_label", expert_category_label(str(signal.get("category") or "")))
+    signal.setdefault("source_label", expert_signal_label(str(signal.get("source") or "")))
+    signal["weight"] = float(signal.get("weight") or 1.0)
+    signals = repo.setdefault("expert_signals", [])
+    if signal_key(signal) not in {signal_key(item) for item in signals}:
+        signals.append(signal)
+    repo["expert_score"] = round(sum(float(item.get("weight") or 0) for item in signals), 3)
 
 
 def compact_int(value: int | float | None) -> str:
@@ -654,6 +814,8 @@ def normalize_repo(item: dict[str, Any], source: str, query: str) -> dict[str, A
         "readme_excerpt": "",
         "examples": [],
         "features": [],
+        "expert_signals": [],
+        "expert_score": 0.0,
         "scores": {},
         "notes": [],
     }
@@ -677,6 +839,8 @@ def merge_repo(existing: dict[str, Any], incoming: dict[str, Any]) -> dict[str, 
     ]:
         if incoming.get(field):
             existing[field] = incoming[field]
+    for signal in incoming.get("expert_signals") or []:
+        attach_expert_signal(existing, signal)
     return existing
 
 
@@ -716,17 +880,61 @@ def feature_labels_zh(features: list[str]) -> list[str]:
     return [FEATURE_LABEL_ZH.get(feature, feature) for feature in features]
 
 
+def expert_signal_summary(repo: dict[str, Any], limit: int = 3) -> str:
+    signals = repo.get("expert_signals") or []
+    if not signals:
+        return ""
+
+    experts: list[str] = []
+    categories: list[str] = []
+    sources: list[str] = []
+    for signal in signals:
+        expert = str(signal.get("expert_name") or signal.get("expert_id") or "").strip()
+        category = str(signal.get("category_label") or expert_category_label(signal.get("category") or "")).strip()
+        source = str(signal.get("source_label") or expert_signal_label(signal.get("source") or "")).strip()
+        if expert and expert not in experts:
+            experts.append(expert)
+        if category and category not in categories:
+            categories.append(category)
+        if source and source not in sources:
+            sources.append(source)
+
+    expert_text = "、".join(experts[:limit])
+    if len(experts) > limit:
+        expert_text += f" 等 {len(experts)} 个观察源"
+    category_text = "、".join(categories[:2])
+    source_text = "、".join(sources[:2])
+    return f"{expert_text} 通过{source_text}关注到它，覆盖{category_text}。"
+
+
+def expert_score_components(repo: dict[str, Any]) -> tuple[float, int, int]:
+    signals = repo.get("expert_signals") or []
+    if not signals:
+        return 0.0, 0, 0
+    expert_ids = {str(signal.get("expert_id") or signal.get("expert_name") or "") for signal in signals}
+    categories = {str(signal.get("category") or "") for signal in signals}
+    score = sum(float(signal.get("weight") or 0) for signal in signals)
+    return score, len([item for item in expert_ids if item]), len([item for item in categories if item])
+
+
 def editorial_lens(repo: dict[str, Any]) -> dict[str, Any]:
     frontier_hits = keyword_hits(repo, FRONTIER_KEYWORDS)
     product_hits = keyword_hits(repo, PRODUCT_KEYWORDS)
     features = feature_labels_zh(repo.get("features") or [])
+    expert_summary = expert_signal_summary(repo)
     front_signal = "、".join(features[:2]) if features else "开发者关注度"
     product_signal = "、".join(product_hits[:3]) if product_hits else front_signal
+    frontier_reason = f"命中 {front_signal}，适合观察前沿团队正在围绕哪些工具链和能力下注。"
+    product_reason = f"命中 {product_signal}，适合拆成可使用、可演示、可复刻的产品点子。"
+    if expert_summary:
+        frontier_reason = f"{expert_summary}再叠加 {front_signal} 信号，适合优先观察。"
+        product_reason = f"{expert_summary}如果它能落到具体使用场景，也值得拆成产品点子。"
     return {
         "frontier_hits": frontier_hits[:8],
         "product_hits": product_hits[:8],
-        "frontier_reason": f"命中 {front_signal}，适合观察前沿团队正在围绕哪些工具链和能力下注。",
-        "product_reason": f"命中 {product_signal}，适合拆成可使用、可演示、可复刻的产品点子。",
+        "expert_summary": expert_summary,
+        "frontier_reason": frontier_reason,
+        "product_reason": product_reason,
     }
 
 
@@ -779,6 +987,12 @@ def score_repo(repo: dict[str, Any], history: dict[str, Any], run_date: dt.date)
     product_signal = min(len(lens["product_hits"]) * 24, 170)
     total_star_weight = min(math.log10(max(stars, 1)) * 35, 190)
     velocity_weight = min(star_velocity * 14, 240) + min(delta_per_day * 38, 380)
+    expert_raw_score, expert_count, expert_category_count = expert_score_components(repo)
+    expert_signal_weight = (
+        min(expert_raw_score * 36, 260)
+        + min(expert_count * 32, 160)
+        + min(expert_category_count * 24, 80)
+    )
 
     rising_score = (
         min(star_velocity * 18, 260)
@@ -787,6 +1001,7 @@ def score_repo(repo: dict[str, Any], history: dict[str, Any], run_date: dt.date)
         + freshness
         + young_bonus
         + feature_bonus
+        + expert_signal_weight * 0.35
     )
     all_time_score = stars + forks * 1.5 + feature_bonus * 20 + freshness
     frontier_score = (
@@ -796,6 +1011,7 @@ def score_repo(repo: dict[str, Any], history: dict[str, Any], run_date: dt.date)
         + freshness
         + frontier_signal
         + min(feature_bonus * 1.4, 90)
+        + expert_signal_weight
     )
     product_score = (
         min(star_velocity * 16, 240)
@@ -805,6 +1021,7 @@ def score_repo(repo: dict[str, Any], history: dict[str, Any], run_date: dt.date)
         + young_bonus
         + product_signal
         + min(feature_bonus * 1.2, 85)
+        + expert_signal_weight * 0.55
     )
 
     repo["age_days"] = age_days
@@ -812,6 +1029,7 @@ def score_repo(repo: dict[str, Any], history: dict[str, Any], run_date: dt.date)
     repo["delta_stars"] = delta_stars
     repo["delta_days"] = delta_days
     repo["delta_per_day"] = round(delta_per_day, 2)
+    repo["expert_score"] = round(expert_raw_score, 3)
     repo["scores"] = {
         "all_time": round(all_time_score, 2),
         "rising": round(rising_score, 2),
@@ -881,20 +1099,24 @@ def repo_card(repo: dict[str, Any], index: int, list_name: str) -> str:
     lens = repo.get("lens") or {}
     reason = lens.get("product_reason") if list_name == "产品点子榜" else lens.get("frontier_reason")
     reason = reason or "适合作为选题池里的候选项目继续观察。"
-    return "\n".join(
-        [
-            f"### {index}. {repo['full_name']}",
-            f"- 榜单：{list_name}",
-            f"- 链接：{repo['html_url']}",
-            f"- 数据：{compact_int(repo['stars'])} 个星标，{compact_int(repo['forks'])} 个分支，创建 {repo.get('created_at', '')[:10]}，最近更新 {repo.get('pushed_at', '')[:10]}",
-            f"- 语言/协议：{repo.get('language') or '未知'} / {repo.get('license') or '未知'}",
-            f"- 网页编程功能：{', '.join(features)}",
-            f"- 项目介绍：{chinese_intro(repo)}",
-            f"- 选题判断：{reason}",
-            f"- 热度信号：项目年龄 {repo.get('age_days')} 天，平均 {repo.get('star_velocity')}/天；{delta}",
-            f"- Topics：{topics}",
-        ]
-    )
+    expert_line = ""
+    expert_summary = expert_signal_summary(repo)
+    if expert_summary:
+        expert_line = f"- 人物/专家信号：{expert_summary}"
+    lines = [
+        f"### {index}. {repo['full_name']}",
+        f"- 榜单：{list_name}",
+        f"- 链接：{repo['html_url']}",
+        f"- 数据：{compact_int(repo['stars'])} 个星标，{compact_int(repo['forks'])} 个分支，创建 {repo.get('created_at', '')[:10]}，最近更新 {repo.get('pushed_at', '')[:10]}",
+        f"- 语言/协议：{repo.get('language') or '未知'} / {repo.get('license') or '未知'}",
+        f"- 网页编程功能：{', '.join(features)}",
+        f"- 项目介绍：{chinese_intro(repo)}",
+        expert_line,
+        f"- 选题判断：{reason}",
+        f"- 热度信号：项目年龄 {repo.get('age_days')} 天，平均 {repo.get('star_velocity')}/天；{delta}",
+        f"- Topics：{topics}",
+    ]
+    return "\n".join(line for line in lines if line)
 
 
 def xhs_draft(repo: dict[str, Any], index: int) -> str:
@@ -1013,6 +1235,7 @@ def build_markdown(
             "## 数据口径",
             "",
             f"- GitHub 搜索每个查询最多抓取 {config.get('per_page', 50)} 条，默认只抓第 {config.get('pages', 1)} 页。",
+            "- 人物/专家观察源：只读取公开 GitHub star、配置里的公开推文链接和项目引用，不采集私信、私有收藏或登录后内容。",
             "- 前沿关注榜：优先看智能体、模型上下文协议、代码智能体、开发者工具链、评测、上下文记忆等信号。",
             "- 产品点子榜：优先看应用、编辑器、模板、原型、仪表盘、可视化工作流、浏览器工具等信号。",
             "- 历史高星榜：GitHub 搜索按星标排序后，再用本地评分做二次排序。",
@@ -1021,6 +1244,22 @@ def build_markdown(
         ]
     )
     return "\n".join(lines).rstrip() + "\n"
+
+
+def summarize_expert_sources(repos: list[dict[str, Any]], config: dict[str, Any]) -> dict[str, Any]:
+    signals = [signal for repo in repos for signal in repo.get("expert_signals") or []]
+    experts = sorted({str(signal.get("expert_id") or signal.get("expert_name") or "") for signal in signals if signal})
+    categories = sorted({str(signal.get("category_label") or "") for signal in signals if signal.get("category_label")})
+    source_types = sorted({str(signal.get("source_label") or "") for signal in signals if signal.get("source_label")})
+    return {
+        "enabled": bool((config.get("expert_sources") or {}).get("enabled", False)),
+        "configured_experts": len(iter_enabled_experts(config)),
+        "matched_repositories": len([repo for repo in repos if repo.get("expert_signals")]),
+        "signal_count": len(signals),
+        "expert_count": len([item for item in experts if item]),
+        "categories": categories,
+        "source_types": source_types,
+    }
 
 
 def write_outputs(
@@ -1051,6 +1290,7 @@ def write_outputs(
                 "rising": rising,
                 "xhs_repos": xhs_repos,
                 "all_repos": all_repos,
+                "expert_sources": summarize_expert_sources(all_repos, config),
             },
             fh,
             ensure_ascii=False,
@@ -1061,6 +1301,166 @@ def write_outputs(
     shutil.copyfile(markdown_path, paths.output_dir / "latest.md")
     shutil.copyfile(json_path, paths.output_dir / "latest.json")
     return markdown_path, json_path
+
+
+def iter_enabled_experts(config: dict[str, Any]) -> list[dict[str, Any]]:
+    expert_config = config.get("expert_sources") or {}
+    if not expert_config.get("enabled", False):
+        return []
+    experts = []
+    for expert in expert_config.get("experts") or []:
+        if expert.get("enabled", True):
+            experts.append(expert)
+    return experts
+
+
+def expert_display_name(expert: dict[str, Any]) -> str:
+    return str(expert.get("name") or expert.get("github") or expert.get("id") or "未命名观察源")
+
+
+def expert_id(expert: dict[str, Any]) -> str:
+    return str(expert.get("id") or expert.get("github") or expert_display_name(expert)).strip()
+
+
+def base_expert_signal(
+    expert_config: dict[str, Any],
+    expert: dict[str, Any],
+    source: str,
+    repo_full_name: str,
+    url: str = "",
+    note: str = "",
+    starred_at: str | None = None,
+) -> dict[str, Any]:
+    category = str(expert.get("category") or "")
+    signal = {
+        "expert_id": expert_id(expert),
+        "expert_name": expert_display_name(expert),
+        "category": category,
+        "category_label": expert_category_label(category),
+        "source": source,
+        "source_label": expert_signal_label(source),
+        "repo": repo_full_name,
+        "url": url,
+        "note": note,
+        "weight": expert_total_weight(expert_config, expert, source),
+    }
+    if expert.get("github"):
+        signal["github"] = expert.get("github")
+    if expert.get("x"):
+        signal["x"] = expert.get("x")
+    if starred_at:
+        signal["starred_at"] = starred_at
+    return signal
+
+
+def reference_entry_parts(entry: Any) -> tuple[list[str], str, str]:
+    if isinstance(entry, str):
+        return extract_repo_full_names_from_text(entry), entry, ""
+    if not isinstance(entry, dict):
+        return [], "", ""
+
+    names: list[str] = []
+    for key in ["repo", "repos", "full_name", "full_names"]:
+        for value in as_list(entry.get(key)):
+            if isinstance(value, str):
+                names.extend(extract_repo_full_names_from_text(value))
+
+    url = str(entry.get("url") or entry.get("link") or "")
+    text = " ".join(str(entry.get(key) or "") for key in ["text", "title", "note", "summary"])
+    names.extend(extract_repo_full_names_from_text(f"{url} {text}"))
+    note = str(entry.get("note") or entry.get("title") or entry.get("summary") or "").strip()
+
+    unique_names = []
+    seen: set[str] = set()
+    for name in names:
+        if name not in seen:
+            seen.add(name)
+            unique_names.append(name)
+    return unique_names, url, note
+
+
+def normalize_starred_item(item: dict[str, Any]) -> tuple[dict[str, Any], str | None]:
+    if isinstance(item.get("repo"), dict):
+        return item["repo"], item.get("starred_at")
+    return item, item.get("starred_at")
+
+
+def collect_expert_repositories(
+    client: GitHubClient,
+    config: dict[str, Any],
+) -> list[dict[str, Any]]:
+    expert_config = config.get("expert_sources") or {}
+    experts = iter_enabled_experts(config)
+    if not experts:
+        return []
+
+    per_page = int(expert_config.get("starred_per_page", expert_config.get("per_page", 20)))
+    pages = int(expert_config.get("starred_pages", expert_config.get("pages", 1)))
+    merged: dict[str, dict[str, Any]] = {}
+
+    def add_repo(item: dict[str, Any], signal: dict[str, Any], query: str) -> None:
+        repo = normalize_repo(item, "expert", query)
+        if not repo.get("full_name"):
+            return
+        signal["repo"] = repo["full_name"]
+        attach_expert_signal(repo, signal)
+        if repo["full_name"] in merged:
+            merge_repo(merged[repo["full_name"]], repo)
+        else:
+            merged[repo["full_name"]] = repo
+
+    for expert in experts:
+        name = expert_display_name(expert)
+        expert_name = expert_id(expert)
+        if expert.get("track_starred", True) and expert.get("github"):
+            try:
+                starred_items = client.list_starred_repositories(
+                    str(expert["github"]),
+                    per_page=per_page,
+                    pages=pages,
+                )
+            except GithubApiError as exc:
+                print(f"Expert source skipped for {name}: {exc}", file=sys.stderr)
+                starred_items = []
+
+            for item in starred_items:
+                repo_item, starred_at = normalize_starred_item(item)
+                full_name = repo_item.get("full_name") or ""
+                if not full_name:
+                    continue
+                signal = base_expert_signal(
+                    expert_config,
+                    expert,
+                    "github_star",
+                    full_name,
+                    url=f"https://github.com/{expert['github']}?tab=stars",
+                    note="该观察源的公开 GitHub star 列表出现过这个项目。",
+                    starred_at=starred_at,
+                )
+                add_repo(repo_item, signal, f"expert:{expert_name}:github_star")
+
+        for source, key in [
+            ("tweet_link", "tweet_links"),
+            ("project_reference", "project_refs"),
+        ]:
+            for entry in as_list(expert.get(key)):
+                repo_names, url, note = reference_entry_parts(entry)
+                for full_name in repo_names:
+                    item = client.get_repository(full_name)
+                    if not item:
+                        print(f"Expert reference skipped for {name}: {full_name}", file=sys.stderr)
+                        continue
+                    signal = base_expert_signal(
+                        expert_config,
+                        expert,
+                        source,
+                        full_name,
+                        url=url or f"https://github.com/{full_name}",
+                        note=note or "公开链接或项目引用里出现过这个仓库。",
+                    )
+                    add_repo(item, signal, f"expert:{expert_name}:{source}")
+
+    return list(merged.values())
 
 
 def collect_repositories(
@@ -1087,6 +1487,14 @@ def collect_repositories(
                     merge_repo(merged[repo["full_name"]], repo)
                 else:
                     merged[repo["full_name"]] = repo
+
+    for repo in collect_expert_repositories(client, config):
+        if not repo.get("full_name"):
+            continue
+        if repo["full_name"] in merged:
+            merge_repo(merged[repo["full_name"]], repo)
+        else:
+            merged[repo["full_name"]] = repo
 
     return list(merged.values())
 
@@ -1158,6 +1566,7 @@ def select_rankings(
         repo
         for repo in repos
         if "frontier" in repo.get("sources", [])
+        or repo.get("expert_signals")
         or repo.get("lens", {}).get("frontier_hits")
         or "AI Coding / Agent" in repo.get("features", [])
         or "MCP / Tool Calling" in repo.get("features", [])
@@ -1252,6 +1661,14 @@ def run(args: argparse.Namespace) -> int:
     print(f"All-time ranking: {len(all_time)}")
     print(f"Rising ranking: {len(rising)}")
     print(f"XHS drafts: {len(xhs_repos)}")
+    expert_summary = summarize_expert_sources(repos, config)
+    if expert_summary["enabled"]:
+        print(
+            "Expert signals: "
+            f"{expert_summary['signal_count']} signals across "
+            f"{expert_summary['matched_repositories']} repos "
+            f"from {expert_summary['expert_count']} sources"
+        )
     if not token:
         print("Tip: set GITHUB_TOKEN in .env to avoid unauthenticated GitHub rate limits.")
     return 0

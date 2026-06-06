@@ -123,6 +123,109 @@ MIT
         )
         self.assertEqual(examples[0]["source"], "README")
 
+    def test_extract_repo_full_names_from_public_text(self):
+        text = "看这个 https://github.com/openai/codex 和另一个 vercel/ai 都很适合观察。"
+        names = daily.extract_repo_full_names_from_text(text)
+        self.assertIn("openai/codex", names)
+        self.assertIn("vercel/ai", names)
+
+    def test_collect_expert_repositories_from_starred_and_refs(self):
+        class FakeClient:
+            def list_starred_repositories(self, username, per_page=30, pages=1):
+                self.starred_args = (username, per_page, pages)
+                return [
+                    {
+                        "starred_at": "2026-06-05T00:00:00Z",
+                        "repo": {
+                            "id": 1,
+                            "full_name": "demo/starred",
+                            "name": "starred",
+                            "owner": {"login": "demo"},
+                            "html_url": "https://github.com/demo/starred",
+                            "description": "AI coding agent",
+                            "stargazers_count": 120,
+                            "forks_count": 12,
+                            "watchers_count": 120,
+                            "open_issues_count": 1,
+                            "topics": ["ai-coding"],
+                            "default_branch": "main",
+                        },
+                    }
+                ]
+
+            def get_repository(self, full_name):
+                if full_name != "demo/referenced":
+                    return None
+                return {
+                    "id": 2,
+                    "full_name": "demo/referenced",
+                    "name": "referenced",
+                    "owner": {"login": "demo"},
+                    "html_url": "https://github.com/demo/referenced",
+                    "description": "Browser IDE",
+                    "stargazers_count": 80,
+                    "forks_count": 8,
+                    "watchers_count": 80,
+                    "open_issues_count": 0,
+                    "topics": ["web-ide"],
+                    "default_branch": "main",
+                }
+
+        config = {
+            "expert_sources": {
+                "enabled": True,
+                "starred_per_page": 10,
+                "starred_pages": 1,
+                "experts": [
+                    {
+                        "id": "expert",
+                        "name": "Expert",
+                        "category": "ai_engineer",
+                        "github": "expert-user",
+                        "track_starred": True,
+                        "project_refs": [{"repo": "demo/referenced", "url": "https://github.com/demo/referenced"}],
+                    }
+                ],
+            }
+        }
+
+        repos = daily.collect_expert_repositories(FakeClient(), config)
+        by_name = {repo["full_name"]: repo for repo in repos}
+        self.assertEqual(set(by_name), {"demo/starred", "demo/referenced"})
+        self.assertEqual(by_name["demo/starred"]["expert_signals"][0]["source"], "github_star")
+        self.assertEqual(by_name["demo/referenced"]["expert_signals"][0]["source"], "project_reference")
+
+    def test_expert_signal_boosts_frontier_score(self):
+        run_date = dt.date(2026, 6, 5)
+        base_repo = {
+            "full_name": "demo/repo",
+            "stars": 100,
+            "forks": 10,
+            "open_issues": 1,
+            "created_at": "2026-05-01T00:00:00Z",
+            "pushed_at": "2026-06-04T00:00:00Z",
+            "features": ["AI Coding / Agent"],
+            "expert_signals": [],
+        }
+        expert_repo = dict(base_repo)
+        expert_repo["expert_signals"] = []
+        daily.attach_expert_signal(
+            expert_repo,
+            {
+                "expert_id": "expert",
+                "expert_name": "Expert",
+                "category": "ai_engineer",
+                "source": "github_star",
+                "repo": "demo/repo",
+                "weight": 1.5,
+            },
+        )
+
+        daily.score_repo(base_repo, {"repos": {}}, run_date)
+        daily.score_repo(expert_repo, {"repos": {}}, run_date)
+        self.assertGreater(expert_repo["scores"]["frontier"], base_repo["scores"]["frontier"])
+        self.assertIn("expert_summary", expert_repo["lens"])
+
     def test_score_repo_uses_history_delta(self):
         run_date = dt.date(2026, 6, 5)
         history = {

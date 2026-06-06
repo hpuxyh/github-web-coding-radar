@@ -388,6 +388,68 @@
         font-size: 0.86rem;
       }
 
+      .expert-signals {
+        margin-top: 12px;
+        padding: 12px;
+        border: 1px solid rgba(33, 181, 115, 0.2);
+        border-radius: 11px;
+        background: rgba(33, 181, 115, 0.06);
+      }
+
+      .expert-signals-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .expert-signals-header strong {
+        color: #12734d;
+        font-size: 0.88rem;
+      }
+
+      .expert-signals-header span {
+        color: #61736c;
+        font-size: 0.8rem;
+        font-weight: 750;
+      }
+
+      .expert-signals p {
+        margin: 8px 0 0;
+        color: #40584d;
+        line-height: 1.55;
+        font-size: 0.86rem;
+      }
+
+      .expert-signal-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 10px;
+      }
+
+      .expert-signal-list a,
+      .expert-signal-list span {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        min-height: 25px;
+        padding: 0 8px;
+        border: 1px solid rgba(33, 181, 115, 0.2);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.72);
+        color: #176f4b;
+        text-decoration: none;
+        font-size: 0.78rem;
+        font-weight: 760;
+      }
+
+      .expert-signal-list a:hover {
+        border-color: rgba(33, 181, 115, 0.45);
+        color: #0f7a50;
+      }
+
       .beginner-difficulty {
         margin-top: 12px;
         border: 1px solid rgba(214, 145, 42, 0.22);
@@ -2452,6 +2514,46 @@
         return `最近更新 ${ym}`;
       }
 
+      function expertSignals(repo) {
+        return Array.isArray(repo.expert_signals) ? repo.expert_signals.filter(Boolean) : [];
+      }
+
+      function expertSignalSummaryText(repo) {
+        const signals = expertSignals(repo);
+        if (!signals.length) return '';
+        const experts = [...new Set(signals.map((item) => item.expert_name || item.expert_id).filter(Boolean))];
+        const categories = [...new Set(signals.map((item) => item.category_label || item.category).filter(Boolean))];
+        const sources = [...new Set(signals.map((item) => item.source_label || item.source).filter(Boolean))];
+        const expertText =
+          experts.length > 3 ? `${experts.slice(0, 3).join('、')} 等 ${experts.length} 个观察源` : experts.join('、');
+        return `${expertText} 通过${sources.slice(0, 2).join('、')}关注到它，覆盖${categories.slice(0, 2).join('、')}。`;
+      }
+
+      function renderExpertSignals(repo) {
+        const signals = expertSignals(repo);
+        if (!signals.length) return '';
+        const summaryText = repo.lens?.expert_summary || expertSignalSummaryText(repo);
+        const signalTags = signals.slice(0, 5).map((signal) => {
+          const label = `${signal.expert_name || signal.expert_id || '观察源'}：${signal.source_label || '公开信号'}`;
+          if (signal.url) {
+            return `<a href="${escapeHtml(signal.url)}" target="_blank" rel="noreferrer">${escapeHtml(label)}</a>`;
+          }
+          return `<span>${escapeHtml(label)}</span>`;
+        });
+        return `
+          <section class="expert-signals">
+            <div class="expert-signals-header">
+              <strong>人物/专家信号</strong>
+              <span>${signals.length} 条公开信号</span>
+            </div>
+            <p>${escapeHtml(summaryText)}</p>
+            <div class="expert-signal-list">
+              ${signalTags.join('')}
+            </div>
+          </section>
+        `;
+      }
+
       function renderSummary(data) {
         const allRepos = data.all_repos || [];
         const rankings = exclusiveRankings(data);
@@ -2462,6 +2564,8 @@
         const drafts = data.xhs_repos || [];
         const topStars = Math.max(0, ...allRepos.map((repo) => Number(repo.stars || 0)));
         const featureSet = new Set(allRepos.flatMap((repo) => repo.features || []));
+        const expertSignalList = allRepos.flatMap((repo) => expertSignals(repo));
+        const expertCount = new Set(expertSignalList.map((signal) => signal.expert_id || signal.expert_name).filter(Boolean)).size;
         const latestPush = allRepos
           .map((repo) => repo.pushed_at)
           .filter(Boolean)
@@ -2475,6 +2579,7 @@
           ['产品灵感', productIdeas.length, '能拿来用或改造'],
           ['正在变火', rising.length, '最近涨得快'],
           ['经典项目', allTime.length, `最高 ${compact(topStars)} 个收藏`],
+          ['人物信号', expertSignalList.length, `${expertCount} 个观察源`],
           ['草稿', drafts.length, `${featureSet.size} 类工具类型`],
         ]
           .map(
@@ -2545,6 +2650,14 @@
           difficulty.use.label,
           difficulty.use.summary,
           ...difficulty.use.reasons,
+          expertSignalSummaryText(repo),
+          ...expertSignals(repo).flatMap((signal) => [
+            signal.expert_name,
+            signal.expert_id,
+            signal.category_label,
+            signal.source_label,
+            signal.note,
+          ]),
           ...(repo.features || []).map(toChineseFeature),
           ...(repo.features || []),
           ...(repo.topics || []),
@@ -2616,6 +2729,7 @@
                       <p>${escapeHtml(details.who)}</p>
                     </section>
                   </div>
+                  ${renderExpertSignals(repo)}
                   ${renderDifficultyBlock(repo)}
                   <details class="usage-details">
                     <summary class="usage-summary">点开看具体怎么用</summary>

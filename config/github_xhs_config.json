@@ -15,6 +15,102 @@
   "request_interval_seconds": 6.5,
   "request_timeout_seconds": 60,
   "retries": 2,
+  "expert_sources": {
+    "enabled": true,
+    "starred_per_page": 20,
+    "starred_pages": 1,
+    "weights": {
+      "github_star": 1.0,
+      "tweet_link": 1.2,
+      "project_reference": 1.1
+    },
+    "category_weights": {
+      "ai_engineer": 1.35,
+      "open_source_author": 1.25,
+      "investor_product_expert": 1.1
+    },
+    "experts": [
+      {
+        "id": "karpathy",
+        "name": "Andrej Karpathy",
+        "category": "ai_engineer",
+        "github": "karpathy",
+        "x": "karpathy",
+        "weight": 1.2,
+        "track_starred": true,
+        "project_refs": [
+          {
+            "repo": "karpathy/llm.c",
+            "url": "https://github.com/karpathy/llm.c",
+            "note": "公开开源项目，可作为 AI 工程趋势观察锚点。"
+          }
+        ]
+      },
+      {
+        "id": "swyx",
+        "name": "Swyx",
+        "category": "ai_engineer",
+        "github": "swyxio",
+        "x": "swyx",
+        "weight": 1.15,
+        "track_starred": true
+      },
+      {
+        "id": "harrison-chase",
+        "name": "Harrison Chase",
+        "category": "ai_engineer",
+        "github": "hwchase17",
+        "x": "hwchase17",
+        "weight": 1.15,
+        "track_starred": true
+      },
+      {
+        "id": "shadcn",
+        "name": "shadcn",
+        "category": "open_source_author",
+        "github": "shadcn",
+        "x": "shadcn",
+        "weight": 1.1,
+        "track_starred": true
+      },
+      {
+        "id": "antfu",
+        "name": "Anthony Fu",
+        "category": "open_source_author",
+        "github": "antfu",
+        "x": "antfu7",
+        "weight": 1.05,
+        "track_starred": true
+      },
+      {
+        "id": "sindresorhus",
+        "name": "Sindre Sorhus",
+        "category": "open_source_author",
+        "github": "sindresorhus",
+        "x": "sindresorhus",
+        "weight": 1.0,
+        "track_starred": true
+      },
+      {
+        "id": "rauchg",
+        "name": "Guillermo Rauch",
+        "category": "investor_product_expert",
+        "github": "rauchg",
+        "x": "rauchg",
+        "weight": 1.05,
+        "track_starred": true
+      },
+      {
+        "id": "levelsio",
+        "name": "Pieter Levels",
+        "category": "investor_product_expert",
+        "github": "levelsio",
+        "x": "levelsio",
+        "weight": 1.0,
+        "track_starred": true
+      }
+    ]
+  },
   "all_time_queries": [
     "topic:llm stars:>=20000 archived:false",
     "topic:developer-tools stars:>=10000 archived:false",
