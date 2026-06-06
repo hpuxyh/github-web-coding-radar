@@ -388,6 +388,99 @@
         font-size: 0.86rem;
       }
 
+      .beginner-difficulty {
+        margin-top: 12px;
+        padding: 12px;
+        border: 1px solid rgba(214, 145, 42, 0.22);
+        border-radius: 11px;
+        background: rgba(214, 145, 42, 0.06);
+      }
+
+      .beginner-heading {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+
+      .beginner-heading h4 {
+        margin: 0;
+        color: #7a4a12;
+        font-size: 0.88rem;
+        line-height: 1.2;
+      }
+
+      .beginner-heading span {
+        color: #7a6351;
+        font-size: 0.76rem;
+        font-weight: 700;
+      }
+
+      .difficulty-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .difficulty-item {
+        padding: 11px 12px;
+        border: 1px solid rgba(214, 145, 42, 0.18);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.74);
+      }
+
+      .difficulty-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 7px;
+      }
+
+      .difficulty-top strong {
+        color: var(--ink);
+        font-size: 0.82rem;
+      }
+
+      .difficulty-level {
+        flex: 0 0 auto;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: rgba(33, 181, 115, 0.12);
+        color: #157a4d;
+        font-size: 0.74rem;
+        font-weight: 850;
+      }
+
+      .difficulty-level.level-3 {
+        background: rgba(214, 145, 42, 0.15);
+        color: #8a560f;
+      }
+
+      .difficulty-level.level-4,
+      .difficulty-level.level-5 {
+        background: rgba(224, 90, 79, 0.12);
+        color: #a13a2f;
+      }
+
+      .difficulty-item p {
+        margin: 0;
+        color: #465750;
+        line-height: 1.52;
+        font-size: 0.84rem;
+      }
+
+      .difficulty-item ul {
+        display: grid;
+        gap: 5px;
+        margin: 8px 0 0;
+        padding-left: 18px;
+        color: #647269;
+        line-height: 1.44;
+        font-size: 0.78rem;
+      }
+
       .usage-details {
         margin-top: 12px;
         border: 1px solid rgba(33, 181, 115, 0.24);
@@ -879,6 +972,15 @@
 
         .playbook {
           grid-template-columns: 1fr;
+        }
+
+        .difficulty-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .beginner-heading {
+          align-items: flex-start;
+          flex-direction: column;
         }
 
         .detail-grid {
@@ -1789,6 +1891,189 @@
           .replaceAll('"', '&quot;')
           .replaceAll("'", '&#039;');
 
+      const difficultyLabels = {
+        1: '很低',
+        2: '较低',
+        3: '中等',
+        4: '较高',
+        5: '高',
+      };
+
+      const installSummaries = {
+        1: '基本是打开网页、下载应用或看在线演示就能试，不需要自己搭服务。',
+        2: '通常照着文档走就能开始，可能需要下载应用或准备一个账号。',
+        3: '需要安装依赖、配置账号或 API Key，纯小白要耐心照步骤来。',
+        4: '需要命令行、环境变量、依赖服务或本地运行环境，最好有人带着装。',
+        5: '偏工程基础设施，通常要懂部署、权限、运行环境和报错排查。',
+      };
+
+      const usageSummaries = {
+        1: '功能更像普通软件，点按钮、输入需求或看结果就能上手。',
+        2: '照示例改文字、改参数就能用，主要难点是把自己的需求说清楚。',
+        3: '需要理解项目、文件、提示词或配置之间的关系，适合边试边学。',
+        4: '要会看日志、改配置、处理报错，纯小白容易卡在细节里。',
+        5: '主要面向工程师深度使用，小白更适合先看演示、截图和案例。',
+      };
+
+      const clampDifficulty = (score) => Math.max(1, Math.min(5, Math.round(score)));
+
+      function uniquePush(list, text) {
+        if (text && !list.includes(text)) list.push(text);
+      }
+
+      function repoSignalText(repo) {
+        return stripEmoji(
+          [
+            repo.full_name,
+            repo.name,
+            repo.description,
+            repo.readme_excerpt,
+            repo.homepage,
+            repo.language,
+            ...(repo.features || []),
+            ...(repo.topics || []),
+          ]
+            .filter(Boolean)
+            .join(' ')
+            .toLowerCase(),
+        );
+      }
+
+      function difficultyDefaults(score, type) {
+        if (score <= 2 && type === 'install') {
+          return ['有现成入口或较清晰文档，先试用比自己部署更现实。', '不需要一开始理解完整工程结构。'];
+        }
+        if (score <= 2) {
+          return ['更偏可视化或直接输入需求，学习成本相对低。', '先照项目示例做一遍，就能判断有没有用。'];
+        }
+        if (score === 3 && type === 'install') {
+          return ['大概率要跟着 README 安装依赖或准备账号。', '遇到报错时可能需要搜索或请技术同学帮忙。'];
+        }
+        if (score === 3) {
+          return ['要先理解它解决的具体场景，再照示例操作。', '适合从一个很小的任务开始试，不要直接上复杂项目。'];
+        }
+        if (type === 'install') {
+          return ['不是普通下载即用工具，部署前要看清依赖和运行环境。', '纯小白建议先看在线演示或截图，再决定是否投入安装。'];
+        }
+        return ['使用时常会碰到配置、日志、权限或报错。', '更适合有开发经验的人深度使用，小白可以先当案例学习。'];
+      }
+
+      function beginnerDifficulty(repo) {
+        const features = repo.features || [];
+        const text = repoSignalText(repo);
+        const language = String(repo.language || '').toLowerCase();
+        const installReasons = [];
+        const useReasons = [];
+        let installScore = 3;
+        let useScore = 3;
+
+        const hasOnlineEntry = Boolean(repo.homepage) || /\b(demo|preview|playground|website|web app|browser|vercel|netlify|streamlit|github\.io)\b/.test(text);
+        const hasPackagedEntry = /\b(download|desktop app|native desktop|macos|windows|linux|appimage|release)\b/.test(text);
+        const isVisualNoCodeTool =
+          features.includes('Low-code / No-code') ||
+          /\b(no-code|low-code|template|prototype|design|visual|screenshot|slides|poster|desktop app|html artifacts)\b/.test(text);
+        const hasFriendlyEntry = hasOnlineEntry || hasPackagedEntry;
+        if (hasOnlineEntry) {
+          installScore -= 1;
+          uniquePush(installReasons, '有官网、演示或在线入口，可以先看效果再决定要不要部署。');
+        }
+
+        if (hasPackagedEntry) {
+          installScore -= 1;
+          uniquePush(installReasons, '更像下载安装使用的工具，比自己搭服务友好。');
+        }
+
+        if (features.includes('Low-code / No-code')) {
+          installScore -= 1;
+          useScore -= 1;
+          uniquePush(installReasons, '偏低代码或无代码，通常不需要先懂完整工程。');
+          uniquePush(useReasons, '功能更像搭积木，重点是选模板、填内容、看结果。');
+        }
+
+        if (features.includes('Web IDE / Browser Editor')) {
+          installScore -= 1;
+          useScore -= 0.5;
+          uniquePush(installReasons, '有网页编辑或浏览器工作台，启动门槛比本地工程低。');
+          uniquePush(useReasons, '可以在界面里编辑和预览，适合从小改动开始试。');
+        }
+
+        if (features.includes('AI Coding / Agent')) {
+          installScore += isVisualNoCodeTool ? 0.3 : 1;
+          useScore += isVisualNoCodeTool ? 0.5 : 1;
+          uniquePush(installReasons, '涉及 AI 编程智能体，常要配置模型、项目目录或权限。');
+          uniquePush(useReasons, '要会描述任务、检查改动，并判断 AI 有没有乱改。');
+        }
+
+        if (features.includes('MCP / Tool Calling')) {
+          installScore += isVisualNoCodeTool ? 0.4 : 1;
+          useScore += isVisualNoCodeTool ? 0.5 : 1;
+          uniquePush(installReasons, '涉及工具调用或 MCP，通常要配置外部工具和连接方式。');
+          uniquePush(useReasons, '使用时要理解工具权限、输入输出和失败原因。');
+        }
+
+        if (features.includes('Sandbox / Preview')) {
+          installScore += isVisualNoCodeTool ? 0.3 : 1;
+          useScore += isVisualNoCodeTool ? 0.2 : 0.5;
+          uniquePush(installReasons, '带沙盒或预览环境，安装时可能要准备运行环境。');
+          uniquePush(useReasons, '要看运行结果、日志或报错，不能只看按钮。');
+        }
+
+        if (features.includes('Deploy / Cloud')) {
+          installScore += 1.5;
+          useScore += 1;
+          uniquePush(installReasons, '涉及云端发布或部署，纯小白会遇到账号、权限和环境问题。');
+          uniquePush(useReasons, '真正用起来要理解发布流程、配置和线上状态。');
+        }
+
+        if (features.includes('Testing / Quality')) {
+          useScore += 0.5;
+          uniquePush(useReasons, '测试和质量工具通常要看报告、规则或失败原因。');
+        }
+
+        if (/\b(cli|terminal|command line|api key|env|docker|kubernetes|self-host|server|proxy|runtime|database|oauth|auth|rag|vector|infrastructure|framework)\b/.test(text)) {
+          installScore += isVisualNoCodeTool ? 0.3 : 1;
+          useScore += isVisualNoCodeTool ? 0.2 : 0.5;
+          uniquePush(installReasons, '文档或标签里出现命令行、服务、密钥或部署词，安装不会特别傻瓜。');
+          uniquePush(useReasons, '操作时可能要处理配置、命令、权限或服务状态。');
+        }
+
+        if (isVisualNoCodeTool) {
+          useScore -= 1;
+          uniquePush(useReasons, '更偏原型、设计或模板，具体功能通常能用视觉结果判断。');
+        }
+
+        if (['rust', 'go', 'java', 'c++', 'c', 'swift'].includes(language) && !hasFriendlyEntry) {
+          installScore += 1;
+          uniquePush(installReasons, '底层语言或原生应用项目，对本地环境更挑。');
+        } else if (['typescript', 'javascript', 'python'].includes(language) && !hasFriendlyEntry) {
+          installScore += 0.5;
+          uniquePush(installReasons, '需要常见开发环境，比如 Node.js 或 Python。');
+        } else if (!language || language === 'html') {
+          installScore -= 0.5;
+          uniquePush(installReasons, '语言门槛不明显，先看页面或示例更容易。');
+        }
+
+        const installLevel = clampDifficulty(installScore);
+        const useLevel = clampDifficulty(useScore);
+        const installFinalReasons = installReasons.length ? installReasons.slice(0, 2) : difficultyDefaults(installLevel, 'install');
+        const useFinalReasons = useReasons.length ? useReasons.slice(0, 2) : difficultyDefaults(useLevel, 'use');
+
+        return {
+          install: {
+            level: installLevel,
+            label: difficultyLabels[installLevel],
+            summary: installSummaries[installLevel],
+            reasons: installFinalReasons,
+          },
+          use: {
+            level: useLevel,
+            label: difficultyLabels[useLevel],
+            summary: usageSummaries[useLevel],
+            reasons: useFinalReasons,
+          },
+        };
+      }
+
       const friendlyProjectNameText = {
         'nexu-io/open-design': 'AI 设计助手',
         'superset-sh/superset': 'AI 代码工作台',
@@ -2048,11 +2333,40 @@
         `;
       }
 
+      function renderDifficultyBlock(repo) {
+        const difficulty = beginnerDifficulty(repo);
+        const renderItem = (title, item) => `
+          <section class="difficulty-item">
+            <div class="difficulty-top">
+              <strong>${escapeHtml(title)}</strong>
+              <span class="difficulty-level level-${item.level}">${escapeHtml(item.label)}</span>
+            </div>
+            <p>${escapeHtml(item.summary)}</p>
+            <ul>
+              ${item.reasons.map((reason) => `<li>${escapeHtml(reason)}</li>`).join('')}
+            </ul>
+          </section>
+        `;
+        return `
+          <section class="beginner-difficulty">
+            <div class="beginner-heading">
+              <h4>纯小白上手难度</h4>
+              <span>安装部署 + 功能操作</span>
+            </div>
+            <div class="difficulty-grid">
+              ${renderItem('安装部署复杂度', difficulty.install)}
+              ${renderItem('功能操作难度', difficulty.use)}
+            </div>
+          </section>
+        `;
+      }
+
       function collectDrafts(data) {
         return (data.xhs_repos || []).map((repo, index) => {
           const features = repo.features?.length ? repo.features.map((feature) => stripEmoji(toChineseFeature(feature))) : ['开发者效率'];
           const intro = stripEmoji(toChineseIntro(repo));
           const friendlyName = stripEmoji(displayProjectName(repo));
+          const difficulty = beginnerDifficulty(repo);
           const delta =
             repo.delta_stars === null || repo.delta_stars === undefined
               ? ''
@@ -2060,7 +2374,7 @@
           const featureLines = features.slice(0, 4).map((feature) => `- ${feature}`).join('\n');
           return {
             title: `${friendlyName}：好用工具选题`,
-            text: `封面文案：${friendlyName}｜${features[0]}\n\n开头：\n今天刷到一个开源项目「${friendlyName}」，适合关注 AI 工具和效率工具的朋友收藏。\n\n它是干什么的：\n${intro}\n\n核心功能：\n${featureLines}\n\n为什么现在值得看：\n目前 ${compact(repo.stars)} 个收藏，创建于 ${shortDate(repo.created_at)}，最近仍有更新${delta}。\n\n项目链接：\n${repo.html_url}\n\n标签：\n#开源项目 #AI工具 #效率工具 #程序员工具 #开发者工具`,
+            text: `封面文案：${friendlyName}｜${features[0]}\n\n开头：\n今天刷到一个开源项目「${friendlyName}」，适合关注 AI 工具和效率工具的朋友收藏。\n\n它是干什么的：\n${intro}\n\n核心功能：\n${featureLines}\n\n小白上手难度：\n- 安装部署：${difficulty.install.label}，${difficulty.install.summary}\n- 功能操作：${difficulty.use.label}，${difficulty.use.summary}\n\n为什么现在值得看：\n目前 ${compact(repo.stars)} 个收藏，创建于 ${shortDate(repo.created_at)}，最近仍有更新${delta}。\n\n项目链接：\n${repo.html_url}\n\n标签：\n#开源项目 #AI工具 #效率工具 #程序员工具 #开发者工具`,
             repo,
             index: index + 1,
           };
@@ -2168,6 +2482,7 @@
 
       function repoSearchText(repo) {
         const details = projectDetails(repo);
+        const difficulty = beginnerDifficulty(repo);
         return [
           displayProjectName(repo),
           repo.full_name,
@@ -2184,6 +2499,12 @@
           repo.language,
           repo.license,
           rankingReason(repo),
+          difficulty.install.label,
+          difficulty.install.summary,
+          ...difficulty.install.reasons,
+          difficulty.use.label,
+          difficulty.use.summary,
+          ...difficulty.use.reasons,
           ...(repo.features || []).map(toChineseFeature),
           ...(repo.features || []),
           ...(repo.topics || []),
@@ -2255,6 +2576,7 @@
                       <p>${escapeHtml(details.who)}</p>
                     </section>
                   </div>
+                  ${renderDifficultyBlock(repo)}
                   <details class="usage-details">
                     <summary class="usage-summary">点开看具体怎么用</summary>
                     <div class="playbook">
