@@ -2127,10 +2127,11 @@
 
       function renderSummary(data) {
         const allRepos = data.all_repos || [];
-        const frontier = data.frontier || [];
-        const productIdeas = data.product_ideas || [];
-        const rising = data.rising || [];
-        const allTime = data.all_time || [];
+        const rankings = exclusiveRankings(data);
+        const frontier = rankings.frontier;
+        const productIdeas = rankings.product_ideas;
+        const rising = rankings.rising;
+        const allTime = rankings.all_time;
         const drafts = data.xhs_repos || [];
         const topStars = Math.max(0, ...allRepos.map((repo) => Number(repo.stars || 0)));
         const featureSet = new Set(allRepos.flatMap((repo) => repo.features || []));
@@ -2163,13 +2164,33 @@
         subtitle.textContent = `日报日期 ${data.date || '未知'} · 最近项目更新 ${shortDate(latestPush)}`;
       }
 
+      function exclusiveRankings(data) {
+        const seen = new Set();
+        const take = (repos = []) =>
+          repos.filter((repo) => {
+            const key = repo.full_name || repo.html_url || repo.name;
+            if (!key) return true;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+          });
+
+        return {
+          frontier: take(data.frontier || []),
+          product_ideas: take(data.product_ideas || []),
+          rising: take(data.rising || []),
+          all_time: take(data.all_time || []),
+        };
+      }
+
       function getReposForTab() {
         if (!state.data) return [];
-        if (state.activeTab === 'frontier') return state.data.frontier || [];
-        if (state.activeTab === 'product_ideas') return state.data.product_ideas || [];
-        if (state.activeTab === 'all_time') return state.data.all_time || [];
+        const rankings = exclusiveRankings(state.data);
+        if (state.activeTab === 'frontier') return rankings.frontier;
+        if (state.activeTab === 'product_ideas') return rankings.product_ideas;
+        if (state.activeTab === 'all_time') return rankings.all_time;
         if (state.activeTab === 'drafts') return state.data.xhs_repos || [];
-        return state.data.rising || [];
+        return rankings.rising;
       }
 
       function repoSearchText(repo) {

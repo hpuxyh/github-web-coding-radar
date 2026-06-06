@@ -11,6 +11,27 @@ import github_xhs_daily as daily
 
 
 class GithubXhsDailyTests(unittest.TestCase):
+    def ranked_repo(self, name, sources, scores=None, features=None, age_days=10):
+        score_values = {
+            "frontier": 100,
+            "product": 100,
+            "rising": 100,
+            "all_time": 100,
+        }
+        score_values.update(scores or {})
+        return {
+            "full_name": name,
+            "name": name.split("/")[-1],
+            "html_url": f"https://github.com/{name}",
+            "sources": sources,
+            "scores": score_values,
+            "features": features or [],
+            "lens": {},
+            "age_days": age_days,
+            "stars": 100,
+            "forks": 10,
+        }
+
     def test_render_query_expands_relative_dates(self):
         run_date = dt.date(2026, 6, 5)
         query = daily.render_query("created:>={date_60} pushed:>={date_7}", run_date)
@@ -27,6 +48,36 @@ class GithubXhsDailyTests(unittest.TestCase):
         self.assertIn("AI Coding / Agent", features)
         self.assertIn("Web IDE / Browser Editor", features)
         self.assertIn("Sandbox / Preview", features)
+
+    def test_select_rankings_keeps_tabs_exclusive(self):
+        shared = self.ranked_repo(
+            "demo/shared",
+            ["frontier", "product", "rising", "all_time"],
+            scores={"frontier": 500, "product": 500, "rising": 500, "all_time": 500},
+            features=["AI Coding / Agent", "Web IDE / Browser Editor"],
+        )
+        repos = [
+            shared,
+            self.ranked_repo("demo/frontier", ["frontier"], scores={"frontier": 400}, features=["AI Coding / Agent"]),
+            self.ranked_repo("demo/product", ["product"], scores={"product": 400}, features=["Web IDE / Browser Editor"]),
+            self.ranked_repo("demo/rising", ["rising"], scores={"rising": 400}),
+            self.ranked_repo("demo/classic", ["all_time"], scores={"all_time": 400}),
+        ]
+        frontier, product_ideas, all_time, rising, _ = daily.select_rankings(
+            repos,
+            {
+                "frontier_limit": 3,
+                "product_limit": 3,
+                "top_limit": 3,
+                "rising_limit": 3,
+                "xhs_count": 3,
+            },
+        )
+        sections = [frontier, product_ideas, rising, all_time]
+        names = [repo["full_name"] for section in sections for repo in section]
+        self.assertEqual(len(names), len(set(names)))
+        self.assertIn("demo/shared", [repo["full_name"] for repo in frontier])
+        self.assertNotIn("demo/shared", [repo["full_name"] for repo in product_ideas + rising + all_time])
 
     def test_extract_readme_examples_from_usage_section(self):
         readme = """

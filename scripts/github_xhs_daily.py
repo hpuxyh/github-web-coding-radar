@@ -1141,7 +1141,7 @@ def select_rankings(
     rising_max_age_days = int(config.get("rising_max_age_days", 180))
 
     # 同一个项目只进一个榜单，避免不同标签页里重复出现。
-    # 认领顺序：经典项目 -> 大佬在看 -> 产品灵感 -> 正在变火。
+    # 认领顺序跟页面标签一致：大佬在看 -> 产品灵感 -> 正在变火 -> 经典项目。
     claimed: set[str] = set()
 
     def take(candidates: list[dict[str, Any]], score_key: str, limit: int) -> list[dict[str, Any]]:
@@ -1153,11 +1153,6 @@ def select_rankings(
         for repo in ranked:
             claimed.add(repo["full_name"])
         return ranked
-
-    all_time_candidates = [repo for repo in repos if "all_time" in repo.get("sources", [])]
-    if not all_time_candidates:
-        all_time_candidates = repos
-    all_time = take(all_time_candidates, "all_time", top_limit)
 
     frontier_candidates = [
         repo
@@ -1186,6 +1181,11 @@ def select_rankings(
         if "rising" in repo.get("sources", []) or repo.get("age_days", 9999) <= rising_max_age_days
     ]
     rising = take(rising_candidates, "rising", rising_limit)
+
+    all_time_candidates = [repo for repo in repos if "all_time" in repo.get("sources", [])]
+    if not all_time_candidates:
+        all_time_candidates = repos
+    all_time = take(all_time_candidates, "all_time", top_limit)
 
     seen: set[str] = set()
     xhs_repos: list[dict[str, Any]] = []
