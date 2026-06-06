@@ -4,7 +4,7 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .coverage
-data/
+/data/
 output/
 logs/
 node_modules/
