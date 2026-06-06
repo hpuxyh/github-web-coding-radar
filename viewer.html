@@ -388,11 +388,53 @@
         font-size: 0.86rem;
       }
 
+      .usage-details {
+        margin-top: 12px;
+        border: 1px solid rgba(33, 181, 115, 0.24);
+        border-radius: 11px;
+        background: rgba(33, 181, 115, 0.04);
+        overflow: hidden;
+      }
+
+      .usage-summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 14px;
+        list-style: none;
+        cursor: pointer;
+        color: #147a54;
+        font-size: 0.92rem;
+        font-weight: 850;
+      }
+
+      .usage-summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .usage-summary::after {
+        content: "⌄";
+        flex: 0 0 auto;
+        font-size: 1.1rem;
+        line-height: 1;
+        transition: transform 0.18s ease;
+      }
+
+      .usage-details[open] .usage-summary::after {
+        transform: rotate(180deg);
+      }
+
+      .usage-details[open] .usage-summary {
+        border-bottom: 1px solid rgba(33, 181, 115, 0.16);
+      }
+
       .playbook {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 10px;
-        margin-top: 12px;
+        margin: 0;
+        padding: 10px;
       }
 
       .playbook-block {
@@ -2208,20 +2250,23 @@
                       <p>${escapeHtml(details.who)}</p>
                     </section>
                   </div>
-                  <div class="playbook">
-                    <section class="playbook-block">
-                      <h4>可以怎么用</h4>
-                      <ul>
-                        ${playbook.scenarios.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
-                      </ul>
-                    </section>
-                    <section class="playbook-block">
-                      <h4>上手步骤</h4>
-                      <ol>
-                        ${playbook.steps.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
-                      </ol>
-                    </section>
-                  </div>
+                  <details class="usage-details">
+                    <summary class="usage-summary">点开看具体怎么用</summary>
+                    <div class="playbook">
+                      <section class="playbook-block">
+                        <h4>可以怎么用</h4>
+                        <ul>
+                          ${playbook.scenarios.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
+                        </ul>
+                      </section>
+                      <section class="playbook-block">
+                        <h4>上手步骤</h4>
+                        <ol>
+                          ${playbook.steps.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
+                        </ol>
+                      </section>
+                    </div>
+                  </details>
                   ${edge ? `<section class="edge">
                     <h4>✦ 它强在哪？为什么 Codex、Claude Code 替不了</h4>
                     <ul>${edge.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
