@@ -536,6 +536,26 @@
         font-weight: 900;
       }
 
+      .yuzhu-play-button {
+        min-height: 34px;
+        padding: 0 12px;
+        border: 1px solid rgba(31, 45, 64, 0.12);
+        border-radius: 8px;
+        background: #ffffff;
+        color: #111111;
+        font-weight: 900;
+      }
+
+      .yuzhu-play-button:hover {
+        background: #f2f5f8;
+      }
+
+      .yuzhu-player.is-playing .yuzhu-cover {
+        box-shadow:
+          0 4px 14px rgba(31, 45, 64, 0.14),
+          0 0 0 8px color-mix(in srgb, var(--accent, #09a3ff) 14%, transparent);
+      }
+
       .yuzhu-main {
         position: relative;
         z-index: 1;
@@ -554,15 +574,22 @@
         font-weight: 800;
       }
 
-      .yuzhu-nav span {
+      .yuzhu-nav button {
         min-height: 36px;
         display: inline-flex;
         align-items: center;
         padding: 0 12px;
+        border: 0;
         border-radius: 8px;
+        background: transparent;
+        color: #222222;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 850;
       }
 
-      .yuzhu-nav span:first-child {
+      .yuzhu-nav button:hover,
+      .yuzhu-nav button.is-active {
         background: #eeeeee;
       }
 
@@ -604,6 +631,7 @@
       .yuzhu-section,
       .yuzhu-contact {
         padding: 28px 0;
+        scroll-margin-top: 16px;
       }
 
       .yuzhu-section h3,
@@ -1464,29 +1492,42 @@
                     <strong>我的歌单</strong>
                     <span>静态展示，不接外部音乐服务</span>
                   </div>
-                  <div class="yuzhu-controls">◀ ▶ ▶|</div>
+                  <div class="yuzhu-controls">
+                    <button class="yuzhu-play-button" type="button" data-yuzhu-player>▶ 试听</button>
+                  </div>
                 </div>
               </aside>
               <section class="yuzhu-main">
                 <nav class="yuzhu-nav" aria-label="页面导航">
-                  <span>首页</span><b>·</b><span>介绍</span><b>·</b><span>项目</span><b>·</b><span>博客</span>
+                  <button class="is-active" type="button" data-yuzhu-section="home">首页</button>
+                  <b>·</b>
+                  <button type="button" data-yuzhu-section="intro">介绍</button>
+                  <b>·</b>
+                  <button type="button" data-yuzhu-section="project">项目</button>
+                  <b>·</b>
+                  <button type="button" data-yuzhu-section="blog">博客</button>
                 </nav>
-                <section class="yuzhu-hero">
+                <section class="yuzhu-hero" data-yuzhu-panel="home">
                   <h2>👋 ${escapeHtml(data.kicker)}</h2>
                   <a class="yuzhu-kicker" href="${escapeHtml(sourceDemoUrls[projectId])}" target="_blank" rel="noreferrer">原站静态副本</a>
                   <div class="yuzhu-intro-lines">${introLinesHtml()}</div>
                   <p class="yuzhu-section-note">${escapeHtml(data.subtitle)}</p>
                   <p class="yuzhu-dot">·</p>
                 </section>
-                <section class="yuzhu-section">
+                <section class="yuzhu-section" data-yuzhu-panel="project">
                   <h3>${escapeHtml(data.sectionTitle)}</h3>
                   <p class="yuzhu-section-note">学任何东西最有成就感的时刻，莫过于自己的作品得到他人认可。</p>
                   <div class="yuzhu-card-grid">${yuzhuCardsHtml(data.cards)}</div>
                 </section>
-                <section class="yuzhu-section yuzhu-about">
+                <section class="yuzhu-section yuzhu-about" data-yuzhu-panel="intro">
                   <h3>自我介绍</h3>
                   <p class="yuzhu-section-note">${escapeHtml(data.intro)}</p>
                   <div class="yuzhu-skills">${chipsHtml(data.skillsText)}</div>
+                </section>
+                <section class="yuzhu-section" data-yuzhu-panel="blog">
+                  <h3>博客</h3>
+                  <p class="yuzhu-section-note">这里可以放最近写过的文章、学习记录或者想公开分享的小想法。</p>
+                  <div class="yuzhu-card-grid">${yuzhuCardsHtml(data.cards.slice(0, 2))}</div>
                 </section>
                 <section class="yuzhu-section">
                   <h3>我的小伙伴们</h3>
@@ -1590,6 +1631,31 @@
 
       form.addEventListener('input', (event) => {
         applyInput(event.target);
+      });
+
+      preview.addEventListener('click', (event) => {
+        if (!isYuzhuPack()) return;
+        const sectionButton = event.target.closest('[data-yuzhu-section]');
+        if (sectionButton) {
+          const section = sectionButton.dataset.yuzhuSection;
+          preview
+            .querySelectorAll('[data-yuzhu-section]')
+            .forEach((button) => button.classList.toggle('is-active', button === sectionButton));
+          preview
+            .querySelector(`[data-yuzhu-panel="${section}"]`)
+            ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          return;
+        }
+
+        const playerButton = event.target.closest('[data-yuzhu-player]');
+        if (playerButton) {
+          const player = playerButton.closest('.yuzhu-player');
+          const isPlaying = !player.classList.contains('is-playing');
+          player.classList.toggle('is-playing', isPlaying);
+          playerButton.textContent = isPlaying ? 'Ⅱ 暂停' : '▶ 试听';
+          const note = player.querySelector('.yuzhu-track span');
+          note.textContent = isPlaying ? '播放中，静态演示' : '静态展示，不接外部音乐服务';
+        }
       });
 
       saveButton.addEventListener('click', saveData);
