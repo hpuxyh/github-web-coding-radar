@@ -721,6 +721,12 @@
         'choice-tool': '转盘选择 HTML 小工具'
       };
 
+      const sourceDemoUrls = {
+        'portfolio-page': 'https://siquan001.github.io/',
+        'ai-profile-page': 'https://xiestar.github.io/',
+        'choice-tool': 'https://nikpatil2123.github.io/Spin-wheel-Game/'
+      };
+
       const params = new URLSearchParams(window.location.search);
       const projectId = packCatalog[params.get('project')] ? params.get('project') : 'portfolio-page';
       const packIndex = Math.min(
@@ -728,14 +734,16 @@
         packCatalog[projectId].length - 1
       );
       const pack = packCatalog[projectId][packIndex];
-      const storageKey = `remix-editor-${projectId}-${packIndex}`;
+      const storageVersion = 'real-site-frontends-v1';
+      const storageKey = `remix-editor-${storageVersion}-${projectId}-${packIndex}`;
       const form = document.getElementById('editorForm');
       const preview = document.getElementById('preview');
       const saveButton = document.getElementById('saveButton');
       const saveTop = document.getElementById('saveTop');
       const resetButton = document.getElementById('resetButton');
       const saveNotice = document.getElementById('saveNotice');
-      const sampleDemoUrl = `./remix-demo.html?project=${projectId}&pack=${packIndex}&mode=sample`;
+      const sampleDemoUrl =
+        sourceDemoUrls[projectId] || `./remix-demo.html?project=${projectId}&pack=${packIndex}&mode=sample`;
       const mineDemoUrl = `./remix-demo.html?project=${projectId}&pack=${packIndex}&mode=mine`;
 
       let data = loadData();
@@ -1119,7 +1127,12 @@
         saveNotice.textContent = '已恢复成示例内容，并保存到当前浏览器。';
       }
 
-      document.getElementById('sampleDemoTop').href = sampleDemoUrl;
+      const sampleDemoTop = document.getElementById('sampleDemoTop');
+      sampleDemoTop.href = sampleDemoUrl;
+      if (sourceDemoUrls[projectId]) {
+        sampleDemoTop.target = '_blank';
+        sampleDemoTop.rel = 'noreferrer';
+      }
       document.getElementById('mineDemoTop').href = mineDemoUrl;
       document.getElementById('mineDemoButton').href = mineDemoUrl;
       document.getElementById('packLabel').textContent = `${projectNames[projectId]} · 第 ${packIndex + 1} 个改法`;

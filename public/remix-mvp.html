@@ -1345,6 +1345,10 @@
       function renderDetail() {
         const project = getActiveProject();
         const pack = project.packs[state.packIndex] || project.packs[0];
+        const sampleHref =
+          project.sourceDemoUrl ||
+          `./remix-demo.html?project=${project.id}&pack=${state.packIndex}&mode=sample`;
+        const sampleTarget = project.sourceDemoUrl ? ' target="_blank" rel="noreferrer"' : '';
         detailPanel.innerHTML = `
           <div class="detail-head">
             <span class="pill">${project.type}</span>
@@ -1406,7 +1410,7 @@
                   <p class="hero-copy">${pack.goal}</p>
                 </div>
                 <div class="pack-actions">
-                  <a class="demo-button" href="./remix-demo.html?project=${project.id}&pack=${state.packIndex}&mode=sample">
+                  <a class="demo-button" href="${sampleHref}"${sampleTarget}>
                     查看示例前端
                   </a>
                   <a class="edit-button" href="./remix-editor.html?project=${project.id}&pack=${state.packIndex}">
@@ -1439,7 +1443,7 @@
               </div>
               <div class="edit-box">
                 <strong>下一步：先看模板效果，再改自己的</strong>
-                <p>点“查看示例前端”可以先看这个模板被整理后的样子；点“打开编辑页面”可以直接在网页里修改，修改后再打开“我的前端”查看自己的版本。</p>
+                <p>点“查看示例前端”会直接打开原来的真实网页；点“打开编辑页面”可以在我们网站里改成自己的版本，修改后再打开“我的前端”查看效果。</p>
               </div>
             </div>
           </div>

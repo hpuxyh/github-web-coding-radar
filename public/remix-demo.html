@@ -428,6 +428,12 @@
         'choice-tool': '转盘选择 HTML 小工具'
       };
 
+      const sourceDemoUrls = {
+        'portfolio-page': 'https://siquan001.github.io/',
+        'ai-profile-page': 'https://xiestar.github.io/',
+        'choice-tool': 'https://nikpatil2123.github.io/Spin-wheel-Game/'
+      };
+
       const sampleDefaults = {
         'portfolio-page-0': {
           title: '雨竹upon的小站',
@@ -559,13 +565,15 @@
       const packIndex = Math.min(Math.max(Number(params.get('pack') || 0), 0), packCatalog[projectId].length - 1);
       const mode = params.get('mode') === 'mine' ? 'mine' : 'sample';
       const pack = packCatalog[projectId][packIndex];
-      const storageKey = `remix-editor-${projectId}-${packIndex}`;
+      const storageVersion = 'real-site-frontends-v1';
+      const storageKey = `remix-editor-${storageVersion}-${projectId}-${packIndex}`;
       const sampleData = clone(sampleDefaults[`${projectId}-${packIndex}`]);
       const hasSaved = Boolean(localStorage.getItem(storageKey));
       const data = mode === 'mine' ? loadMineData(sampleData) : sampleData;
       const demoRoot = document.getElementById('demoRoot');
       const editUrl = `./remix-editor.html?project=${projectId}&pack=${packIndex}`;
-      const sampleUrl = `./remix-demo.html?project=${projectId}&pack=${packIndex}&mode=sample`;
+      const sampleUrl =
+        sourceDemoUrls[projectId] || `./remix-demo.html?project=${projectId}&pack=${packIndex}&mode=sample`;
 
       function clone(value) {
         return JSON.parse(JSON.stringify(value));
@@ -672,7 +680,12 @@
         document.getElementById('resultReason').textContent = choice.note;
       }
 
-      document.getElementById('sampleLink').href = sampleUrl;
+      const sampleLink = document.getElementById('sampleLink');
+      sampleLink.href = sampleUrl;
+      if (sourceDemoUrls[projectId]) {
+        sampleLink.target = '_blank';
+        sampleLink.rel = 'noreferrer';
+      }
       document.getElementById('editLink').href = editUrl;
       document.getElementById('modeLabel').textContent = mode === 'mine' ? '我的前端' : '示例前端';
       document.getElementById('demoTitle').textContent =
