@@ -132,6 +132,109 @@
         padding: 16px 18px;
       }
 
+      .chat-editor {
+        display: grid;
+        gap: 14px;
+        padding: 16px 18px;
+      }
+
+      .chat-thread {
+        max-height: calc(100vh - 320px);
+        min-height: 360px;
+        display: grid;
+        align-content: start;
+        gap: 12px;
+        overflow: auto;
+        padding-right: 4px;
+      }
+
+      .chat-message {
+        max-width: 92%;
+        display: grid;
+        gap: 6px;
+        padding: 12px;
+        border: 1px solid #dfe5ec;
+        border-radius: 8px;
+        background: #f8fafc;
+      }
+
+      .chat-message.user {
+        justify-self: end;
+        border-color: #172033;
+        background: #172033;
+        color: #ffffff;
+      }
+
+      .chat-message strong {
+        font-size: 0.84rem;
+      }
+
+      .chat-message p {
+        color: inherit;
+        font-size: 0.95rem;
+        line-height: 1.65;
+      }
+
+      .chat-quick {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .chat-chip {
+        min-height: 34px;
+        padding: 0 10px;
+        border: 1px solid #d8dee7;
+        border-radius: 8px;
+        background: #ffffff;
+        color: #1d2a3b;
+        font-size: 0.86rem;
+        font-weight: 820;
+      }
+
+      .chat-chip:hover {
+        border-color: #b9c5d4;
+        background: #f7f9fb;
+      }
+
+      .chat-compose {
+        display: grid;
+        gap: 10px;
+      }
+
+      .chat-compose textarea {
+        min-height: 118px;
+      }
+
+      .chat-send-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .change-list {
+        display: grid;
+        gap: 6px;
+        padding: 12px;
+        border: 1px solid #dfe5ec;
+        border-radius: 8px;
+        background: #f8fafc;
+      }
+
+      .change-list h3 {
+        color: #172033;
+        font-size: 0.96rem;
+      }
+
+      .change-list ul {
+        margin: 0;
+        padding-left: 18px;
+        color: #607084;
+        font-size: 0.9rem;
+        line-height: 1.6;
+      }
+
       label,
       .field-label {
         display: grid;
@@ -340,6 +443,30 @@
         font-family:
           "Noto Sans SC", "Noto Sans JP", Inter, ui-sans-serif, system-ui,
           -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .yuzhu-site.theme-cute {
+        background:
+          radial-gradient(circle at 14% 12%, rgba(255, 196, 220, 0.42), transparent 20%),
+          radial-gradient(circle at 78% 8%, rgba(255, 230, 156, 0.34), transparent 18%),
+          linear-gradient(180deg, #fff8fb 0%, #ffffff 100%);
+      }
+
+      .yuzhu-site.theme-clean {
+        background:
+          radial-gradient(circle at 16% 14%, rgba(187, 238, 255, 0.3), transparent 18%),
+          linear-gradient(180deg, #f7fbff 0%, #ffffff 100%);
+      }
+
+      .yuzhu-site.theme-dark {
+        background:
+          radial-gradient(circle at 18% 16%, rgba(87, 108, 255, 0.22), transparent 22%),
+          linear-gradient(180deg, #111827 0%, #172033 100%);
+      }
+
+      .yuzhu-site.theme-dark .yuzhu-stage {
+        border-color: rgba(255, 255, 255, 0.16);
+        background: rgba(255, 255, 255, 0.96);
       }
 
       .yuzhu-stage {
@@ -810,6 +937,7 @@
 
         .panel-head,
         .form-grid,
+        .chat-editor,
         .preview-frame {
           padding: 16px;
         }
@@ -863,7 +991,7 @@
             <h2 id="editTitle">填写内容</h2>
             <p id="editHint">先把示例文字换成自己的内容。</p>
           </div>
-          <form class="form-grid" id="editorForm"></form>
+          <div class="chat-editor" id="editorForm"></div>
           <div class="form-actions">
             <button class="button primary" type="button" id="saveButton">保存</button>
             <a class="button" id="mineDemoButton" href="#">查看我的前端</a>
@@ -1042,9 +1170,21 @@
       const mineDemoUrl = `./remix-demo.html?project=${projectId}&pack=${packIndex}&mode=mine`;
 
       let data = loadData();
+      let lastChanges = ['还没开始修改，可以直接说你想要什么效果。'];
+      let chatMessages = initialChatMessages();
 
       function clone(value) {
         return JSON.parse(JSON.stringify(value));
+      }
+
+      function initialChatMessages() {
+        return [
+          {
+            role: 'assistant',
+            text:
+              '你不用一个字段一个字段填，直接告诉我想把这个小站改成什么样。比如：改成摄影作品集、颜色温柔一点、加三个作品、做成 AI 工具榜单。'
+          }
+        ];
       }
 
       function defaultDataForPack() {
@@ -1254,6 +1394,10 @@
         return /^#[0-9a-fA-F]{6}$/.test(String(value || '')) ? value : '#1769c2';
       }
 
+      function safeTheme(value) {
+        return ['cute', 'clean', 'dark'].includes(String(value || '')) ? value : 'clean';
+      }
+
       function isYuzhuPack() {
         return projectId === 'portfolio-page' && packIndex === 0;
       }
@@ -1306,100 +1450,196 @@
       }
 
       function renderForm() {
-        if (isYuzhuPack()) {
-          form.innerHTML = `
-            <label>
-              小站名字
-              <input name="title" value="${escapeHtml(data.title)}" />
-            </label>
-            <label>
-              首页短句
-              <input name="subtitle" value="${escapeHtml(data.subtitle)}" />
-            </label>
-            <label>
-              欢迎标题
-              <input name="kicker" value="${escapeHtml(data.kicker)}" />
-            </label>
-            <label>
-              自我介绍
-              <textarea name="intro">${escapeHtml(data.intro)}</textarea>
-            </label>
-            <div class="two-cols">
-              <label>
-                按钮文字
-                <input name="primary" value="${escapeHtml(data.primary)}" />
-              </label>
-              <label>
-                主色
-                <input name="color" type="color" value="${safeColor(data.color)}" />
-              </label>
-            </div>
-            <label>
-              技能和兴趣
-              <input name="skillsText" value="${escapeHtml(data.skillsText)}" />
-            </label>
-            <label>
-              代表作标题
-              <input name="sectionTitle" value="${escapeHtml(data.sectionTitle)}" />
-            </label>
-            <div class="field-label">
-              代表作
-              ${renderCardsFields(data.cards, 'cards', '代表作 ')}
-            </div>
-            <div class="field-label">
-              友链
-              ${renderCardsFields(data.friends, 'friends', '朋友 ')}
-            </div>
-            <label>
-              联系区标题
-              <input name="contactTitle" value="${escapeHtml(data.contactTitle)}" />
-            </label>
-            <label>
-              联系区说明
-              <textarea name="contactNote">${escapeHtml(data.contactNote)}</textarea>
-            </label>
-          `;
-          return;
-        }
-
-        if (pack.kind === 'choice') {
-          form.innerHTML = `
-            ${renderCommonFields()}
-            <label>
-              选择问题
-              <input name="question" value="${escapeHtml(data.question)}" />
-            </label>
-            <div class="field-label">
-              候选项
-              ${renderCardsFields(data.choices, 'choices', '候选项 ')}
-            </div>
-            <label>
-              推荐结果
-              <input name="resultTitle" value="${escapeHtml(data.resultTitle)}" />
-            </label>
-            <label>
-              推荐理由
-              <textarea name="resultReason">${escapeHtml(data.resultReason)}</textarea>
-            </label>
-          `;
-          return;
-        }
-
+        const quickPrompts = [
+          '改成摄影作品集',
+          '颜色换成温柔粉色',
+          '改成 AI 工具榜单',
+          '做成小红书选题工具',
+          '换成深色酷一点',
+          '加三个网页项目'
+        ];
         form.innerHTML = `
-          ${renderCommonFields()}
-          <label>
-            小标签
-            <input name="kicker" value="${escapeHtml(data.kicker)}" />
-          </label>
-          <label>
-            内容区标题
-            <input name="sectionTitle" value="${escapeHtml(data.sectionTitle)}" />
-          </label>
-          <div class="field-label">
-            卡片内容
-            ${renderCardsFields(data.cards, 'cards', '卡片 ')}
+          <div class="chat-thread" id="chatThread" aria-live="polite">
+            ${chatMessages
+              .map(
+                (message) => `
+                  <div class="chat-message ${message.role === 'user' ? 'user' : 'assistant'}">
+                    <strong>${message.role === 'user' ? '你' : 'AI 修改助手'}</strong>
+                    <p>${escapeHtml(message.text)}</p>
+                  </div>
+                `
+              )
+              .join('')}
+          </div>
+          <div class="chat-quick" aria-label="快捷修改">
+            ${quickPrompts
+              .map(
+                (prompt) => `
+                  <button class="chat-chip" type="button" data-chat-prompt="${escapeHtml(prompt)}">${escapeHtml(prompt)}</button>
+                `
+              )
+              .join('')}
+          </div>
+          <div class="change-list">
+            <h3>刚刚改了什么</h3>
+            <ul>${lastChanges.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
+          </div>
+          <div class="chat-compose">
+            <textarea id="chatInput" placeholder="直接说你想要的效果：比如，把它改成一个摄影作品集，整体更温柔，作品区放三张照片项目。"></textarea>
+            <div class="chat-send-row">
+              <span class="notice">发出去后，左边预览会马上变化。</span>
+              <button class="button primary" type="button" data-send-chat>发送修改</button>
+            </div>
           </div>
         `;
+        requestAnimationFrame(() => {
+          const thread = document.getElementById('chatThread');
+          if (thread) thread.scrollTop = thread.scrollHeight;
+        });
+      }
+
+      function setCards(items) {
+        data.cards = items;
+      }
+
+      function setFriends(items) {
+        data.friends = items;
+      }
+
+      function applyStyle(theme, color, label, changes) {
+        data.visualStyle = theme;
+        data.color = color;
+        changes.push(label);
+      }
+
+      function applyChatInstruction(rawText) {
+        const text = String(rawText || '').trim();
+        const changes = [];
+        if (!text) return changes;
+
+        if (/摄影|照片|相册|拍照/.test(text)) {
+          data.title = '我的摄影作品集';
+          data.subtitle = '记录我看到的光、城市和生活瞬间。';
+          data.kicker = '欢迎来到我的摄影小站！';
+          data.intro = '你好，我喜欢用镜头记录日常，也会整理街拍、人像和旅行照片。这里是我的摄影作品入口。';
+          data.primary = '联系约拍';
+          data.sectionTitle = '摄影作品';
+          data.skillsText = '摄影 / 修图 / 街拍 / 人像 / 旅行记录';
+          data.contactTitle = '联系我';
+          data.contactNote = '想约拍、交流作品或一起扫街，可以从这里联系我。';
+          setCards([
+            { title: '街头光影', meta: '城市记录', note: '用街拍记录城市里真实、松弛又有光的瞬间。' },
+            { title: '人像练习', meta: '约拍作品', note: '尝试用自然光拍出舒服、有故事感的人像。' },
+            { title: '旅行相册', meta: '照片合集', note: '把路上的风景、店铺和偶遇整理成一个相册。' }
+          ]);
+          changes.push('页面变成摄影作品集', '代表作换成摄影项目', '联系按钮改成约拍入口');
+        } else if (/小红书|选题|笔记|种草/.test(text)) {
+          data.title = '小红书选题工具';
+          data.subtitle = '把灵感、标题和素材整理成一张可直接开写的选题清单。';
+          data.kicker = '今天写什么？';
+          data.intro = '这是一个帮内容创作者整理选题的小页面，可以放爆款方向、标题灵感和素材状态。';
+          data.primary = '查看选题';
+          data.sectionTitle = '选题卡片';
+          data.skillsText = '选题 / 标题 / 素材 / 发布计划 / 内容复盘';
+          data.contactTitle = '合作和交流';
+          data.contactNote = '如果你也在做内容，可以一起交换选题和复盘方法。';
+          setCards([
+            { title: '选题灵感', meta: '适合新手', note: '把最近看到的热点、问题和用户需求先收集起来。' },
+            { title: '标题方向', meta: '马上能写', note: '准备 3 个标题版本，先选最容易让人点开的一个。' },
+            { title: '素材状态', meta: '发布前检查', note: '图片、案例、数据和结尾引导都放在这里。' }
+          ]);
+          changes.push('页面变成小红书选题工具', '卡片改成选题、标题和素材', '说明文案换成内容创作者能看懂的说法');
+        } else if (/ai|AI|工具榜单|榜单|工具清单/.test(text)) {
+          data.title = 'AI 工具榜单';
+          data.subtitle = '把常用 AI 工具按写作、图片、代码和效率整理出来。';
+          data.kicker = '我的 AI 工具榜';
+          data.intro = '这里整理我常用的 AI 工具和使用场景，方便新手快速知道每个工具适合做什么。';
+          data.primary = '查看工具';
+          data.sectionTitle = '推荐工具';
+          data.skillsText = 'AI 写作 / 图片生成 / 代码助手 / 自动化 / 效率工具';
+          data.contactTitle = '推荐工具给我';
+          data.contactNote = '如果你有好用的 AI 工具，也可以发给我一起测试。';
+          setCards([
+            { title: '写作工具', meta: '内容生成', note: '适合写大纲、标题、改文案和整理资料。' },
+            { title: '图片工具', meta: '视觉创作', note: '适合做封面、头像、插图和产品展示图。' },
+            { title: '代码工具', meta: '网页改造', note: '适合帮你理解项目、改页面和生成小功能。' }
+          ]);
+          changes.push('页面变成 AI 工具榜单', '代表作改成工具分类', '按钮和联系区换成工具推荐语境');
+        } else if (/餐厅|吃什么|选择器|去哪吃/.test(text)) {
+          data.title = '周末餐厅选择器';
+          data.subtitle = '把候选餐厅、预算和适合场景整理出来，朋友聚餐不用再纠结。';
+          data.kicker = '今天去哪吃？';
+          data.intro = '这是一个简单的餐厅选择页面，可以放餐厅卡片、推荐理由和适合人群。';
+          data.primary = '帮我选餐厅';
+          data.sectionTitle = '候选餐厅';
+          data.skillsText = '餐厅 / 预算 / 距离 / 口味 / 聚餐';
+          setCards([
+            { title: '巷口小馆', meta: '人均 50', note: '近、不用排队，适合临时决定。' },
+            { title: '热辣火锅', meta: '适合多人', note: '氛围热闹，适合朋友聚餐。' },
+            { title: '轻食咖啡', meta: '清淡聊天', note: '适合不想吃太撑，还想坐下来聊聊。' }
+          ]);
+          changes.push('页面变成餐厅选择器', '卡片换成候选餐厅', '按钮改成选择餐厅');
+        } else if (/项目|作品|卡片|网页/.test(text)) {
+          data.sectionTitle = '我的网页项目';
+          setCards([
+            { title: '个人主页', meta: '网页作品', note: '展示我的介绍、作品和联系方式。' },
+            { title: '选择困难小工具', meta: '互动工具', note: '帮朋友从几个选项里快速做决定。' },
+            { title: '内容清单页', meta: '整理页面', note: '把常用工具、灵感和链接整理在一起。' }
+          ]);
+          changes.push('代表作换成三个网页项目');
+        }
+
+        if (/粉|温柔|可爱|甜|少女/.test(text)) {
+          applyStyle('cute', '#ff6aa2', '颜色和背景换成温柔可爱风格', changes);
+        } else if (/黑|深色|酷|高级/.test(text)) {
+          applyStyle('dark', '#111827', '颜色和背景换成深色酷一点', changes);
+        } else if (/蓝|清爽|干净|清新|天空/.test(text)) {
+          applyStyle('clean', '#09a3ff', '颜色换成清爽蓝色', changes);
+        } else if (/绿|自然|植物/.test(text)) {
+          applyStyle('clean', '#16a34a', '主色换成自然绿色', changes);
+        } else if (/紫|科技|赛博/.test(text)) {
+          applyStyle('clean', '#6d5dfc', '主色换成科技紫色', changes);
+        }
+
+        if (/朋友|友链|伙伴/.test(text)) {
+          setFriends([
+            { title: '朋友的小站', meta: '友链', note: '这里放朋友主页或你想推荐的人。' },
+            { title: '合作伙伴', meta: '合作', note: '适合放一起做项目的人或团队。' },
+            { title: '更多链接', meta: '入口', note: '把更多值得访问的页面继续放进来。' }
+          ]);
+          changes.push('友链区换成更通用的朋友链接');
+        }
+
+        const nameMatch = text.match(/(?:名字|名称|标题|小站).{0,8}(?:改成|换成|叫|是)\s*([^，。,.!！?？]+)/);
+        if (nameMatch && nameMatch[1]) {
+          data.title = nameMatch[1].trim();
+          changes.push('小站名字已按你的说法替换');
+        }
+
+        return [...new Set(changes)];
+      }
+
+      function sendChatMessage(textFromButton) {
+        const input = document.getElementById('chatInput');
+        const text = String(textFromButton || input?.value || '').trim();
+        if (!text) {
+          saveNotice.textContent = '先说一句你想怎么改。';
+          return;
+        }
+        chatMessages.push({ role: 'user', text });
+        const changes = applyChatInstruction(text);
+        lastChanges = changes.length
+          ? changes
+          : ['这句话我还没完全理解，可以试试“改成摄影作品集”“颜色换成粉色”“加三个项目”。'];
+        chatMessages.push({
+          role: 'assistant',
+          text: changes.length
+            ? `已帮你改好：${changes.join('、')}。左边预览已经更新。`
+            : '我还没理解这句话要改哪里。你可以换成更直接的说法，比如“改成摄影作品集，颜色温柔一点”。'
+        });
+        renderPreview();
+        saveData();
+        renderForm();
       }
 
       function applyInput(target) {
@@ -1470,7 +1710,7 @@
       function renderYuzhuPreview() {
         const name = shortSiteName();
         return `
-          <div class="yuzhu-site">
+          <div class="yuzhu-site theme-${safeTheme(data.visualStyle)}">
             <div class="yuzhu-stage">
               <div class="yuzhu-bubbles" aria-hidden="true">
                 <span></span><span></span><span></span><span></span>
@@ -1605,6 +1845,8 @@
 
       function resetData() {
         data = defaultDataForPack();
+        chatMessages = initialChatMessages();
+        lastChanges = ['已恢复成示例内容，可以重新说你想怎么改。'];
         localStorage.setItem(storageKey, JSON.stringify(data));
         renderForm();
         renderPreview();
@@ -1622,8 +1864,9 @@
       document.getElementById('mineDemoButton').href = mineDemoUrl;
       document.getElementById('editHint').textContent = pack.helper;
       if (isYuzhuPack()) {
-        document.getElementById('editTitle').textContent = '具体修改 case';
-        document.getElementById('editHint').textContent = '按这些字段把雨竹upon的小站换成你的内容。';
+        document.getElementById('editTitle').textContent = 'AI 修改助手';
+        document.getElementById('editHint').textContent =
+          '直接说你想要什么效果，右侧会像聊天一样帮你改左边页面。';
         document.getElementById('previewTitle').textContent = '我方重写的静态预览';
         document.getElementById('previewHint').textContent =
           '不是 iframe 原网页，而是按雨竹upon小站结构重写的可编辑静态版本。';
@@ -1631,6 +1874,24 @@
 
       form.addEventListener('input', (event) => {
         applyInput(event.target);
+      });
+
+      form.addEventListener('click', (event) => {
+        const promptButton = event.target.closest('[data-chat-prompt]');
+        if (promptButton) {
+          sendChatMessage(promptButton.dataset.chatPrompt);
+          return;
+        }
+
+        if (event.target.closest('[data-send-chat]')) {
+          sendChatMessage();
+        }
+      });
+
+      form.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
+          sendChatMessage();
+        }
       });
 
       preview.addEventListener('click', (event) => {
