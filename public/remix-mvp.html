@@ -843,6 +843,138 @@
         font-size: 0.78rem;
       }
 
+      .hot-radar-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+        gap: 16px;
+        align-items: stretch;
+      }
+
+      .hot-radar-main,
+      .hot-radar-list {
+        border: 1px solid rgba(31, 45, 64, 0.1);
+        border-radius: 8px;
+        background: #ffffff;
+      }
+
+      .hot-radar-main {
+        display: grid;
+        align-content: space-between;
+        min-height: 360px;
+        padding: 22px;
+      }
+
+      .hot-radar-label {
+        display: inline-flex;
+        width: fit-content;
+        min-height: 30px;
+        align-items: center;
+        padding: 0 10px;
+        border-radius: 8px;
+        background: #eaf8f0;
+        color: #25734d;
+        font-size: 0.8rem;
+        font-weight: 880;
+      }
+
+      .hot-radar-main h3 {
+        max-width: 520px;
+        margin-top: 18px;
+        color: #172033;
+        font-size: clamp(1.7rem, 3vw, 2.5rem);
+        line-height: 1.08;
+      }
+
+      .hot-radar-main p {
+        max-width: 560px;
+        margin-top: 14px;
+        color: #526174;
+        font-size: 1rem;
+        line-height: 1.7;
+      }
+
+      .hot-stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 24px;
+      }
+
+      .hot-stats span {
+        min-height: 68px;
+        display: grid;
+        align-content: center;
+        gap: 5px;
+        padding: 10px;
+        border: 1px solid rgba(31, 45, 64, 0.1);
+        border-radius: 8px;
+        background: #f8fbfd;
+        color: #607084;
+        font-size: 0.8rem;
+        font-weight: 760;
+      }
+
+      .hot-stats strong {
+        color: #172033;
+        font-size: 1.25rem;
+        line-height: 1;
+      }
+
+      .hot-radar-list {
+        display: grid;
+        gap: 0;
+        overflow: hidden;
+      }
+
+      .hot-radar-item {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 14px;
+        align-items: start;
+        min-height: 94px;
+        padding: 16px;
+        border-bottom: 1px solid rgba(31, 45, 64, 0.1);
+      }
+
+      .hot-radar-item:last-child {
+        border-bottom: 0;
+      }
+
+      .hot-radar-item small {
+        color: #1769c2;
+        font-size: 0.78rem;
+        font-weight: 880;
+      }
+
+      .hot-radar-item strong {
+        display: block;
+        margin-top: 5px;
+        color: #172033;
+        font-size: 1.02rem;
+      }
+
+      .hot-radar-item p {
+        margin-top: 6px;
+        color: #607084;
+        font-size: 0.9rem;
+        line-height: 1.52;
+      }
+
+      .hot-score {
+        min-width: 76px;
+        display: grid;
+        gap: 3px;
+        justify-items: end;
+        color: #607084;
+        font-size: 0.75rem;
+        font-weight: 760;
+      }
+
+      .hot-score strong {
+        margin: 0;
+        font-size: 1.02rem;
+      }
+
       .pack-detail {
         margin-top: 0;
         padding-top: 0;
@@ -1107,6 +1239,8 @@
         .simple-pack-layout,
         .tiny-browser,
         .workflow,
+        .hot-radar-layout,
+        .hot-stats,
         .why-grid,
         .showcase-grid {
           grid-template-columns: 1fr;
@@ -1195,6 +1329,7 @@
       </a>
       <nav class="nav" aria-label="页面模块" role="tablist">
         <button class="active" type="button" data-tab="library" role="tab" aria-selected="true">选模板</button>
+        <button type="button" data-tab="hot" role="tab" aria-selected="false">热点项目</button>
         <button type="button" data-tab="workflow" role="tab" aria-selected="false">怎么做</button>
         <button type="button" data-tab="showcase" role="tab" aria-selected="false">晒作品</button>
         <button type="button" data-tab="why" role="tab" aria-selected="false">为什么做</button>
@@ -1273,6 +1408,74 @@
               <div class="project-list" id="projectList"></div>
             </aside>
             <section class="detail-panel" id="detailPanel" aria-live="polite"></section>
+          </div>
+        </div>
+      </section>
+
+      <section class="section tab-panel" id="panel-hot" data-panel="hot" role="tabpanel" hidden>
+        <div class="section-inner">
+          <div class="section-heading">
+            <span>热点项目</span>
+            <h2>把 GitHub 上值得看的项目先挑出来。</h2>
+            <p>
+              这个模块来自之前做的 GitHub 好项目雷达。它不是让新手直接看代码，而是先知道最近哪些项目值得看、值得学、也可能值得改造成自己的作品。
+            </p>
+          </div>
+
+          <div class="hot-radar-layout">
+            <article class="hot-radar-main">
+              <div>
+                <span class="hot-radar-label">GitHub 好项目雷达 · 2026-06-06</span>
+                <h3>先看趋势，再决定改什么。</h3>
+                <p>
+                  雷达会把项目分成“大佬在看”“产品灵感”“正在变火”和“经典项目”。小白不用先刷 GitHub，只要从这里挑一个方向，再回到模板区改成自己的页面。
+                </p>
+                <div class="hot-stats" aria-label="GitHub 热点项目统计">
+                  <span><strong>4</strong>个榜单</span>
+                  <span><strong>60</strong>个候选项目</span>
+                  <span><strong>HTML</strong>静态可打开</span>
+                </div>
+              </div>
+              <div class="actions compact-actions">
+                <a class="button primary" href="./radar.html">打开完整雷达</a>
+                <button class="button" type="button" data-open-tab="library">回去选模板</button>
+              </div>
+            </article>
+
+            <div class="hot-radar-list" aria-label="GitHub 热点项目精选">
+              <a class="hot-radar-item" href="https://github.com/nexu-io/open-design" target="_blank" rel="noreferrer">
+                <div>
+                  <small>大佬在看</small>
+                  <strong>nexu-io/open-design</strong>
+                  <p>本地优先的 AI 设计和原型工具，适合观察 AI 生成网页、海报、幻灯片的方向。</p>
+                </div>
+                <span class="hot-score"><strong>5.9 万</strong>Stars</span>
+              </a>
+              <a class="hot-radar-item" href="https://github.com/nexu-io/html-anything" target="_blank" rel="noreferrer">
+                <div>
+                  <small>产品灵感</small>
+                  <strong>nexu-io/html-anything</strong>
+                  <p>用 AI 写 HTML 并预览发布，和“普通人改网页”这个方向很接近。</p>
+                </div>
+                <span class="hot-score"><strong>6149</strong>Stars</span>
+              </a>
+              <a class="hot-radar-item" href="https://github.com/HKUDS/Vibe-Trading" target="_blank" rel="noreferrer">
+                <div>
+                  <small>正在变火</small>
+                  <strong>HKUDS/Vibe-Trading</strong>
+                  <p>个人交易 Agent 项目，适合观察“AI 帮人做具体任务”的产品化路径。</p>
+                </div>
+                <span class="hot-score"><strong>1.1 万</strong>Stars</span>
+              </a>
+              <a class="hot-radar-item" href="https://github.com/affaan-m/ECC" target="_blank" rel="noreferrer">
+                <div>
+                  <small>经典项目</small>
+                  <strong>affaan-m/ECC</strong>
+                  <p>面向 Claude Code、Codex、Cursor 的 Agent 工作流优化系统，适合看长期能力建设。</p>
+                </div>
+                <span class="hot-score"><strong>20.8 万</strong>Stars</span>
+              </a>
+            </div>
           </div>
         </div>
       </section>
