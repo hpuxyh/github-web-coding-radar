@@ -77,9 +77,9 @@
       }
 
       .shell {
-        width: min(1500px, 100%);
+        width: min(1720px, 100%);
         margin: 0 auto;
-        padding: 18px 24px;
+        padding: 16px 20px;
       }
 
       h2,
@@ -90,8 +90,8 @@
 
       .editor-layout {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(360px, 440px);
-        gap: 16px;
+        grid-template-columns: minmax(760px, 1fr) minmax(400px, 440px);
+        gap: 18px;
         align-items: start;
       }
 
@@ -104,11 +104,15 @@
       }
 
       .edit-panel {
-        max-height: calc(100vh - 36px);
-        overflow: auto;
+        height: calc(100vh - 32px);
+        min-height: 720px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
       }
 
       .panel-head {
+        flex-shrink: 0;
         padding: 16px 18px;
         border-bottom: 1px solid #e6ebf0;
       }
@@ -133,23 +137,26 @@
       }
 
       .chat-editor {
+        flex: 1;
+        min-height: 0;
         display: grid;
+        grid-template-rows: minmax(0, 1fr) auto auto auto;
         gap: 14px;
         padding: 16px 18px;
+        overflow: hidden;
       }
 
       .chat-thread {
-        max-height: calc(100vh - 320px);
-        min-height: 360px;
+        min-height: 0;
         display: grid;
         align-content: start;
         gap: 12px;
         overflow: auto;
-        padding-right: 4px;
+        padding: 0 4px 2px 0;
       }
 
       .chat-message {
-        max-width: 92%;
+        max-width: 88%;
         display: grid;
         gap: 6px;
         padding: 12px;
@@ -160,6 +167,7 @@
 
       .chat-message.user {
         justify-self: end;
+        max-width: 82%;
         border-color: #172033;
         background: #172033;
         color: #ffffff;
@@ -179,6 +187,7 @@
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
+        padding-top: 2px;
       }
 
       .chat-chip {
@@ -203,7 +212,8 @@
       }
 
       .chat-compose textarea {
-        min-height: 118px;
+        min-height: 92px;
+        max-height: 142px;
       }
 
       .chat-send-row {
@@ -292,9 +302,8 @@
       }
 
       .form-actions {
-        position: sticky;
+        flex-shrink: 0;
         z-index: 3;
-        bottom: 0;
         display: flex;
         flex-wrap: wrap;
         align-items: center;
@@ -302,6 +311,10 @@
         padding: 12px 18px;
         border-top: 1px solid #e6ebf0;
         background: rgba(255, 255, 255, 0.96);
+      }
+
+      .form-actions .notice {
+        width: 100%;
       }
 
       .notice {
@@ -313,17 +326,25 @@
       .preview-panel {
         position: sticky;
         top: 18px;
+        height: calc(100vh - 32px);
+        min-height: 720px;
+        display: flex;
+        flex-direction: column;
         overflow: hidden;
       }
 
       .preview-frame {
+        min-height: 0;
+        flex: 1;
+        display: flex;
         padding: 8px;
         background: #edf2f7;
       }
 
       .site-preview {
-        height: calc(100vh - 128px);
-        min-height: 660px;
+        width: 100%;
+        height: 100%;
+        min-height: 0;
         overflow: hidden;
         border: 1px solid #d9e1ea;
         border-radius: 8px;
@@ -432,9 +453,9 @@
 
       .yuzhu-site {
         height: 100%;
-        min-height: 660px;
+        min-height: 0;
         overflow: auto;
-        padding: 18px;
+        padding: 16px;
         background:
           radial-gradient(circle at 18% 16%, rgba(188, 255, 196, 0.32), transparent 18%),
           radial-gradient(circle at 72% 10%, rgba(196, 188, 255, 0.28), transparent 16%),
@@ -470,10 +491,10 @@
       }
 
       .yuzhu-stage {
-        min-height: 780px;
+        min-height: 100%;
         position: relative;
         display: grid;
-        grid-template-columns: minmax(220px, 0.34fr) minmax(0, 0.66fr);
+        grid-template-columns: minmax(240px, 0.32fr) minmax(0, 0.68fr);
         overflow: hidden;
         border: 1px solid rgba(30, 42, 58, 0.12);
         border-radius: 8px;
@@ -547,8 +568,8 @@
         align-content: start;
         justify-items: center;
         gap: 16px;
-        min-height: 780px;
-        padding: 92px 22px 36px;
+        min-height: 100%;
+        padding: 70px 22px 34px;
         border-right: 1px solid rgba(31, 45, 64, 0.16);
         text-align: center;
       }
@@ -687,7 +708,7 @@
         position: relative;
         z-index: 1;
         min-width: 0;
-        padding: 24px 42px 54px;
+        padding: 24px 42px 44px;
         text-align: center;
       }
 
@@ -721,12 +742,12 @@
       }
 
       .yuzhu-hero {
-        min-height: 360px;
+        min-height: 310px;
         display: grid;
         align-content: center;
         justify-items: center;
-        gap: 18px;
-        padding: 44px 0;
+        gap: 14px;
+        padding: 34px 0;
       }
 
       .yuzhu-kicker {
@@ -757,7 +778,7 @@
 
       .yuzhu-section,
       .yuzhu-contact {
-        padding: 28px 0;
+        padding: 24px 0;
         scroll-margin-top: 16px;
       }
 
@@ -906,18 +927,34 @@
         }
       }
 
-      @media (max-width: 1020px) {
+      @media (max-width: 1220px) {
         .editor-layout {
           grid-template-columns: 1fr;
         }
 
         .preview-panel {
           position: static;
+          height: auto;
+          min-height: 0;
         }
 
         .edit-panel {
-          max-height: none;
+          height: auto;
+          min-height: 0;
           overflow: visible;
+        }
+
+        .chat-editor {
+          overflow: visible;
+        }
+
+        .chat-thread {
+          max-height: 520px;
+        }
+
+        .site-preview {
+          height: min(760px, calc(100vh - 144px));
+          min-height: 620px;
         }
       }
 
