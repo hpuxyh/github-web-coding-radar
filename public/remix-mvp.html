@@ -627,6 +627,24 @@
         font-size: 1rem;
       }
 
+      .preview-shot {
+        aspect-ratio: 1 / 1;
+        margin-top: 12px;
+        overflow: hidden;
+        border: 1px solid rgba(31, 45, 64, 0.12);
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 12px 28px rgba(31, 45, 64, 0.08);
+      }
+
+      .preview-shot img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+        object-position: top center;
+      }
+
       .tiny-browser {
         display: grid;
         grid-template-columns: 0.72fr 1.28fr;
@@ -1311,6 +1329,7 @@
           sourceName: 'siquan001/siquan001.github.io',
           sourceUrl: 'https://github.com/siquan001/siquan001.github.io',
           sourceDemoUrl: './static-sites/yuzhu-upon/index.html',
+          screenshot: './assets/remix-previews/yuzhu-upon-home.png',
           sourceNote: '这是一个中国开发者的真实个人小站，原网页有自我介绍、代表作、项目、友链和联系方式。',
           category: 'easy',
           score: 96,
@@ -1372,6 +1391,7 @@
           sourceName: 'xiestar/xiestar.github.io',
           sourceUrl: 'https://github.com/xiestar/xiestar.github.io',
           sourceDemoUrl: 'https://xiestar.github.io/',
+          screenshot: './assets/remix-previews/xiestar-home.png',
           sourceNote: '这是一个中国创作者的真实个人主页，原网页有关于我、作品展示、专业服务和联系方式。',
           category: 'profile',
           score: 92,
@@ -1433,6 +1453,7 @@
           sourceName: 'nikpatil2123/Spin-wheel-Game',
           sourceUrl: 'https://github.com/nikpatil2123/Spin-wheel-Game',
           sourceDemoUrl: 'https://nikpatil2123.github.io/Spin-wheel-Game/',
+          screenshot: './assets/remix-previews/spin-wheel-home.png',
           sourceNote: '这是一个能直接打开的转盘网页，适合把选项换成餐厅、礼物、旅行路线或抽签结果。',
           category: 'choice',
           score: 84,
@@ -1566,34 +1587,6 @@
         return ['改成餐厅选择器', '换成礼物推荐器', '加几个选项'];
       }
 
-      function tinyPreviewData(project) {
-        if (project.id === 'portfolio-page') {
-          return {
-            name: '雨竹upon的小站',
-            line: '海内存知己，天涯若比邻。',
-            hero: '欢迎来到我的小站！',
-            intro: '大家好，我是雨竹upon，一个热爱前端的高中生。',
-            cards: ['QUIK 起始页', '雨竹音乐盒', 'Win10online']
-          };
-        }
-        if (project.id === 'ai-profile-page') {
-          return {
-            name: '流星玩AI',
-            line: 'AI 工具和作品主页',
-            hero: '流星玩AI',
-            intro: '分享 AI 工具、效率方法和作品案例。',
-            cards: ['作品展示', '服务介绍', '联系合作']
-          };
-        }
-        return {
-          name: '转盘选择工具',
-          line: '点一下，帮你选一个',
-          hero: '今天选什么？',
-          intro: '把候选项放进去，点击按钮就能随机给出结果。',
-          cards: ['餐厅', '礼物', '旅行']
-        };
-      }
-
       function renderFilters() {
         filterBar.innerHTML = filters
           .map(
@@ -1627,7 +1620,6 @@
       function renderDetail() {
         const project = getActiveProject();
         const pack = project.packs[state.packIndex] || project.packs[0];
-        const preview = tinyPreviewData(project);
         const sampleHref =
           project.sourceDemoUrl ||
           `./remix-demo.html?project=${project.id}&pack=${state.packIndex}&mode=sample`;
@@ -1661,25 +1653,9 @@
             <div class="pack-detail">
               <div class="simple-pack-layout">
                 <div class="tiny-preview">
-                  <h4>模板预览</h4>
-                  <div class="tiny-browser" aria-label="${preview.name}缩小预览">
-                    <div class="tiny-side">
-                      <div class="tiny-avatar"></div>
-                      <strong>${preview.name}</strong>
-                      <span>${preview.line}</span>
-                    </div>
-                    <div class="tiny-main">
-                      <div class="tiny-nav">
-                        <span>首页</span>
-                        <span>介绍</span>
-                        <span>项目</span>
-                      </div>
-                      <div class="tiny-title">${preview.hero}</div>
-                      <p>${preview.intro}</p>
-                      <div class="tiny-cards">
-                        ${preview.cards.map((item) => `<span>${item}</span>`).join('')}
-                      </div>
-                    </div>
+                  <h4>原网页截图</h4>
+                  <div class="preview-shot">
+                    <img src="${project.screenshot}" alt="${project.name}真实网页截图" loading="lazy" />
                   </div>
                 </div>
 
