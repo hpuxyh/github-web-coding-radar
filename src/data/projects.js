@@ -21,6 +21,33 @@ export const githubSnapshot = {
 
 export const projects = [
   {
+    id: 'github-remix-mvp',
+    name: 'GitHub 项目改造 MVP',
+    repoName: 'github-web-coding-radar',
+    type: '可改造项目库',
+    category: 'content',
+    status: 'MVP 已发布',
+    publishedAt: '2026-06-07',
+    repoUrl: 'https://github.com/hpuxyh/github-web-coding-radar',
+    liveUrl: './remix-mvp.html',
+    problem:
+      '小白看到 GitHub 项目之后，最容易卡在选项目、改代码、跑起来、展示作品这几步。',
+    preview: {
+      title: '改造包工作台',
+      subtitle: '项目库 + 三档改造包 + 作品提交',
+      items: ['可改造指数', '难度评估', '复制提示词', '作品案例'],
+    },
+    summary:
+      '这是第一版可用 MVP：展示 3 类适合小白的项目，每个项目都有 3 个改造包。',
+    details:
+      '页面支持按项目档位筛选、查看技术难度和小白难度、复制改造提示词，并用本地表单演示作品提交。',
+    techIntro:
+      '先用静态页面验证“项目解释 + 改造包 + 作品展示”这条链路，后续再接真实项目抓取、审核和数据库。',
+    tags: ['MVP', '改造包', '小白难度', '作品展示'],
+    accent: '#1769c2',
+    featured: true,
+  },
+  {
     id: 'github-remix-community',
     name: 'GitHub 项目改造社区',
     repoName: 'github-web-coding-radar',
@@ -273,6 +300,15 @@ export const projects = [
 ];
 
 export const repoCatalog = [
+  {
+    name: 'GitHub 项目改造 MVP',
+    description: '可改造项目库、三档改造包、提示词复制和作品提交演示。',
+    language: 'MVP 页面',
+    updatedAt: '2026-06-07',
+    kind: '我的项目',
+    repoUrl: './remix-mvp.html',
+    highlighted: true,
+  },
   {
     name: 'GitHub 项目改造社区',
     description: '把 GitHub 项目转成小白能理解、能改造、能展示的作品。',

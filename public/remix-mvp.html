@@ -1,0 +1,1489 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="GitHub 项目改造 MVP：为小白用户提供可改造项目、三档改造包、提示词、关键文件、运行命令、部署建议和作品展示。"
+    />
+    <title>GitHub 项目改造 MVP</title>
+    <style>
+      :root {
+        color: #172033;
+        background: #f7fbff;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        min-width: 320px;
+        margin: 0;
+        background: #f7fbff;
+      }
+
+      button,
+      input,
+      textarea,
+      select {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .topbar {
+        position: sticky;
+        z-index: 20;
+        top: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 5vw;
+        border-bottom: 1px solid rgba(42, 67, 90, 0.12);
+        background: rgba(248, 252, 255, 0.88);
+        backdrop-filter: blur(18px);
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 860;
+      }
+
+      .brand-mark {
+        display: inline-grid;
+        width: 36px;
+        height: 36px;
+        place-items: center;
+        border-radius: 8px;
+        background: #172033;
+        color: #ffffff;
+        font-size: 0.8rem;
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .nav a {
+        min-height: 36px;
+        display: inline-flex;
+        align-items: center;
+        padding: 0 12px;
+        border-radius: 8px;
+        color: #526174;
+        font-size: 0.92rem;
+        font-weight: 760;
+      }
+
+      .nav a:hover {
+        background: rgba(47, 128, 237, 0.1);
+        color: #1769c2;
+      }
+
+      .hero {
+        min-height: 72svh;
+        display: flex;
+        align-items: center;
+        padding: 86px 5vw 46px;
+        background-image:
+          linear-gradient(
+            90deg,
+            rgba(247, 251, 255, 0.98) 0%,
+            rgba(247, 251, 255, 0.92) 40%,
+            rgba(247, 251, 255, 0.56) 72%,
+            rgba(247, 251, 255, 0.16) 100%
+          ),
+          linear-gradient(
+            180deg,
+            rgba(247, 251, 255, 0.08) 0%,
+            rgba(247, 251, 255, 0.96) 100%
+          ),
+          url("assets/portfolio-hero.png");
+        background-position: center right;
+        background-size: cover;
+      }
+
+      .hero-inner {
+        width: min(920px, 100%);
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        min-height: 34px;
+        align-items: center;
+        padding: 0 12px;
+        border: 1px solid rgba(47, 128, 237, 0.24);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.78);
+        color: #1769c2;
+        font-size: 0.88rem;
+        font-weight: 850;
+      }
+
+      h1 {
+        max-width: 820px;
+        margin-top: 22px;
+        color: #172033;
+        font-size: clamp(3.05rem, 8vw, 6.4rem);
+        line-height: 0.96;
+        letter-spacing: 0;
+      }
+
+      .hero-lead {
+        max-width: 760px;
+        margin-top: 24px;
+        color: #243044;
+        font-size: clamp(1.18rem, 2.1vw, 1.56rem);
+        line-height: 1.56;
+        font-weight: 850;
+      }
+
+      .hero-copy {
+        max-width: 760px;
+        margin-top: 16px;
+        color: #526174;
+        font-size: 1.04rem;
+        line-height: 1.78;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 30px;
+      }
+
+      .button {
+        min-height: 46px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 0 18px;
+        border: 1px solid rgba(31, 45, 64, 0.14);
+        border-radius: 8px;
+        background: #ffffff;
+        color: #1d2a3b;
+        font-weight: 850;
+        box-shadow: 0 14px 30px rgba(31, 45, 64, 0.08);
+      }
+
+      .button.primary {
+        border-color: #172033;
+        background: #172033;
+        color: #ffffff;
+      }
+
+      .button:hover {
+        transform: translateY(-1px);
+      }
+
+      .metric-strip {
+        padding: 24px 5vw;
+        background: #132034;
+        color: #ffffff;
+      }
+
+      .metrics {
+        width: min(1180px, 100%);
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1px;
+        margin: 0 auto;
+        overflow: hidden;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.14);
+      }
+
+      .metric {
+        min-height: 112px;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .metric strong {
+        display: block;
+        font-size: clamp(1.78rem, 3vw, 2.5rem);
+        line-height: 1;
+      }
+
+      .metric span {
+        display: block;
+        margin-top: 10px;
+        color: rgba(255, 255, 255, 0.76);
+        line-height: 1.58;
+      }
+
+      .section {
+        padding: 72px 5vw;
+      }
+
+      .section.alt {
+        background: #ffffff;
+      }
+
+      .section-inner {
+        width: min(1180px, 100%);
+        margin: 0 auto;
+      }
+
+      .section-heading {
+        max-width: 820px;
+        margin-bottom: 28px;
+      }
+
+      .section-heading span {
+        display: inline-flex;
+        min-height: 28px;
+        align-items: center;
+        padding: 0 10px;
+        border-radius: 8px;
+        background: #e8f3fb;
+        color: #1769c2;
+        font-size: 0.78rem;
+        font-weight: 850;
+      }
+
+      .section-heading h2 {
+        margin-top: 14px;
+        color: #172033;
+        font-size: clamp(2rem, 4vw, 3.5rem);
+        line-height: 1.08;
+        letter-spacing: 0;
+      }
+
+      .section-heading p {
+        margin-top: 14px;
+        color: #526174;
+        font-size: 1.06rem;
+        line-height: 1.75;
+      }
+
+      .app-layout {
+        display: grid;
+        grid-template-columns: minmax(280px, 0.88fr) minmax(0, 1.12fr);
+        gap: 18px;
+        align-items: start;
+      }
+
+      .tool-panel,
+      .detail-panel,
+      .showcase-panel,
+      .form-panel {
+        border: 1px solid rgba(38, 59, 82, 0.1);
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 18px 40px rgba(39, 58, 77, 0.07);
+      }
+
+      .tool-panel {
+        padding: 18px;
+      }
+
+      .filter-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+
+      .chip-button,
+      .project-button,
+      .pack-tab,
+      .copy-button {
+        border: 1px solid rgba(31, 45, 64, 0.12);
+        border-radius: 8px;
+        background: #ffffff;
+        color: #243044;
+      }
+
+      .chip-button {
+        min-height: 34px;
+        padding: 0 11px;
+        font-size: 0.9rem;
+        font-weight: 760;
+      }
+
+      .chip-button.active {
+        border-color: #1769c2;
+        background: #1769c2;
+        color: #ffffff;
+      }
+
+      .project-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .project-button {
+        width: 100%;
+        min-height: 132px;
+        padding: 16px;
+        text-align: left;
+      }
+
+      .project-button.active {
+        border-color: rgba(23, 105, 194, 0.5);
+        background: #f2f8ff;
+      }
+
+      .project-topline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .project-type {
+        color: #1769c2;
+        font-size: 0.82rem;
+        font-weight: 850;
+      }
+
+      .score {
+        min-width: 52px;
+        min-height: 30px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: #172033;
+        color: #ffffff;
+        font-size: 0.86rem;
+        font-weight: 850;
+      }
+
+      .project-button h3 {
+        margin-top: 10px;
+        font-size: 1.24rem;
+        line-height: 1.3;
+      }
+
+      .project-button p {
+        margin-top: 8px;
+        color: #526174;
+        line-height: 1.55;
+      }
+
+      .tag-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 10px;
+      }
+
+      .tag-row span,
+      .pill {
+        display: inline-flex;
+        min-height: 26px;
+        align-items: center;
+        padding: 0 8px;
+        border-radius: 8px;
+        background: #eef7ef;
+        color: #26734d;
+        font-size: 0.78rem;
+        font-weight: 800;
+      }
+
+      .detail-panel {
+        min-height: 680px;
+        overflow: hidden;
+      }
+
+      .detail-head {
+        padding: 22px;
+        background: linear-gradient(135deg, #172033, #1d6fae);
+        color: #ffffff;
+      }
+
+      .detail-head p {
+        margin-top: 10px;
+        color: rgba(255, 255, 255, 0.78);
+        line-height: 1.7;
+      }
+
+      .detail-meta {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1px;
+        margin-top: 18px;
+        overflow: hidden;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.18);
+      }
+
+      .detail-meta div {
+        min-height: 78px;
+        padding: 14px;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .detail-meta strong {
+        display: block;
+        font-size: 1.36rem;
+      }
+
+      .detail-meta span {
+        display: block;
+        margin-top: 6px;
+        color: rgba(255, 255, 255, 0.76);
+        font-size: 0.86rem;
+      }
+
+      .detail-body {
+        padding: 22px;
+      }
+
+      .mini-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .mini-box {
+        min-height: 118px;
+        padding: 14px;
+        border: 1px solid rgba(31, 45, 64, 0.1);
+        border-radius: 8px;
+        background: #f8fbfd;
+      }
+
+      .mini-box strong {
+        display: block;
+        color: #172033;
+      }
+
+      .mini-box span {
+        display: block;
+        margin-top: 8px;
+        color: #526174;
+        line-height: 1.55;
+      }
+
+      .pack-tabs {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 22px;
+      }
+
+      .pack-tab {
+        min-height: 58px;
+        padding: 8px 10px;
+        text-align: left;
+      }
+
+      .pack-tab.active {
+        border-color: #1769c2;
+        background: #eef7ff;
+      }
+
+      .pack-tab strong {
+        display: block;
+        font-size: 0.96rem;
+      }
+
+      .pack-tab span {
+        display: block;
+        margin-top: 4px;
+        color: #607084;
+        font-size: 0.78rem;
+      }
+
+      .pack-detail {
+        margin-top: 18px;
+        padding-top: 18px;
+        border-top: 1px solid rgba(31, 45, 64, 0.1);
+      }
+
+      .pack-title-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+      }
+
+      .pack-title-row h3 {
+        font-size: 1.56rem;
+        line-height: 1.25;
+      }
+
+      .difficulty {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .difficulty span {
+        display: inline-flex;
+        min-height: 30px;
+        align-items: center;
+        padding: 0 10px;
+        border-radius: 8px;
+        background: #fff5e5;
+        color: #955018;
+        font-size: 0.84rem;
+        font-weight: 850;
+      }
+
+      .pack-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 18px;
+      }
+
+      .info-block {
+        padding: 16px;
+        border: 1px solid rgba(31, 45, 64, 0.1);
+        border-radius: 8px;
+        background: #ffffff;
+      }
+
+      .info-block h4 {
+        margin: 0;
+        color: #172033;
+        font-size: 1rem;
+      }
+
+      .info-block ul {
+        display: grid;
+        gap: 7px;
+        margin: 10px 0 0;
+        padding-left: 18px;
+        color: #526174;
+        line-height: 1.56;
+      }
+
+      .prompt-box {
+        margin-top: 14px;
+        padding: 16px;
+        border: 1px solid rgba(23, 105, 194, 0.18);
+        border-radius: 8px;
+        background: #f3f8ff;
+      }
+
+      .prompt-box pre {
+        overflow: auto;
+        max-height: 260px;
+        margin: 12px 0 0;
+        white-space: pre-wrap;
+        color: #253044;
+        font-size: 0.92rem;
+        line-height: 1.62;
+      }
+
+      .copy-button {
+        min-height: 36px;
+        padding: 0 12px;
+        color: #1769c2;
+        font-weight: 850;
+      }
+
+      .copy-button.done {
+        border-color: #1f9b64;
+        background: #ebf8f1;
+        color: #1f7a52;
+      }
+
+      .workflow {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .step {
+        min-height: 180px;
+        padding: 18px;
+        border: 1px solid rgba(31, 45, 64, 0.1);
+        border-radius: 8px;
+        background: #ffffff;
+      }
+
+      .step strong {
+        display: inline-grid;
+        width: 32px;
+        height: 32px;
+        place-items: center;
+        border-radius: 8px;
+        background: #1769c2;
+        color: #ffffff;
+      }
+
+      .step h3 {
+        margin-top: 14px;
+        font-size: 1.12rem;
+      }
+
+      .step p {
+        margin-top: 9px;
+        color: #526174;
+        line-height: 1.62;
+      }
+
+      .showcase-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+        gap: 18px;
+        align-items: start;
+      }
+
+      .form-panel,
+      .showcase-panel {
+        padding: 20px;
+      }
+
+      form {
+        display: grid;
+        gap: 12px;
+        margin-top: 16px;
+      }
+
+      label {
+        display: grid;
+        gap: 6px;
+        color: #243044;
+        font-size: 0.92rem;
+        font-weight: 800;
+      }
+
+      input,
+      textarea,
+      select {
+        width: 100%;
+        border: 1px solid rgba(31, 45, 64, 0.16);
+        border-radius: 8px;
+        background: #ffffff;
+        color: #172033;
+      }
+
+      input,
+      select {
+        min-height: 42px;
+        padding: 0 12px;
+      }
+
+      textarea {
+        min-height: 96px;
+        padding: 10px 12px;
+        resize: vertical;
+      }
+
+      .submit-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .notice {
+        color: #607084;
+        font-size: 0.9rem;
+        line-height: 1.5;
+      }
+
+      .work-list {
+        display: grid;
+        gap: 12px;
+        margin-top: 16px;
+      }
+
+      .work-item {
+        display: grid;
+        grid-template-columns: 96px minmax(0, 1fr);
+        gap: 14px;
+        padding: 14px;
+        border: 1px solid rgba(31, 45, 64, 0.1);
+        border-radius: 8px;
+        background: #f8fbfd;
+      }
+
+      .work-shot {
+        width: 96px;
+        min-height: 84px;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #ffdf6e, #72e6bd 46%, #7cc7ff);
+        color: #172033;
+        font-weight: 900;
+      }
+
+      .work-item h3 {
+        font-size: 1.08rem;
+      }
+
+      .work-item p {
+        margin-top: 8px;
+        color: #526174;
+        line-height: 1.58;
+      }
+
+      .work-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .work-meta span,
+      .work-meta a {
+        display: inline-flex;
+        min-height: 26px;
+        align-items: center;
+        padding: 0 8px;
+        border-radius: 8px;
+        background: #eef3f8;
+        color: #435269;
+        font-size: 0.78rem;
+        font-weight: 820;
+      }
+
+      .work-meta a {
+        background: #e8f3fb;
+        color: #1769c2;
+      }
+
+      footer {
+        padding: 30px 5vw 44px;
+        background: #132034;
+        color: rgba(255, 255, 255, 0.72);
+      }
+
+      footer div {
+        width: min(1180px, 100%);
+        margin: 0 auto;
+      }
+
+      @media (max-width: 980px) {
+        .nav {
+          display: none;
+        }
+
+        .hero {
+          min-height: auto;
+          padding-top: 58px;
+          background-position: center;
+        }
+
+        .metrics,
+        .app-layout,
+        .mini-grid,
+        .pack-grid,
+        .workflow,
+        .showcase-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .detail-meta,
+        .pack-tabs {
+          grid-template-columns: 1fr;
+        }
+
+        .detail-panel {
+          min-height: auto;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .section {
+          padding: 54px 5vw;
+        }
+
+        .actions,
+        .submit-row {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .button,
+        .copy-button {
+          width: 100%;
+        }
+
+        .work-item {
+          grid-template-columns: 1fr;
+        }
+
+        .work-shot {
+          width: 100%;
+          min-height: 94px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="./">
+        <span class="brand-mark">改</span>
+        <span>GitHub 项目改造 MVP</span>
+      </a>
+      <nav class="nav" aria-label="页面导航">
+        <a href="#library">项目库</a>
+        <a href="#workflow">流程</a>
+        <a href="#showcase">作品</a>
+        <a href="./remix-community.html">说明页</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-inner">
+          <span class="eyebrow">第一版 MVP：可改造项目库 + 三档改造包 + 作品展示</span>
+          <h1>把 GitHub 项目改成自己的作品</h1>
+          <p class="hero-lead">
+            先不做重型在线 IDE，先把小白最容易卡住的三件事解决掉：选什么项目、怎么改、改完怎么展示。
+          </p>
+          <p class="hero-copy">
+            这一版用 3 个适合小白的项目类型做演示。每个项目都给轻改造、进阶改造、想象方向三种改造包，并且标出技术难度、小白难度、关键文件、运行命令、部署建议和可复制提示词。
+          </p>
+          <div class="actions">
+            <a class="button primary" href="#library">开始看项目库</a>
+            <a class="button" href="#showcase">提交一个作品</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="metric-strip" aria-label="MVP 范围">
+        <div class="metrics">
+          <div class="metric">
+            <strong>3</strong>
+            <span>首批项目类型：落地页、数据看板、选择器工具。</span>
+          </div>
+          <div class="metric">
+            <strong>9</strong>
+            <span>首批改造包，每个项目 3 个方向。</span>
+          </div>
+          <div class="metric">
+            <strong>A/B</strong>
+            <span>优先选纯前端和本地数据项目，避开重后端。</span>
+          </div>
+          <div class="metric">
+            <strong>1</strong>
+            <span>北极星指标：每周成功展示的改造作品数。</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section alt" id="library">
+        <div class="section-inner">
+          <div class="section-heading">
+            <span>项目库</span>
+            <h2>先只收“高成功率”的项目。</h2>
+            <p>
+              第一版不追求项目多，而是追求小白能真的改出来。项目会先按可改造指数、平台技术难度和小白难度筛一遍。
+            </p>
+          </div>
+
+          <div class="app-layout">
+            <aside class="tool-panel" aria-label="可改造项目列表">
+              <div class="filter-bar" id="filterBar"></div>
+              <div class="project-list" id="projectList"></div>
+            </aside>
+            <section class="detail-panel" id="detailPanel" aria-live="polite"></section>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="workflow">
+        <div class="section-inner">
+          <div class="section-heading">
+            <span>使用流程</span>
+            <h2>让小白每次只迈一步。</h2>
+            <p>
+              改造包的设计原则不是一次性把项目改到很酷，而是让用户先完成一个能运行、能展示的最小作品。
+            </p>
+          </div>
+          <div class="workflow">
+            <article class="step">
+              <strong>1</strong>
+              <h3>先选 A/B 档项目</h3>
+              <p>纯前端、低依赖、有截图、有清楚入口的项目优先。第一版暂时不碰登录、支付和数据库。</p>
+            </article>
+            <article class="step">
+              <strong>2</strong>
+              <h3>先做轻改造</h3>
+              <p>先改标题、图片、数据和栏目，不急着加复杂功能。跑通一次比想象十个方向更重要。</p>
+            </article>
+            <article class="step">
+              <strong>3</strong>
+              <h3>小步提示词</h3>
+              <p>每段提示词只改一个范围：先理解项目，再改数据，再改页面，最后构建检查。</p>
+            </article>
+            <article class="step">
+              <strong>4</strong>
+              <h3>提交作品案例</h3>
+              <p>作品页展示原项目、改造方向、截图和链接，让后来者能照着复刻。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section alt" id="showcase">
+        <div class="section-inner">
+          <div class="section-heading">
+            <span>作品展示</span>
+            <h2>社区先从案例库开始。</h2>
+            <p>
+              这里先做本地提交演示。真实版本可以接 GitHub Issue、表单服务或数据库，审核后再公开展示。
+            </p>
+          </div>
+
+          <div class="showcase-grid">
+            <section class="form-panel" aria-labelledby="submitTitle">
+              <h3 id="submitTitle">提交改造成品</h3>
+              <form id="workForm">
+                <label>
+                  作品名称
+                  <input id="workTitle" name="title" required placeholder="例如：我的 AI 工具榜单" />
+                </label>
+                <label>
+                  来源项目
+                  <select id="workProject" name="project"></select>
+                </label>
+                <label>
+                  作品链接
+                  <input id="workUrl" name="url" type="url" placeholder="https://..." />
+                </label>
+                <label>
+                  改造说明
+                  <textarea id="workNote" name="note" required placeholder="我把它改成了什么，主要动了哪些地方"></textarea>
+                </label>
+                <div class="submit-row">
+                  <button class="button primary" type="submit">加入本地案例</button>
+                  <span class="notice" id="formNotice">演示版会保存在当前浏览器。</span>
+                </div>
+              </form>
+            </section>
+
+            <section class="showcase-panel" aria-labelledby="worksTitle">
+              <h3 id="worksTitle">改造案例</h3>
+              <div class="work-list" id="workList"></div>
+            </section>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div>
+        这一版验证“项目解释 + 改造包 + 作品展示”是否能让小白真的迈出第一步。更新日期：2026-06-07。
+      </div>
+    </footer>
+
+    <script>
+      const projects = [
+        {
+          id: 'portfolio-page',
+          name: '作品集落地页模板',
+          type: 'A 档：纯前端模板',
+          score: 92,
+          technicalDifficulty: 2,
+          noviceDifficulty: 1.5,
+          summary:
+            '适合从一个现成页面改出个人主页、产品介绍页、作品展示页。依赖少，失败率低。',
+          whyGood:
+            '它通常只有页面、样式和少量数据文件，小白不需要理解后端，也不需要数据库。',
+          need: '准备头像、项目截图、个人介绍、GitHub 或作品链接。',
+          avoid: '第一版不要加登录、评论、后台管理和支付。',
+          tags: ['低依赖', '可静态部署', '适合第一单'],
+          packs: [
+            {
+              level: '轻改造',
+              title: '改成个人作品集',
+              tech: 1,
+              novice: 1,
+              goal:
+                '把模板里的默认内容换成自己的头像、项目、经历和联系方式，先做一个能发出去的个人主页。',
+              files: ['src/data/profile.js', 'src/App.jsx', 'src/styles.css', 'public/assets/'],
+              stayAway: ['package.json', 'vite.config.js', '构建脚本'],
+              commands: ['npm install', 'npm run dev', 'npm run build'],
+              deploy:
+                '优先用 GitHub Pages 或 Cloudflare Pages，构建命令 npm run build，输出目录 dist。',
+              prompt:
+                '请先阅读这个前端项目的结构，帮我把它改成个人作品集。要求：只改页面内容、数据和样式，不改依赖和构建配置。先告诉我应该重点修改哪些文件，再分步骤完成：1. 替换首页标题和个人介绍；2. 把项目列表改成我的 4 个作品；3. 调整颜色和按钮文案；4. 保持 npm run build 可以通过。'
+            },
+            {
+              level: '进阶改造',
+              title: '改成小红书选题工具',
+              tech: 2,
+              novice: 2.5,
+              goal:
+                '把作品集卡片改成选题卡片，展示标题、适合人群、爆点、发布时间和素材状态。',
+              files: ['src/data/topics.js', 'src/App.jsx', 'src/styles.css'],
+              stayAway: ['后端接口', '数据库', '登录模块'],
+              commands: ['npm install', 'npm run dev', 'npm run build'],
+              deploy:
+                '先用静态 JSON 或 JS 数据文件，发布到 Cloudflare Pages；第二版再接表单或数据库。',
+              prompt:
+                '请把这个前端作品集模板改成“小红书选题工具”。不要接数据库，不要新增后端。请新增一个本地数据文件 topics.js，字段包含 title、audience、hook、status、publishWindow。页面展示为可筛选的选题卡片，并保留原来的响应式布局。最后告诉我运行和部署命令。'
+            },
+            {
+              level: '想象方向',
+              title: '改成 AI 工具榜单',
+              tech: 3,
+              novice: 3,
+              goal:
+                '把页面改成 AI 工具列表，有分类、推荐理由、适合人群和访问入口。',
+              files: ['src/data/tools.js', 'src/App.jsx', 'src/styles.css'],
+              stayAway: ['自动爬虫', '用户账号', '在线评分系统'],
+              commands: ['npm install', 'npm run dev', 'npm run build'],
+              deploy:
+                '第一版只做手工维护榜单；后续再考虑从 GitHub 或 Product Hunt 自动抓取。',
+              prompt:
+                '请把这个页面改成“AI 工具榜单”。先做静态版本：工具数据放在 tools.js，包含名称、用途、适合人群、价格状态、推荐理由、访问链接。页面要支持按用途筛选。不要加后端，不要自动抓取数据，保证构建通过。'
+            }
+          ]
+        },
+        {
+          id: 'dashboard-template',
+          name: '数据看板模板',
+          type: 'B 档：前端工具 + 本地数据',
+          score: 86,
+          technicalDifficulty: 3,
+          noviceDifficulty: 2.5,
+          summary:
+            '适合改成收入看板、内容看板、产品雷达。核心是换数据结构和图表文案。',
+          whyGood:
+            '它比落地页多一些状态和图表，但如果数据先放本地文件，小白仍然可以完成第一版。',
+          need: '准备一份 CSV/JSON 数据，或者先手工写 10 条样例数据。',
+          avoid: '第一版不要接实时数据库、复杂权限和多用户协作。',
+          tags: ['换数据', '适合工具页', '中等难度'],
+          packs: [
+            {
+              level: '轻改造',
+              title: '改成个人收入看板',
+              tech: 2,
+              novice: 2,
+              goal:
+                '把原始指标换成收入、支出、结余、项目来源，做一个自己能看的财务小面板。',
+              files: ['src/data/finance.js', 'src/components/Chart.jsx', 'src/App.jsx'],
+              stayAway: ['真实支付接口', '银行接口', '数据库连接'],
+              commands: ['npm install', 'npm run dev', 'npm run build'],
+              deploy:
+                '如果包含个人敏感数据，不建议公开部署；可先本地使用，或部署脱敏样例版。',
+              prompt:
+                '请把这个看板项目改成“个人收入看板”。先不要接任何真实支付或银行接口。把数据放在 finance.js，字段包含 month、income、expense、balance、source。页面保留图表和指标卡，但文案全部换成普通人能懂的中文。最后运行 npm run build 检查。'
+            },
+            {
+              level: '进阶改造',
+              title: '改成产品灵感雷达',
+              tech: 3,
+              novice: 3,
+              goal:
+                '把看板变成新产品线索池，按热度、可改造程度、适合人群和来源筛选。',
+              files: ['src/data/products.js', 'src/App.jsx', 'src/styles.css'],
+              stayAway: ['自动抓取', '登录收藏', '复杂推荐算法'],
+              commands: ['npm install', 'npm run dev', 'npm run build'],
+              deploy:
+                '第一版用手工数据验证页面价值；自动抓取和排序可以放到后续脚本里。',
+              prompt:
+                '请把这个数据看板改成“产品灵感雷达”。新增 products.js，本地数据字段包含 name、source、audience、remixScore、reason、url。页面要有筛选、排序和详情说明。不要接后端，不要做登录。请保持移动端可读。'
+            },
+            {
+              level: '想象方向',
+              title: '改成团队周报看板',
+              tech: 3.5,
+              novice: 4,
+              goal:
+                '让团队把每周进展、问题和下周计划整理成可视化页面。',
+              files: ['src/data/weekly.js', 'src/components/', 'src/App.jsx'],
+              stayAway: ['飞书/Slack 自动同步', '多人权限', '数据库'],
+              commands: ['npm install', 'npm run dev', 'npm run build'],
+              deploy:
+                '第一版适合做公开样例或内部静态页；涉及团队隐私时不要公开部署。',
+              prompt:
+                '请把这个看板改成“团队周报看板”。先用 weekly.js 存本地样例数据，字段包含 owner、done、blocked、next、status。页面要能按成员和状态筛选。不要接企业 IM，不要做权限系统。先保证静态版本可运行。'
+            }
+          ]
+        },
+        {
+          id: 'choice-tool',
+          name: '选择器小工具',
+          type: 'B 档：轻逻辑前端工具',
+          score: 82,
+          technicalDifficulty: 3,
+          noviceDifficulty: 2.8,
+          summary:
+            '适合改成餐厅选择器、礼物推荐器、路线抽签器。逻辑轻，效果明显，用户容易有成就感。',
+          whyGood:
+            '它有一点交互逻辑，但多数改造只需要换选项、规则和结果文案。',
+          need: '准备候选项、筛选条件、结果文案和少量图片。',
+          avoid: '第一版不要接地图定位、真实外卖接口和复杂 AI 推荐。',
+          tags: ['轻逻辑', '有互动', '适合展示'],
+          packs: [
+            {
+              level: '轻改造',
+              title: '改成餐厅选择器',
+              tech: 2,
+              novice: 2,
+              goal:
+                '输入人数、预算、口味和距离偏好，页面从本地餐厅数据里给一个推荐。',
+              files: ['src/data/restaurants.js', 'src/App.jsx', 'src/styles.css'],
+              stayAway: ['地图 API', '真实定位', '外卖平台接口'],
+              commands: ['npm install', 'npm run dev', 'npm run build'],
+              deploy:
+                '本地餐厅数据可以公开；如果含私人地址，先脱敏再部署。',
+              prompt:
+                '请把这个选择器项目改成“餐厅选择器”。不要接地图 API，不要调用外卖平台。新增 restaurants.js，字段包含 name、price、taste、distance、goodFor、note。页面让用户选择预算、口味和人数，然后从本地数据里推荐 1 个结果，并解释为什么推荐。'
+            },
+            {
+              level: '进阶改造',
+              title: '改成礼物推荐器',
+              tech: 2.5,
+              novice: 3,
+              goal:
+                '根据关系、预算、年龄段和场景推荐礼物，并给购买前提醒。',
+              files: ['src/data/gifts.js', 'src/App.jsx', 'src/styles.css'],
+              stayAway: ['电商接口', '支付', '真实价格同步'],
+              commands: ['npm install', 'npm run dev', 'npm run build'],
+              deploy:
+                '第一版只做本地推荐清单，链接可以手工放入，不要承诺实时价格。',
+              prompt:
+                '请把这个选择器改成“礼物推荐器”。数据放在 gifts.js，字段包含 name、forWhom、budget、occasion、risk、buyUrl。用户选择关系、预算和场景后，推荐 3 个礼物，并说明适合原因和避雷点。不要接电商接口，不要做支付。'
+            },
+            {
+              level: '想象方向',
+              title: '改成旅行路线抽签器',
+              tech: 3,
+              novice: 3.5,
+              goal:
+                '从候选城市、预算和时间里抽出一条轻旅行路线。',
+              files: ['src/data/trips.js', 'src/App.jsx', 'src/styles.css'],
+              stayAway: ['机票酒店接口', '实时天气', '地图路线规划'],
+              commands: ['npm install', 'npm run dev', 'npm run build'],
+              deploy:
+                '先做静态路线灵感页；真实订票和地图能力放到后续阶段。',
+              prompt:
+                '请把这个选择器改成“旅行路线抽签器”。新增 trips.js，字段包含 city、days、budget、style、route、tips。页面让用户选择天数、预算和旅行风格，然后推荐一条路线。不要接机票酒店接口，不要接地图。'
+            }
+          ]
+        }
+      ];
+
+      const filters = [
+        { id: 'all', label: '全部' },
+        { id: 'A', label: 'A 档项目' },
+        { id: 'B', label: 'B 档项目' }
+      ];
+
+      const starterWorks = [
+        {
+          title: '我的作品集第一页',
+          project: '作品集落地页模板',
+          url: '',
+          note: '先完成轻改造：替换头像、项目卡片和联系方式，能本地运行。',
+          tag: '轻改造'
+        },
+        {
+          title: '周末吃什么选择器',
+          project: '选择器小工具',
+          url: '',
+          note: '把候选项换成本地餐厅，结果页会解释为什么推荐。',
+          tag: '进阶改造'
+        }
+      ];
+
+      const state = {
+        filter: 'all',
+        projectId: projects[0].id,
+        packIndex: 0,
+        copiedKey: ''
+      };
+
+      const filterBar = document.getElementById('filterBar');
+      const projectList = document.getElementById('projectList');
+      const detailPanel = document.getElementById('detailPanel');
+      const workProject = document.getElementById('workProject');
+      const workForm = document.getElementById('workForm');
+      const workList = document.getElementById('workList');
+      const formNotice = document.getElementById('formNotice');
+
+      function scoreLabel(score) {
+        if (score >= 90) return '高成功率';
+        if (score >= 80) return '适合试做';
+        return '谨慎尝试';
+      }
+
+      function stars(value) {
+        return `${value}/5`;
+      }
+
+      function visibleProjects() {
+        if (state.filter === 'all') return projects;
+        return projects.filter((project) => project.type.startsWith(`${state.filter} 档`));
+      }
+
+      function getActiveProject() {
+        return projects.find((project) => project.id === state.projectId) || projects[0];
+      }
+
+      function renderFilters() {
+        filterBar.innerHTML = filters
+          .map(
+            (filter) =>
+              `<button class="chip-button ${state.filter === filter.id ? 'active' : ''}" type="button" data-filter="${filter.id}">${filter.label}</button>`
+          )
+          .join('');
+      }
+
+      function renderProjectList() {
+        const items = visibleProjects();
+        if (!items.some((project) => project.id === state.projectId)) {
+          state.projectId = items[0]?.id || projects[0].id;
+          state.packIndex = 0;
+        }
+        projectList.innerHTML = items
+          .map(
+            (project) => `
+              <button class="project-button ${project.id === state.projectId ? 'active' : ''}" type="button" data-project="${project.id}">
+                <span class="project-topline">
+                  <span class="project-type">${project.type}</span>
+                  <span class="score">${project.score}</span>
+                </span>
+                <h3>${project.name}</h3>
+                <p>${project.summary}</p>
+                <span class="tag-row">${project.tags.map((tag) => `<span>${tag}</span>`).join('')}</span>
+              </button>
+            `
+          )
+          .join('');
+      }
+
+      function renderDetail() {
+        const project = getActiveProject();
+        const pack = project.packs[state.packIndex] || project.packs[0];
+        const copyKey = `${project.id}-${state.packIndex}`;
+
+        detailPanel.innerHTML = `
+          <div class="detail-head">
+            <span class="pill">${project.type}</span>
+            <h2>${project.name}</h2>
+            <p>${project.whyGood}</p>
+            <div class="detail-meta">
+              <div>
+                <strong>${project.score}</strong>
+                <span>${scoreLabel(project.score)}</span>
+              </div>
+              <div>
+                <strong>${stars(project.technicalDifficulty)}</strong>
+                <span>平台技术难度</span>
+              </div>
+              <div>
+                <strong>${stars(project.noviceDifficulty)}</strong>
+                <span>小白使用难度</span>
+              </div>
+            </div>
+          </div>
+          <div class="detail-body">
+            <div class="mini-grid">
+              <div class="mini-box">
+                <strong>适合准备</strong>
+                <span>${project.need}</span>
+              </div>
+              <div class="mini-box">
+                <strong>第一版避开</strong>
+                <span>${project.avoid}</span>
+              </div>
+              <div class="mini-box">
+                <strong>改造原则</strong>
+                <span>先让作品跑起来，再逐步加功能。每次只让 AI 改一小段。</span>
+              </div>
+            </div>
+
+            <div class="pack-tabs">
+              ${project.packs
+                .map(
+                  (item, index) => `
+                    <button class="pack-tab ${index === state.packIndex ? 'active' : ''}" type="button" data-pack="${index}">
+                      <strong>${item.level}</strong>
+                      <span>${item.title}</span>
+                    </button>
+                  `
+                )
+                .join('')}
+            </div>
+
+            <div class="pack-detail">
+              <div class="pack-title-row">
+                <div>
+                  <h3>${pack.title}</h3>
+                  <p class="hero-copy">${pack.goal}</p>
+                </div>
+                <button class="copy-button ${state.copiedKey === copyKey ? 'done' : ''}" type="button" data-copy="${copyKey}">
+                  ${state.copiedKey === copyKey ? '已复制' : '复制提示词'}
+                </button>
+              </div>
+              <div class="difficulty">
+                <span>技术难度 ${stars(pack.tech)}</span>
+                <span>小白难度 ${stars(pack.novice)}</span>
+                <span>${pack.level}</span>
+              </div>
+              <div class="pack-grid">
+                <div class="info-block">
+                  <h4>关键文件</h4>
+                  <ul>${pack.files.map((item) => `<li>${item}</li>`).join('')}</ul>
+                </div>
+                <div class="info-block">
+                  <h4>不要先动</h4>
+                  <ul>${pack.stayAway.map((item) => `<li>${item}</li>`).join('')}</ul>
+                </div>
+                <div class="info-block">
+                  <h4>运行命令</h4>
+                  <ul>${pack.commands.map((item) => `<li><code>${item}</code></li>`).join('')}</ul>
+                </div>
+                <div class="info-block">
+                  <h4>部署建议</h4>
+                  <ul><li>${pack.deploy}</li></ul>
+                </div>
+              </div>
+              <div class="prompt-box">
+                <strong>给 AI coding 工具的第一段提示词</strong>
+                <pre>${pack.prompt}</pre>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function storedWorks() {
+        try {
+          return JSON.parse(localStorage.getItem('remix-mvp-works') || '[]');
+        } catch (error) {
+          return [];
+        }
+      }
+
+      function saveWorks(works) {
+        localStorage.setItem('remix-mvp-works', JSON.stringify(works));
+      }
+
+      function renderWorkOptions() {
+        workProject.innerHTML = projects
+          .map((project) => `<option value="${project.name}">${project.name}</option>`)
+          .join('');
+      }
+
+      function renderWorks() {
+        const works = [...storedWorks(), ...starterWorks];
+        workList.innerHTML = works
+          .map(
+            (work, index) => `
+              <article class="work-item">
+                <div class="work-shot">${String(index + 1).padStart(2, '0')}</div>
+                <div>
+                  <h3>${work.title}</h3>
+                  <p>${work.note}</p>
+                  <div class="work-meta">
+                    <span>${work.project}</span>
+                    <span>${work.tag || '本地提交'}</span>
+                    ${work.url ? `<a href="${work.url}" target="_blank" rel="noreferrer">打开作品</a>` : ''}
+                  </div>
+                </div>
+              </article>
+            `
+          )
+          .join('');
+      }
+
+      function renderAll() {
+        renderFilters();
+        renderProjectList();
+        renderDetail();
+        renderWorkOptions();
+        renderWorks();
+      }
+
+      filterBar.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-filter]');
+        if (!button) return;
+        state.filter = button.dataset.filter;
+        state.packIndex = 0;
+        renderAll();
+      });
+
+      projectList.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-project]');
+        if (!button) return;
+        state.projectId = button.dataset.project;
+        state.packIndex = 0;
+        state.copiedKey = '';
+        renderAll();
+      });
+
+      detailPanel.addEventListener('click', async (event) => {
+        const packButton = event.target.closest('[data-pack]');
+        if (packButton) {
+          state.packIndex = Number(packButton.dataset.pack);
+          state.copiedKey = '';
+          renderDetail();
+          return;
+        }
+
+        const copyButton = event.target.closest('[data-copy]');
+        if (!copyButton) return;
+        const project = getActiveProject();
+        const pack = project.packs[state.packIndex] || project.packs[0];
+        try {
+          await navigator.clipboard.writeText(pack.prompt);
+          state.copiedKey = copyButton.dataset.copy;
+          renderDetail();
+        } catch (error) {
+          copyButton.textContent = '请手动复制';
+        }
+      });
+
+      workForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const formData = new FormData(workForm);
+        const nextWork = {
+          title: String(formData.get('title') || '').trim(),
+          project: String(formData.get('project') || '').trim(),
+          url: String(formData.get('url') || '').trim(),
+          note: String(formData.get('note') || '').trim(),
+          tag: '本地提交'
+        };
+        if (!nextWork.title || !nextWork.note) return;
+        saveWorks([nextWork, ...storedWorks()]);
+        workForm.reset();
+        formNotice.textContent = '已加入当前浏览器的本地案例。';
+        renderWorkOptions();
+        renderWorks();
+      });
+
+      renderAll();
+    </script>
+  </body>
+</html>
