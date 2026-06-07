@@ -406,14 +406,14 @@
     <script>
       const packCatalog = {
         'portfolio-page': [
-          { title: '做一个个人作品集', kind: 'portfolio' },
-          { title: '改成小红书选题工具', kind: 'list' },
-          { title: '改成 AI 工具榜单', kind: 'list' }
+          { title: '做一个中文个人小站', kind: 'portfolio' },
+          { title: '改成兴趣作品页', kind: 'list' },
+          { title: '改成项目导航页', kind: 'list' }
         ],
-        'dashboard-template': [
-          { title: '改成个人收入看板', kind: 'list' },
-          { title: '改成产品灵感雷达', kind: 'list' },
-          { title: '改成团队周报看板', kind: 'list' }
+        'ai-profile-page': [
+          { title: '做一个 AI 个人主页', kind: 'portfolio' },
+          { title: '改成接单服务页', kind: 'list' },
+          { title: '改成内容账号主页', kind: 'list' }
         ],
         'choice-tool': [
           { title: '改成餐厅选择器', kind: 'choice' },
@@ -424,87 +424,87 @@
 
       const projectNames = {
         'portfolio-page': '中文个人小站模板',
-        'dashboard-template': '清单看板 HTML 模板',
+        'ai-profile-page': 'AI 个人主页模板',
         'choice-tool': '转盘选择 HTML 小工具'
       };
 
       const sampleDefaults = {
         'portfolio-page-0': {
-          title: '林一的网页作品集',
-          subtitle: '我把自己做过的网页、小工具和内容实验整理在这里，方便别人快速了解我能做什么。',
-          primary: '查看作品',
-          color: '#1769c2',
-          kicker: '个人作品集',
-          sectionTitle: '精选作品',
+          title: '雨竹upon的小站',
+          subtitle: '大家好，我是雨竹upon，一个热爱前端开发的人。这里放我的自我介绍、代表作、项目和联系入口。',
+          primary: '查看我的项目',
+          color: '#09a3ff',
+          kicker: '中文个人小站',
+          sectionTitle: '代表作和项目',
           cards: [
-            { title: 'AI 工具清单', meta: '网页作品', note: '整理常用 AI 工具，按写作、图片、代码分类。' },
-            { title: '周末去哪儿', meta: '选择工具', note: '根据预算和距离，帮朋友快速选一个去处。' },
-            { title: '联系我', meta: '微信 / 邮箱', note: '想合作或交流，可以从这里找到我。' }
+            { title: 'QUIK 起始页', meta: '浏览器主页', note: '一个简洁、实用、个性化、无广告的浏览器主页。' },
+            { title: '雨竹音乐盒', meta: '兴趣项目', note: '把喜欢的音乐整理成一个在线音乐盒子，方便自己和朋友打开。' },
+            { title: 'Win10online', meta: '网页实验', note: '用标准网页技术复刻 Windows 10 体验，是一个很有记忆点的早期作品。' }
           ]
         },
         'portfolio-page-1': {
-          title: '小红书选题工作台',
-          subtitle: '把想写的选题整理成卡片，先看爆点、适合人群和素材状态。',
-          primary: '查看选题',
-          color: '#d94686',
-          kicker: '选题工具',
-          sectionTitle: '今天可以写的选题',
+          title: '我的兴趣小站',
+          subtitle: '把我喜欢的内容、正在做的小项目和朋友链接整理在这里，像一个自己的网上房间。',
+          primary: '看看我喜欢什么',
+          color: '#09a3ff',
+          kicker: '兴趣作品页',
+          sectionTitle: '兴趣和作品',
           cards: [
-            { title: 'AI 做头像的 5 个坑', meta: '适合新手', note: '爆点是避坑和前后对比，素材状态：已有截图。' },
-            { title: '租房收纳清单', meta: '适合独居人群', note: '爆点是低预算改造，建议晚上 9 点发布。' },
-            { title: '周末恢复力计划', meta: '适合上班族', note: '爆点是不用花钱也能放松，素材状态：待拍照。' }
+            { title: '我喜欢的音乐', meta: '兴趣收藏', note: '可以放歌单、音乐盒或者常听的音乐平台链接。' },
+            { title: '我的小工具', meta: '网页实验', note: '可以放自己做过的小页面、小组件或练习作品。' },
+            { title: '朋友链接', meta: '友链入口', note: '把朋友的小站放在这里，让别人继续逛下去。' }
           ]
         },
         'portfolio-page-2': {
-          title: 'AI 工具榜单',
-          subtitle: '只收录我真正试过的工具，说明它适合谁、能解决什么问题。',
-          primary: '看工具',
-          color: '#1d6fae',
-          kicker: '工具清单',
-          sectionTitle: '本周推荐',
-          cards: [
-            { title: '写作助手', meta: '适合内容整理', note: '能把零散想法整理成大纲，适合写笔记和短文案。' },
-            { title: '图片生成器', meta: '适合做封面', note: '输入主题后能生成多种风格，适合做首图灵感。' },
-            { title: '代码助手', meta: '适合改网页', note: '适合让它帮你改文案、样式和简单交互。' }
-          ]
-        },
-        'dashboard-template-0': {
-          title: '个人收入看板',
-          subtitle: '把每月收入、支出和结余放在一个页面里，先看清钱去了哪里。',
-          primary: '查看本月',
-          color: '#26734d',
-          kicker: '收入看板',
-          sectionTitle: '本月记录',
-          cards: [
-            { title: '收入 12800', meta: '主业 + 副业', note: '本月比上月多 1800，主要来自项目尾款。' },
-            { title: '支出 6200', meta: '房租 / 生活 / 学习', note: '学习支出偏高，下月可以控制课程购买。' },
-            { title: '结余 6600', meta: '可储蓄', note: '先留 3000 做备用金，剩余再考虑投资。' }
-          ]
-        },
-        'dashboard-template-1': {
-          title: '产品灵感雷达',
-          subtitle: '记录最近看到的新产品：适合谁、为什么值得看、可以改成什么。',
-          primary: '查看灵感',
+          title: '我的项目导航',
+          subtitle: '把我做过的网页、小工具、文章和社交主页放在一起，别人打开后能快速找到重点。',
+          primary: '打开项目',
           color: '#1769c2',
-          kicker: '灵感清单',
-          sectionTitle: '值得观察的产品',
+          kicker: '项目入口',
+          sectionTitle: '项目列表',
           cards: [
-            { title: '浏览器记忆工具', meta: '适合重度信息用户', note: '机会点：自动整理看过的网页和关键句。' },
-            { title: 'AI 表格助手', meta: '适合运营和销售', note: '机会点：把自然语言变成筛选和分析。' },
-            { title: '作品展示社区', meta: '适合新手创作者', note: '机会点：降低从模板到作品的门槛。' }
+            { title: '个人主页', meta: '代表项目', note: '别人第一次认识你时，最应该先看的页面。' },
+            { title: '实用小工具', meta: '网页工具', note: '把你做过的选择器、清单页或查询页放在这里。' },
+            { title: '内容主页', meta: '文章 / 视频', note: '放你的公众号、视频号、博客或作品集合。' }
           ]
         },
-        'dashboard-template-2': {
-          title: '团队周报看板',
-          subtitle: '把本周完成、遇到的问题和下周计划放在一个页面，开会前快速扫一遍。',
-          primary: '查看周报',
-          color: '#955018',
-          kicker: '周报页面',
-          sectionTitle: '本周进展',
+        'ai-profile-page-0': {
+          title: '流星玩AI',
+          subtitle: '追逐月亮的流星，AI 赛道探索者。这里展示我的经历、AI 作品、专业服务和联系方式。',
+          primary: '查看作品',
+          color: '#4f46e5',
+          kicker: 'AI 个人主页',
+          sectionTitle: '作品和服务',
           cards: [
-            { title: '产品', meta: '已完成', note: '完成新手编辑页流程，下一步补作品提交。' },
-            { title: '设计', meta: '进行中', note: '正在整理移动端样式，重点检查按钮和输入框。' },
-            { title: '上线', meta: '先等等', note: '一键发布还没接，先把页面内容和展示效果确认好。' }
+            { title: '个人主页', meta: 'HTML / CSS / JS', note: '展示我的项目、技能和经验，作为别人了解我的入口。' },
+            { title: 'DeepSeek 聊天机器人', meta: 'AI 作品', note: '基于 AI 技术做的聊天机器人，用来展示我的 AI 应用能力。' },
+            { title: '流星玩AI', meta: '内容账号', note: '分享 AI 技术应用和最新动态，帮助更多人了解 AI。' }
+          ]
+        },
+        'ai-profile-page-1': {
+          title: '我的服务介绍',
+          subtitle: '把我能帮别人做的事情写清楚：适合谁、能解决什么问题、怎么联系我。',
+          primary: '联系我',
+          color: '#4f46e5',
+          kicker: '接单服务页',
+          sectionTitle: '我可以帮你做',
+          cards: [
+            { title: 'AI 应用开发', meta: '适合企业和个人', note: '把重复工作整理成 AI 小工具，先从一个简单场景开始。' },
+            { title: '网站开发', meta: '适合个人品牌', note: '做一个能展示介绍、作品和联系方式的网页。' },
+            { title: 'AI 技术培训', meta: '适合团队入门', note: '用实际案例讲清楚 AI 工具怎么帮工作提效。' }
+          ]
+        },
+        'ai-profile-page-2': {
+          title: '我的内容主页',
+          subtitle: '把公众号、视频号、社群和代表内容放在一个页面，方便别人关注和合作。',
+          primary: '关注我',
+          color: '#4f46e5',
+          kicker: '内容账号主页',
+          sectionTitle: '代表内容',
+          cards: [
+            { title: '公众号 / 视频号', meta: '内容入口', note: '放你的账号名称和一句话介绍。' },
+            { title: '代表文章', meta: '精选内容', note: '放最能说明你能力的一篇文章或视频。' },
+            { title: '合作方式', meta: '公开联系方式', note: '写清楚别人可以怎么联系你、适合聊什么。' }
           ]
         },
         'choice-tool-0': {
