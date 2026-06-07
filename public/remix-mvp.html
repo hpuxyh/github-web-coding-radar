@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="GitHub 项目改造 MVP：为小白用户提供可改造项目、三档改造包、提示词、关键文件、运行命令、部署建议和作品展示。"
+      content="把 GitHub 上的好项目，用白话讲清楚，并一步步改成自己的网页作品。"
     />
-    <title>GitHub 项目改造 MVP</title>
+    <title>把 GitHub 好项目改成我的作品</title>
     <style>
       :root {
         color: #172033;
@@ -848,51 +848,51 @@
     <header class="topbar">
       <a class="brand" href="./">
         <span class="brand-mark">改</span>
-        <span>GitHub 项目改造 MVP</span>
+        <span>把好项目改成我的作品</span>
       </a>
       <nav class="nav" aria-label="页面导航">
-        <a href="#library">项目库</a>
-        <a href="#workflow">流程</a>
-        <a href="#showcase">作品</a>
-        <a href="./remix-community.html">说明页</a>
+        <a href="#library">选项目</a>
+        <a href="#workflow">怎么做</a>
+        <a href="#showcase">晒作品</a>
+        <a href="./remix-community.html">为什么做</a>
       </nav>
     </header>
 
     <main>
       <section class="hero">
         <div class="hero-inner">
-          <span class="eyebrow">第一版 MVP：可改造项目库 + 三档改造包 + 作品展示</span>
-          <h1>把 GitHub 项目改成自己的作品</h1>
+          <span class="eyebrow">不用先学会 GitHub，也能开始做网页作品</span>
+          <h1>每天帮你找能改的好项目</h1>
           <p class="hero-lead">
-            先不做重型在线 IDE，先把小白最容易卡住的三件事解决掉：选什么项目、怎么改、改完怎么展示。
+            GitHub 可以理解成一个很大的“代码资料库”。问题是普通人进去容易迷路：不知道哪个项目能改，不知道从哪里下手，也不知道改完怎么发出去。
           </p>
           <p class="hero-copy">
-            这一版用 3 个适合小白的项目类型做演示。每个项目都给轻改造、进阶改造、想象方向三种改造包，并且标出技术难度、小白难度、关键文件、运行命令、部署建议和可复制提示词。
+            这个网站会先帮你挑出适合新手的项目，再告诉你能改成什么、主要改哪里、哪些地方先别碰、复制什么话给 AI、怎么让页面跑起来、怎么把作品发到网上。
           </p>
           <div class="actions">
-            <a class="button primary" href="#library">开始看项目库</a>
-            <a class="button" href="#showcase">提交一个作品</a>
+            <a class="button primary" href="#library">先选一个想做的</a>
+            <a class="button" href="#showcase">看看别人改了什么</a>
           </div>
         </div>
       </section>
 
-      <section class="metric-strip" aria-label="MVP 范围">
+      <section class="metric-strip" aria-label="这一版先提供什么">
         <div class="metrics">
           <div class="metric">
             <strong>3</strong>
-            <span>首批项目类型：落地页、数据看板、选择器工具。</span>
+            <span>先给 3 种最容易开始的作品：个人主页、清单页面、选择工具。</span>
           </div>
           <div class="metric">
             <strong>9</strong>
-            <span>首批改造包，每个项目 3 个方向。</span>
+            <span>每种作品给 3 个改法：先做简单版，再试进阶版。</span>
           </div>
           <div class="metric">
-            <strong>A/B</strong>
-            <span>优先选纯前端和本地数据项目，避开重后端。</span>
+            <strong>避难题</strong>
+            <span>先不碰登录、支付、保存用户数据这些容易卡住的东西。</span>
           </div>
           <div class="metric">
-            <strong>1</strong>
-            <span>北极星指标：每周成功展示的改造作品数。</span>
+            <strong>能展示</strong>
+            <span>目标不是看懂代码，而是做出一个能发给别人看的网页。</span>
           </div>
         </div>
       </section>
@@ -900,15 +900,15 @@
       <section class="section alt" id="library">
         <div class="section-inner">
           <div class="section-heading">
-            <span>项目库</span>
-            <h2>先只收“高成功率”的项目。</h2>
+            <span>选项目</span>
+            <h2>先选一个你想做的小作品。</h2>
             <p>
-              第一版不追求项目多，而是追求小白能真的改出来。项目会先按可改造指数、平台技术难度和小白难度筛一遍。
+              不用先看代码。你先看它能改成什么、适不适合新手、你要准备什么。点左边的项目，右边会出现三种改法。
             </p>
           </div>
 
           <div class="app-layout">
-            <aside class="tool-panel" aria-label="可改造项目列表">
+            <aside class="tool-panel" aria-label="适合改造的项目列表">
               <div class="filter-bar" id="filterBar"></div>
               <div class="project-list" id="projectList"></div>
             </aside>
@@ -920,32 +920,32 @@
       <section class="section" id="workflow">
         <div class="section-inner">
           <div class="section-heading">
-            <span>使用流程</span>
-            <h2>让小白每次只迈一步。</h2>
+            <span>怎么做</span>
+            <h2>每次只做一步，不要一上来改太多。</h2>
             <p>
-              改造包的设计原则不是一次性把项目改到很酷，而是让用户先完成一个能运行、能展示的最小作品。
+              这个网站不是让你变成程序员，而是帮你借助 AI 把一个现成项目改成自己的作品。
             </p>
           </div>
           <div class="workflow">
             <article class="step">
               <strong>1</strong>
-              <h3>先选 A/B 档项目</h3>
-              <p>纯前端、低依赖、有截图、有清楚入口的项目优先。第一版暂时不碰登录、支付和数据库。</p>
+              <h3>先选容易开始的</h3>
+              <p>优先选只改文字、图片、清单和页面的项目。先避开登录、支付、保存用户数据。</p>
             </article>
             <article class="step">
               <strong>2</strong>
-              <h3>先做轻改造</h3>
-              <p>先改标题、图片、数据和栏目，不急着加复杂功能。跑通一次比想象十个方向更重要。</p>
+              <h3>先照着简单版改</h3>
+              <p>先改标题、图片、卡片和文案。第一次成功跑起来，比一次加很多功能更重要。</p>
             </article>
             <article class="step">
               <strong>3</strong>
-              <h3>小步提示词</h3>
-              <p>每段提示词只改一个范围：先理解项目，再改数据，再改页面，最后构建检查。</p>
+              <h3>复制这段话给 AI</h3>
+              <p>每次只让 AI 改一个小范围：先看项目，再改内容，再检查能不能运行。</p>
             </article>
             <article class="step">
               <strong>4</strong>
-              <h3>提交作品案例</h3>
-              <p>作品页展示原项目、改造方向、截图和链接，让后来者能照着复刻。</p>
+              <h3>做完就晒出来</h3>
+              <p>把你改好的网页、截图和说明放进案例区，后来的人也能照着做。</p>
             </article>
           </div>
         </div>
@@ -954,23 +954,23 @@
       <section class="section alt" id="showcase">
         <div class="section-inner">
           <div class="section-heading">
-            <span>作品展示</span>
-            <h2>社区先从案例库开始。</h2>
+            <span>晒作品</span>
+            <h2>先让大家看到“别人真的改出来了”。</h2>
             <p>
-              这里先做本地提交演示。真实版本可以接 GitHub Issue、表单服务或数据库，审核后再公开展示。
+              这里先做一个演示版。你可以把自己的作品名称、来源项目、链接和改造说明加进来，看它应该怎么展示。
             </p>
           </div>
 
           <div class="showcase-grid">
             <section class="form-panel" aria-labelledby="submitTitle">
-              <h3 id="submitTitle">提交改造成品</h3>
+              <h3 id="submitTitle">把我的作品放进来</h3>
               <form id="workForm">
                 <label>
                   作品名称
-                  <input id="workTitle" name="title" required placeholder="例如：我的 AI 工具榜单" />
+                  <input id="workTitle" name="title" required placeholder="例如：我的 AI 工具清单" />
                 </label>
                 <label>
-                  来源项目
+                  我是从哪个项目改的
                   <select id="workProject" name="project"></select>
                 </label>
                 <label>
@@ -978,18 +978,18 @@
                   <input id="workUrl" name="url" type="url" placeholder="https://..." />
                 </label>
                 <label>
-                  改造说明
-                  <textarea id="workNote" name="note" required placeholder="我把它改成了什么，主要动了哪些地方"></textarea>
+                  我改了什么
+                  <textarea id="workNote" name="note" required placeholder="例如：我把原来的个人主页改成了 AI 工具清单，主要替换了标题、卡片和链接"></textarea>
                 </label>
                 <div class="submit-row">
-                  <button class="button primary" type="submit">加入本地案例</button>
-                  <span class="notice" id="formNotice">演示版会保存在当前浏览器。</span>
+                  <button class="button primary" type="submit">放进我的案例列表</button>
+                  <span class="notice" id="formNotice">现在会先保存在你自己的浏览器里。</span>
                 </div>
               </form>
             </section>
 
             <section class="showcase-panel" aria-labelledby="worksTitle">
-              <h3 id="worksTitle">改造案例</h3>
+              <h3 id="worksTitle">别人已经做出来的例子</h3>
               <div class="work-list" id="workList"></div>
             </section>
           </div>
@@ -999,7 +999,7 @@
 
     <footer>
       <div>
-        这一版验证“项目解释 + 改造包 + 作品展示”是否能让小白真的迈出第一步。更新日期：2026-06-07。
+        这一版先验证一件事：普通人能不能从一个 GitHub 项目开始，借助 AI 做出自己的网页作品。更新日期：2026-06-07。
       </div>
     </footer>
 
@@ -1007,145 +1007,148 @@
       const projects = [
         {
           id: 'portfolio-page',
-          name: '作品集落地页模板',
-          type: 'A 档：纯前端模板',
+          name: '个人主页模板',
+          type: '最适合新手：只改文字和图片',
+          category: 'easy',
           score: 92,
           technicalDifficulty: 2,
           noviceDifficulty: 1.5,
           summary:
-            '适合从一个现成页面改出个人主页、产品介绍页、作品展示页。依赖少，失败率低。',
+            '适合把一个现成网页改成自己的个人主页、产品介绍页、作品展示页。',
           whyGood:
-            '它通常只有页面、样式和少量数据文件，小白不需要理解后端，也不需要数据库。',
-          need: '准备头像、项目截图、个人介绍、GitHub 或作品链接。',
-          avoid: '第一版不要加登录、评论、后台管理和支付。',
-          tags: ['低依赖', '可静态部署', '适合第一单'],
+            '这类项目通常只需要换文字、图片、颜色和卡片。你不用懂服务器，也不用准备保存数据的系统。',
+          need: '先准备头像、3 到 5 张作品图、几段自我介绍、几个作品链接。',
+          avoid: '第一次先不要加登录、评论、后台管理和支付。',
+          tags: ['最容易开始', '适合第一单', '能发给别人看'],
           packs: [
             {
-              level: '轻改造',
-              title: '改成个人作品集',
+              level: '第一步：换成自己的内容',
+              title: '做一个个人作品集',
               tech: 1,
               novice: 1,
               goal:
-                '把模板里的默认内容换成自己的头像、项目、经历和联系方式，先做一个能发出去的个人主页。',
+                '把模板里的默认内容换成你的头像、作品、介绍和联系方式，先做一个能发出去的个人主页。',
               files: ['src/data/profile.js', 'src/App.jsx', 'src/styles.css', 'public/assets/'],
               stayAway: ['package.json', 'vite.config.js', '构建脚本'],
               commands: ['npm install', 'npm run dev', 'npm run build'],
               deploy:
-                '优先用 GitHub Pages 或 Cloudflare Pages，构建命令 npm run build，输出目录 dist。',
+                '优先发到 GitHub Pages 或 Cloudflare Pages。它们适合这种纯网页作品。',
               prompt:
-                '请先阅读这个前端项目的结构，帮我把它改成个人作品集。要求：只改页面内容、数据和样式，不改依赖和构建配置。先告诉我应该重点修改哪些文件，再分步骤完成：1. 替换首页标题和个人介绍；2. 把项目列表改成我的 4 个作品；3. 调整颜色和按钮文案；4. 保持 npm run build 可以通过。'
+                '你是我的网页改造助手。请先看一下这个项目的文件结构，帮我把它改成“个人作品集”。要求：只改文字、图片、项目卡片和样式，不要改依赖和构建配置。请分步骤做：1. 告诉我主要应该改哪几个文件；2. 把首页标题和个人介绍换成我的内容；3. 把项目列表改成 4 个我的作品；4. 调整颜色和按钮文案；5. 最后帮我检查 npm run build 能不能通过。'
             },
             {
-              level: '进阶改造',
+              level: '第二步：换成一个小工具',
               title: '改成小红书选题工具',
               tech: 2,
               novice: 2.5,
               goal:
-                '把作品集卡片改成选题卡片，展示标题、适合人群、爆点、发布时间和素材状态。',
+                '把原来的作品卡片，换成小红书选题卡片，用来整理标题、爆点、适合人群和发布时间。',
               files: ['src/data/topics.js', 'src/App.jsx', 'src/styles.css'],
-              stayAway: ['后端接口', '数据库', '登录模块'],
+              stayAway: ['需要服务器的功能', '保存用户数据的功能', '登录功能'],
               commands: ['npm install', 'npm run dev', 'npm run build'],
               deploy:
-                '先用静态 JSON 或 JS 数据文件，发布到 Cloudflare Pages；第二版再接表单或数据库。',
+                '先把选题放在本地数据文件里，做成一个静态网页；以后再考虑多人填写。',
               prompt:
-                '请把这个前端作品集模板改成“小红书选题工具”。不要接数据库，不要新增后端。请新增一个本地数据文件 topics.js，字段包含 title、audience、hook、status、publishWindow。页面展示为可筛选的选题卡片，并保留原来的响应式布局。最后告诉我运行和部署命令。'
+                '请把这个个人主页模板改成“小红书选题工具”。不要接保存用户数据的系统，不要新增服务器功能。请新增一个本地数据文件 topics.js，用中文字段或清楚注释保存：选题标题、适合人群、爆点、素材状态、建议发布时间。页面展示成选题卡片，并保留手机上也好看的布局。最后告诉我怎么在本地运行和怎么发到网上。'
             },
             {
-              level: '想象方向',
+              level: '以后可以做',
               title: '改成 AI 工具榜单',
               tech: 3,
               novice: 3,
               goal:
-                '把页面改成 AI 工具列表，有分类、推荐理由、适合人群和访问入口。',
+                '把页面改成一个 AI 工具清单，展示每个工具是干什么的、适合谁、为什么推荐。',
               files: ['src/data/tools.js', 'src/App.jsx', 'src/styles.css'],
               stayAway: ['自动爬虫', '用户账号', '在线评分系统'],
               commands: ['npm install', 'npm run dev', 'npm run build'],
               deploy:
-                '第一版只做手工维护榜单；后续再考虑从 GitHub 或 Product Hunt 自动抓取。',
+                '第一版手工维护清单就够了。自动抓取、登录收藏、评分系统都放到以后。',
               prompt:
-                '请把这个页面改成“AI 工具榜单”。先做静态版本：工具数据放在 tools.js，包含名称、用途、适合人群、价格状态、推荐理由、访问链接。页面要支持按用途筛选。不要加后端，不要自动抓取数据，保证构建通过。'
+                '请把这个页面改成“AI 工具清单”。先做静态版本：工具数据放在 tools.js，包含工具名称、能帮我做什么、适合谁、价格状态、推荐理由、访问链接。页面支持按用途筛选。不要加服务器功能，不要自动抓取数据。请保证页面能运行，构建能通过。'
             }
           ]
         },
         {
           id: 'dashboard-template',
-          name: '数据看板模板',
-          type: 'B 档：前端工具 + 本地数据',
+          name: '清单看板页面',
+          type: '稍微进阶：把内容整理成卡片',
+          category: 'list',
           score: 86,
           technicalDifficulty: 3,
           noviceDifficulty: 2.5,
           summary:
-            '适合改成收入看板、内容看板、产品雷达。核心是换数据结构和图表文案。',
+            '适合把一堆内容整理成卡片和数字，比如收入记录、选题清单、产品灵感。',
           whyGood:
-            '它比落地页多一些状态和图表，但如果数据先放本地文件，小白仍然可以完成第一版。',
-          need: '准备一份 CSV/JSON 数据，或者先手工写 10 条样例数据。',
-          avoid: '第一版不要接实时数据库、复杂权限和多用户协作。',
-          tags: ['换数据', '适合工具页', '中等难度'],
+            '它比个人主页多一点数据和筛选，但只要数据先手工写在文件里，新手也能完成第一版。',
+          need: '先准备 10 条样例内容。可以是收入记录、选题、产品、任务或任何清单。',
+          avoid: '第一次不要接实时保存数据、多人协作和复杂权限。',
+          tags: ['适合做工具页', '主要换内容', '稍微进阶'],
           packs: [
             {
-              level: '轻改造',
+              level: '第一步：换成自己的清单',
               title: '改成个人收入看板',
               tech: 2,
               novice: 2,
               goal:
-                '把原始指标换成收入、支出、结余、项目来源，做一个自己能看的财务小面板。',
+                '把原来的示例数据换成收入、支出、结余和来源，做一个自己能看的小面板。',
               files: ['src/data/finance.js', 'src/components/Chart.jsx', 'src/App.jsx'],
-              stayAway: ['真实支付接口', '银行接口', '数据库连接'],
+              stayAway: ['真实支付接口', '银行接口', '保存数据的系统'],
               commands: ['npm install', 'npm run dev', 'npm run build'],
               deploy:
-                '如果包含个人敏感数据，不建议公开部署；可先本地使用，或部署脱敏样例版。',
+                '如果里面有真实收入，先不要公开发出去。可以只发一个脱敏样例版。',
               prompt:
-                '请把这个看板项目改成“个人收入看板”。先不要接任何真实支付或银行接口。把数据放在 finance.js，字段包含 month、income、expense、balance、source。页面保留图表和指标卡，但文案全部换成普通人能懂的中文。最后运行 npm run build 检查。'
+                '请把这个看板页面改成“个人收入看板”。不要接支付，不要接银行，不要接保存数据的系统。把样例数据放在 finance.js，字段包含月份、收入、支出、结余、收入来源。页面保留数字卡片和图表，但文案全部换成普通人能懂的中文。最后帮我运行 npm run build 检查。'
             },
             {
-              level: '进阶改造',
+              level: '第二步：换成灵感工具',
               title: '改成产品灵感雷达',
               tech: 3,
               novice: 3,
               goal:
-                '把看板变成新产品线索池，按热度、可改造程度、适合人群和来源筛选。',
+                '把看板变成一个产品灵感清单，记录新工具、适合人群、为什么值得看。',
               files: ['src/data/products.js', 'src/App.jsx', 'src/styles.css'],
               stayAway: ['自动抓取', '登录收藏', '复杂推荐算法'],
               commands: ['npm install', 'npm run dev', 'npm run build'],
               deploy:
-                '第一版用手工数据验证页面价值；自动抓取和排序可以放到后续脚本里。',
+                '第一版用手工整理的数据就够了，先验证别人愿不愿意看。',
               prompt:
-                '请把这个数据看板改成“产品灵感雷达”。新增 products.js，本地数据字段包含 name、source、audience、remixScore、reason、url。页面要有筛选、排序和详情说明。不要接后端，不要做登录。请保持移动端可读。'
+                '请把这个看板页面改成“产品灵感清单”。新增 products.js，本地数据包含产品名称、来源、适合人群、为什么值得看、可以改成什么、链接。页面要能筛选和查看详情。不要接服务器功能，不要做登录。请保持手机上也能看清楚。'
             },
             {
-              level: '想象方向',
+              level: '以后可以做',
               title: '改成团队周报看板',
               tech: 3.5,
               novice: 4,
               goal:
-                '让团队把每周进展、问题和下周计划整理成可视化页面。',
+                '把每个人这周做了什么、遇到什么问题、下周要做什么，整理成一个页面。',
               files: ['src/data/weekly.js', 'src/components/', 'src/App.jsx'],
-              stayAway: ['飞书/Slack 自动同步', '多人权限', '数据库'],
+              stayAway: ['飞书/Slack 自动同步', '多人权限', '保存数据的系统'],
               commands: ['npm install', 'npm run dev', 'npm run build'],
               deploy:
-                '第一版适合做公开样例或内部静态页；涉及团队隐私时不要公开部署。',
+                '如果涉及公司内容，不要公开发布。可以先做一个示例版给团队看。',
               prompt:
-                '请把这个看板改成“团队周报看板”。先用 weekly.js 存本地样例数据，字段包含 owner、done、blocked、next、status。页面要能按成员和状态筛选。不要接企业 IM，不要做权限系统。先保证静态版本可运行。'
+                '请把这个看板改成“团队周报页面”。先用 weekly.js 存本地样例数据，字段包含成员、已完成、遇到的问题、下周计划、状态。页面要能按成员和状态筛选。不要接飞书或 Slack，不要做权限系统。先保证静态版本能运行。'
             }
           ]
         },
         {
           id: 'choice-tool',
-          name: '选择器小工具',
-          type: 'B 档：轻逻辑前端工具',
+          name: '选择困难小工具',
+          type: '稍微进阶：有一点互动',
+          category: 'choice',
           score: 82,
           technicalDifficulty: 3,
           noviceDifficulty: 2.8,
           summary:
-            '适合改成餐厅选择器、礼物推荐器、路线抽签器。逻辑轻，效果明显，用户容易有成就感。',
+            '适合改成餐厅选择器、礼物推荐器、旅行抽签器，做出来马上能玩。',
           whyGood:
-            '它有一点交互逻辑，但多数改造只需要换选项、规则和结果文案。',
-          need: '准备候选项、筛选条件、结果文案和少量图片。',
-          avoid: '第一版不要接地图定位、真实外卖接口和复杂 AI 推荐。',
-          tags: ['轻逻辑', '有互动', '适合展示'],
+            '它有一点互动，但大多数改造只需要换候选项、选择规则和结果文案。',
+          need: '准备候选项、几个筛选条件、结果文案和少量图片。',
+          avoid: '第一次不要接地图定位、外卖接口和复杂 AI 推荐。',
+          tags: ['有互动', '做完能玩', '适合展示'],
           packs: [
             {
-              level: '轻改造',
+              level: '第一步：换成自己的选择题',
               title: '改成餐厅选择器',
               tech: 2,
               novice: 2,
@@ -1155,12 +1158,12 @@
               stayAway: ['地图 API', '真实定位', '外卖平台接口'],
               commands: ['npm install', 'npm run dev', 'npm run build'],
               deploy:
-                '本地餐厅数据可以公开；如果含私人地址，先脱敏再部署。',
+                '如果餐厅信息可以公开，就能发到网上；如果有私人地址，先删掉敏感信息。',
               prompt:
-                '请把这个选择器项目改成“餐厅选择器”。不要接地图 API，不要调用外卖平台。新增 restaurants.js，字段包含 name、price、taste、distance、goodFor、note。页面让用户选择预算、口味和人数，然后从本地数据里推荐 1 个结果，并解释为什么推荐。'
+                '请把这个小工具改成“餐厅选择器”。不要接地图 API，不要调用外卖平台。新增 restaurants.js，数据里包含餐厅名、人均价格、口味、距离、适合几个人、推荐理由。页面让用户选择预算、口味和人数，然后从本地数据里推荐 1 个结果，并用中文解释为什么推荐。'
             },
             {
-              level: '进阶改造',
+              level: '第二步：做成推荐工具',
               title: '改成礼物推荐器',
               tech: 2.5,
               novice: 3,
@@ -1170,12 +1173,12 @@
               stayAway: ['电商接口', '支付', '真实价格同步'],
               commands: ['npm install', 'npm run dev', 'npm run build'],
               deploy:
-                '第一版只做本地推荐清单，链接可以手工放入，不要承诺实时价格。',
+                '第一版只做手工整理的推荐清单，链接可以自己填，不要承诺实时价格。',
               prompt:
-                '请把这个选择器改成“礼物推荐器”。数据放在 gifts.js，字段包含 name、forWhom、budget、occasion、risk、buyUrl。用户选择关系、预算和场景后，推荐 3 个礼物，并说明适合原因和避雷点。不要接电商接口，不要做支付。'
+                '请把这个小工具改成“礼物推荐器”。数据放在 gifts.js，包含礼物名称、适合送谁、预算、场景、可能踩雷点、购买链接。用户选择关系、预算和场景后，推荐 3 个礼物，并说明适合原因和避雷点。不要接电商接口，不要做支付。'
             },
             {
-              level: '想象方向',
+              level: '以后可以做',
               title: '改成旅行路线抽签器',
               tech: 3,
               novice: 3.5,
@@ -1185,9 +1188,9 @@
               stayAway: ['机票酒店接口', '实时天气', '地图路线规划'],
               commands: ['npm install', 'npm run dev', 'npm run build'],
               deploy:
-                '先做静态路线灵感页；真实订票和地图能力放到后续阶段。',
+                '先做路线灵感页，真实订票、天气和地图都放到以后。',
               prompt:
-                '请把这个选择器改成“旅行路线抽签器”。新增 trips.js，字段包含 city、days、budget、style、route、tips。页面让用户选择天数、预算和旅行风格，然后推荐一条路线。不要接机票酒店接口，不要接地图。'
+                '请把这个小工具改成“旅行路线抽签器”。新增 trips.js，字段包含城市、天数、预算、旅行风格、路线、提醒。页面让用户选择天数、预算和旅行风格，然后推荐一条路线。不要接机票酒店接口，不要接地图。'
             }
           ]
         }
@@ -1195,24 +1198,25 @@
 
       const filters = [
         { id: 'all', label: '全部' },
-        { id: 'A', label: 'A 档项目' },
-        { id: 'B', label: 'B 档项目' }
+        { id: 'easy', label: '最容易开始' },
+        { id: 'list', label: '做清单页面' },
+        { id: 'choice', label: '做选择工具' }
       ];
 
       const starterWorks = [
         {
           title: '我的作品集第一页',
-          project: '作品集落地页模板',
+          project: '个人主页模板',
           url: '',
-          note: '先完成轻改造：替换头像、项目卡片和联系方式，能本地运行。',
-          tag: '轻改造'
+          note: '先完成第一步：替换头像、项目卡片和联系方式，已经能在本地打开。',
+          tag: '第一步'
         },
         {
           title: '周末吃什么选择器',
-          project: '选择器小工具',
+          project: '选择困难小工具',
           url: '',
           note: '把候选项换成本地餐厅，结果页会解释为什么推荐。',
-          tag: '进阶改造'
+          tag: '第二步'
         }
       ];
 
@@ -1238,12 +1242,12 @@
       }
 
       function stars(value) {
-        return `${value}/5`;
+        return `${value} 星`;
       }
 
       function visibleProjects() {
         if (state.filter === 'all') return projects;
-        return projects.filter((project) => project.type.startsWith(`${state.filter} 档`));
+        return projects.filter((project) => project.category === state.filter);
       }
 
       function getActiveProject() {
@@ -1271,7 +1275,7 @@
               <button class="project-button ${project.id === state.projectId ? 'active' : ''}" type="button" data-project="${project.id}">
                 <span class="project-topline">
                   <span class="project-type">${project.type}</span>
-                  <span class="score">${project.score}</span>
+                  <span class="score">${project.score}分</span>
                 </span>
                 <h3>${project.name}</h3>
                 <p>${project.summary}</p>
@@ -1294,31 +1298,31 @@
             <p>${project.whyGood}</p>
             <div class="detail-meta">
               <div>
-                <strong>${project.score}</strong>
-                <span>${scoreLabel(project.score)}</span>
+                <strong>${project.score}分</strong>
+                <span>适合新手程度</span>
               </div>
               <div>
                 <strong>${stars(project.technicalDifficulty)}</strong>
-                <span>平台技术难度</span>
+                <span>我们准备它有多难</span>
               </div>
               <div>
                 <strong>${stars(project.noviceDifficulty)}</strong>
-                <span>小白使用难度</span>
+                <span>你照着做有多难</span>
               </div>
             </div>
           </div>
           <div class="detail-body">
             <div class="mini-grid">
               <div class="mini-box">
-                <strong>适合准备</strong>
+                <strong>你要先准备</strong>
                 <span>${project.need}</span>
               </div>
               <div class="mini-box">
-                <strong>第一版避开</strong>
+                <strong>先别碰这些</strong>
                 <span>${project.avoid}</span>
               </div>
               <div class="mini-box">
-                <strong>改造原则</strong>
+                <strong>记住这一条</strong>
                 <span>先让作品跑起来，再逐步加功能。每次只让 AI 改一小段。</span>
               </div>
             </div>
@@ -1343,34 +1347,34 @@
                   <p class="hero-copy">${pack.goal}</p>
                 </div>
                 <button class="copy-button ${state.copiedKey === copyKey ? 'done' : ''}" type="button" data-copy="${copyKey}">
-                  ${state.copiedKey === copyKey ? '已复制' : '复制提示词'}
+                  ${state.copiedKey === copyKey ? '已复制' : '复制给 AI 的话'}
                 </button>
               </div>
               <div class="difficulty">
-                <span>技术难度 ${stars(pack.tech)}</span>
-                <span>小白难度 ${stars(pack.novice)}</span>
+                <span>我们准备难度 ${stars(pack.tech)}</span>
+                <span>你操作难度 ${stars(pack.novice)}</span>
                 <span>${pack.level}</span>
               </div>
               <div class="pack-grid">
                 <div class="info-block">
-                  <h4>关键文件</h4>
+                  <h4>主要改这里</h4>
                   <ul>${pack.files.map((item) => `<li>${item}</li>`).join('')}</ul>
                 </div>
                 <div class="info-block">
-                  <h4>不要先动</h4>
+                  <h4>先别动这里</h4>
                   <ul>${pack.stayAway.map((item) => `<li>${item}</li>`).join('')}</ul>
                 </div>
                 <div class="info-block">
-                  <h4>运行命令</h4>
+                  <h4>让它跑起来</h4>
                   <ul>${pack.commands.map((item) => `<li><code>${item}</code></li>`).join('')}</ul>
                 </div>
                 <div class="info-block">
-                  <h4>部署建议</h4>
+                  <h4>怎么发到网上</h4>
                   <ul><li>${pack.deploy}</li></ul>
                 </div>
               </div>
               <div class="prompt-box">
-                <strong>给 AI coding 工具的第一段提示词</strong>
+                <strong>复制这段话给 AI，让它帮你改</strong>
                 <pre>${pack.prompt}</pre>
               </div>
             </div>
@@ -1408,7 +1412,7 @@
                   <p>${work.note}</p>
                   <div class="work-meta">
                     <span>${work.project}</span>
-                    <span>${work.tag || '本地提交'}</span>
+                    <span>${work.tag || '我的案例'}</span>
                     ${work.url ? `<a href="${work.url}" target="_blank" rel="noreferrer">打开作品</a>` : ''}
                   </div>
                 </div>
@@ -1473,7 +1477,7 @@
           project: String(formData.get('project') || '').trim(),
           url: String(formData.get('url') || '').trim(),
           note: String(formData.get('note') || '').trim(),
-          tag: '本地提交'
+          tag: '我的案例'
         };
         if (!nextWork.title || !nextWork.note) return;
         saveWorks([nextWork, ...storedWorks()]);
