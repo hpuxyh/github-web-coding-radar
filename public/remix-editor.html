@@ -199,7 +199,7 @@
 
       .editor-layout {
         display: grid;
-        grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.1fr);
+        grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
         gap: 18px;
         align-items: start;
       }
@@ -712,6 +712,16 @@
       </section>
 
       <section class="editor-layout">
+        <section class="preview-panel" aria-labelledby="previewTitle">
+          <div class="panel-head">
+            <h2 id="previewTitle">预览我的作品</h2>
+            <p id="previewHint">这里会跟着左边输入的内容一起变化。</p>
+          </div>
+          <div class="preview-frame">
+            <div class="site-preview" id="preview"></div>
+          </div>
+        </section>
+
         <section class="edit-panel" aria-labelledby="editTitle">
           <div class="panel-head">
             <h2 id="editTitle">填写内容</h2>
@@ -723,16 +733,6 @@
             <a class="button" id="mineDemoButton" href="#">查看我的前端</a>
             <button class="button" type="button" id="resetButton">清空重来</button>
             <span class="notice" id="saveNotice">还没有保存。</span>
-          </div>
-        </section>
-
-        <section class="preview-panel" aria-labelledby="previewTitle">
-          <div class="panel-head">
-            <h2 id="previewTitle">预览我的作品</h2>
-            <p id="previewHint">这里会跟着左边输入的内容一起变化。</p>
-          </div>
-          <div class="preview-frame">
-            <div class="site-preview" id="preview"></div>
           </div>
         </section>
       </section>
@@ -1437,7 +1437,9 @@
       if (isYuzhuPack()) {
         document.getElementById('pageTitle').textContent = '直接修改雨竹upon的小站。';
         document.getElementById('pageLead').textContent =
-          '左边先列出这个小站里可以替换的内容；右边直接显示原来的雨竹upon的小站。';
+          '左侧直接显示原来的雨竹upon的小站；右侧列出可以替换的具体内容。';
+        document.getElementById('editTitle').textContent = '具体修改 case';
+        document.getElementById('editHint').textContent = '按这些字段把雨竹upon的小站换成你的内容。';
         document.getElementById('previewTitle').textContent = '预览雨竹upon的小站';
         document.getElementById('previewHint').textContent =
           '这里直接显示原网站，第一版先让小白看着真实页面改内容。';
