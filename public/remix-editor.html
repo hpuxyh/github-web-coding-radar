@@ -305,7 +305,7 @@
         flex-shrink: 0;
         z-index: 3;
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         align-items: center;
         gap: 10px;
         padding: 12px 18px;
@@ -314,7 +314,8 @@
       }
 
       .form-actions .notice {
-        width: 100%;
+        width: auto;
+        margin-left: auto;
       }
 
       .notice {
@@ -1032,10 +1033,7 @@
           <div class="form-actions">
             <button class="button primary" type="button" id="saveButton">保存</button>
             <a class="button" id="mineDemoButton" href="#">查看我的前端</a>
-            <a class="button subtle" id="sampleDemoButton" href="#">看原站副本</a>
-            <a class="button subtle" href="./remix-mvp.html#library">换模板</a>
-            <button class="button" type="button" id="resetButton">清空重来</button>
-            <span class="notice" id="saveNotice">还没有保存。</span>
+            <span class="notice" id="saveNotice">保存后再查看效果。</span>
           </div>
         </section>
       </section>
@@ -1200,10 +1198,7 @@
       const form = document.getElementById('editorForm');
       const preview = document.getElementById('preview');
       const saveButton = document.getElementById('saveButton');
-      const resetButton = document.getElementById('resetButton');
       const saveNotice = document.getElementById('saveNotice');
-      const sampleDemoUrl =
-        sourceDemoUrls[projectId] || `./remix-demo.html?project=${projectId}&pack=${packIndex}&mode=sample`;
       const mineDemoUrl = `./remix-demo.html?project=${projectId}&pack=${packIndex}&mode=mine`;
       const aiApiUrl = 'https://github-web-coding-radar-remix-ai.hpuxyh-taste-lens.workers.dev/api/remix-chat';
 
@@ -1416,7 +1411,7 @@
 
       function saveData() {
         localStorage.setItem(storageKey, JSON.stringify(data));
-        saveNotice.textContent = '已保存到当前浏览器。现在可以打开“我的前端”。';
+        saveNotice.textContent = '已保存，可以查看效果。';
       }
 
       function escapeHtml(value) {
@@ -1951,24 +1946,6 @@
             : renderPortfolioPreview();
       }
 
-      function resetData() {
-        data = defaultDataForPack();
-        chatMessages = initialChatMessages();
-        lastChanges = ['已恢复成示例内容，可以重新说你想怎么改。'];
-        localStorage.setItem(storageKey, JSON.stringify(data));
-        renderForm();
-        renderPreview();
-        saveNotice.textContent = '已恢复成示例内容，并保存到当前浏览器。';
-      }
-
-      const sampleDemoButton = document.getElementById('sampleDemoButton');
-      sampleDemoButton.href = sampleDemoUrl;
-      if (sourceDemoUrls[projectId]) {
-        sampleDemoButton.target = '_blank';
-        sampleDemoButton.rel = 'noreferrer';
-      } else {
-        sampleDemoButton.textContent = '看示例前端';
-      }
       document.getElementById('mineDemoButton').href = mineDemoUrl;
       document.getElementById('editHint').textContent = pack.helper;
       if (isYuzhuPack()) {
@@ -2028,7 +2005,6 @@
       });
 
       saveButton.addEventListener('click', saveData);
-      resetButton.addEventListener('click', resetData);
 
       renderForm();
       renderPreview();
