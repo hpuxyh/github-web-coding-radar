@@ -321,7 +321,7 @@
       .chip-button,
       .project-button,
       .pack-tab,
-      .copy-button {
+      .edit-button {
         border: 1px solid rgba(31, 45, 64, 0.12);
         border-radius: 8px;
         background: #ffffff;
@@ -587,7 +587,7 @@
         line-height: 1.56;
       }
 
-      .prompt-box {
+      .edit-box {
         margin-top: 14px;
         padding: 16px;
         border: 1px solid rgba(23, 105, 194, 0.18);
@@ -595,27 +595,23 @@
         background: #f3f8ff;
       }
 
-      .prompt-box pre {
-        overflow: auto;
-        max-height: 260px;
-        margin: 12px 0 0;
-        white-space: pre-wrap;
+      .edit-box p {
+        margin-top: 8px;
         color: #253044;
-        font-size: 0.92rem;
         line-height: 1.62;
       }
 
-      .copy-button {
+      .edit-button {
         min-height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         padding: 0 12px;
-        color: #1769c2;
+        border-color: #1769c2;
+        background: #1769c2;
+        border-radius: 8px;
+        color: #ffffff;
         font-weight: 850;
-      }
-
-      .copy-button.done {
-        border-color: #1f9b64;
-        background: #ebf8f1;
-        color: #1f7a52;
       }
 
       .workflow {
@@ -829,7 +825,7 @@
         }
 
         .button,
-        .copy-button {
+        .edit-button {
           width: 100%;
         }
 
@@ -867,7 +863,7 @@
             GitHub 可以理解成一个很大的“代码资料库”。问题是普通人进去容易迷路：不知道哪个项目能改，不知道从哪里下手，也不知道改完怎么发出去。
           </p>
           <p class="hero-copy">
-            这个网站会先帮你挑出适合新手的项目，再告诉你能改成什么、主要改哪里、哪些地方先别碰、复制什么话给 AI、怎么让页面跑起来、怎么把作品发到网上。
+            这个网站会先帮你挑出适合新手的项目，再告诉你能改成什么、主要改哪里、哪些地方先别碰。选好方向后，直接打开编辑页，在我们的网站里填内容、看预览、保存作品。
           </p>
           <div class="actions">
             <a class="button primary" href="#library">先选一个想做的</a>
@@ -939,8 +935,8 @@
             </article>
             <article class="step">
               <strong>3</strong>
-              <h3>复制这段话给 AI</h3>
-              <p>每次只让 AI 改一个小范围：先看项目，再改内容，再检查能不能运行。</p>
+              <h3>进入编辑页直接改</h3>
+              <p>不用复制提示词。打开编辑页后，先改标题、卡片、颜色和结果文案。</p>
             </article>
             <article class="step">
               <strong>4</strong>
@@ -1032,9 +1028,7 @@
               stayAway: ['package.json', 'vite.config.js', '构建脚本'],
               commands: ['npm install', 'npm run dev', 'npm run build'],
               deploy:
-                '优先发到 GitHub Pages 或 Cloudflare Pages。它们适合这种纯网页作品。',
-              prompt:
-                '你是我的网页改造助手。请先看一下这个项目的文件结构，帮我把它改成“个人作品集”。要求：只改文字、图片、项目卡片和样式，不要改依赖和构建配置。请分步骤做：1. 告诉我主要应该改哪几个文件；2. 把首页标题和个人介绍换成我的内容；3. 把项目列表改成 4 个我的作品；4. 调整颜色和按钮文案；5. 最后帮我检查 npm run build 能不能通过。'
+                '优先发到 GitHub Pages 或 Cloudflare Pages。它们适合这种纯网页作品。'
             },
             {
               level: '第二步：换成一个小工具',
@@ -1047,9 +1041,7 @@
               stayAway: ['需要服务器的功能', '保存用户数据的功能', '登录功能'],
               commands: ['npm install', 'npm run dev', 'npm run build'],
               deploy:
-                '先把选题放在本地数据文件里，做成一个静态网页；以后再考虑多人填写。',
-              prompt:
-                '请把这个个人主页模板改成“小红书选题工具”。不要接保存用户数据的系统，不要新增服务器功能。请新增一个本地数据文件 topics.js，用中文字段或清楚注释保存：选题标题、适合人群、爆点、素材状态、建议发布时间。页面展示成选题卡片，并保留手机上也好看的布局。最后告诉我怎么在本地运行和怎么发到网上。'
+                '先把选题放在本地数据文件里，做成一个静态网页；以后再考虑多人填写。'
             },
             {
               level: '以后可以做',
@@ -1062,9 +1054,7 @@
               stayAway: ['自动爬虫', '用户账号', '在线评分系统'],
               commands: ['npm install', 'npm run dev', 'npm run build'],
               deploy:
-                '第一版手工维护清单就够了。自动抓取、登录收藏、评分系统都放到以后。',
-              prompt:
-                '请把这个页面改成“AI 工具清单”。先做静态版本：工具数据放在 tools.js，包含工具名称、能帮我做什么、适合谁、价格状态、推荐理由、访问链接。页面支持按用途筛选。不要加服务器功能，不要自动抓取数据。请保证页面能运行，构建能通过。'
+                '第一版手工维护清单就够了。自动抓取、登录收藏、评分系统都放到以后。'
             }
           ]
         },
@@ -1095,9 +1085,7 @@
               stayAway: ['真实支付接口', '银行接口', '保存数据的系统'],
               commands: ['npm install', 'npm run dev', 'npm run build'],
               deploy:
-                '如果里面有真实收入，先不要公开发出去。可以只发一个脱敏样例版。',
-              prompt:
-                '请把这个看板页面改成“个人收入看板”。不要接支付，不要接银行，不要接保存数据的系统。把样例数据放在 finance.js，字段包含月份、收入、支出、结余、收入来源。页面保留数字卡片和图表，但文案全部换成普通人能懂的中文。最后帮我运行 npm run build 检查。'
+                '如果里面有真实收入，先不要公开发出去。可以只发一个脱敏样例版。'
             },
             {
               level: '第二步：换成灵感工具',
@@ -1110,9 +1098,7 @@
               stayAway: ['自动抓取', '登录收藏', '复杂推荐算法'],
               commands: ['npm install', 'npm run dev', 'npm run build'],
               deploy:
-                '第一版用手工整理的数据就够了，先验证别人愿不愿意看。',
-              prompt:
-                '请把这个看板页面改成“产品灵感清单”。新增 products.js，本地数据包含产品名称、来源、适合人群、为什么值得看、可以改成什么、链接。页面要能筛选和查看详情。不要接服务器功能，不要做登录。请保持手机上也能看清楚。'
+                '第一版用手工整理的数据就够了，先验证别人愿不愿意看。'
             },
             {
               level: '以后可以做',
@@ -1125,9 +1111,7 @@
               stayAway: ['飞书/Slack 自动同步', '多人权限', '保存数据的系统'],
               commands: ['npm install', 'npm run dev', 'npm run build'],
               deploy:
-                '如果涉及公司内容，不要公开发布。可以先做一个示例版给团队看。',
-              prompt:
-                '请把这个看板改成“团队周报页面”。先用 weekly.js 存本地样例数据，字段包含成员、已完成、遇到的问题、下周计划、状态。页面要能按成员和状态筛选。不要接飞书或 Slack，不要做权限系统。先保证静态版本能运行。'
+                '如果涉及公司内容，不要公开发布。可以先做一个示例版给团队看。'
             }
           ]
         },
@@ -1158,9 +1142,7 @@
               stayAway: ['地图 API', '真实定位', '外卖平台接口'],
               commands: ['npm install', 'npm run dev', 'npm run build'],
               deploy:
-                '如果餐厅信息可以公开，就能发到网上；如果有私人地址，先删掉敏感信息。',
-              prompt:
-                '请把这个小工具改成“餐厅选择器”。不要接地图 API，不要调用外卖平台。新增 restaurants.js，数据里包含餐厅名、人均价格、口味、距离、适合几个人、推荐理由。页面让用户选择预算、口味和人数，然后从本地数据里推荐 1 个结果，并用中文解释为什么推荐。'
+                '如果餐厅信息可以公开，就能发到网上；如果有私人地址，先删掉敏感信息。'
             },
             {
               level: '第二步：做成推荐工具',
@@ -1173,9 +1155,7 @@
               stayAway: ['电商接口', '支付', '真实价格同步'],
               commands: ['npm install', 'npm run dev', 'npm run build'],
               deploy:
-                '第一版只做手工整理的推荐清单，链接可以自己填，不要承诺实时价格。',
-              prompt:
-                '请把这个小工具改成“礼物推荐器”。数据放在 gifts.js，包含礼物名称、适合送谁、预算、场景、可能踩雷点、购买链接。用户选择关系、预算和场景后，推荐 3 个礼物，并说明适合原因和避雷点。不要接电商接口，不要做支付。'
+                '第一版只做手工整理的推荐清单，链接可以自己填，不要承诺实时价格。'
             },
             {
               level: '以后可以做',
@@ -1188,9 +1168,7 @@
               stayAway: ['机票酒店接口', '实时天气', '地图路线规划'],
               commands: ['npm install', 'npm run dev', 'npm run build'],
               deploy:
-                '先做路线灵感页，真实订票、天气和地图都放到以后。',
-              prompt:
-                '请把这个小工具改成“旅行路线抽签器”。新增 trips.js，字段包含城市、天数、预算、旅行风格、路线、提醒。页面让用户选择天数、预算和旅行风格，然后推荐一条路线。不要接机票酒店接口，不要接地图。'
+                '先做路线灵感页，真实订票、天气和地图都放到以后。'
             }
           ]
         }
@@ -1223,8 +1201,7 @@
       const state = {
         filter: 'all',
         projectId: projects[0].id,
-        packIndex: 0,
-        copiedKey: ''
+        packIndex: 0
       };
 
       const filterBar = document.getElementById('filterBar');
@@ -1289,8 +1266,6 @@
       function renderDetail() {
         const project = getActiveProject();
         const pack = project.packs[state.packIndex] || project.packs[0];
-        const copyKey = `${project.id}-${state.packIndex}`;
-
         detailPanel.innerHTML = `
           <div class="detail-head">
             <span class="pill">${project.type}</span>
@@ -1323,7 +1298,7 @@
               </div>
               <div class="mini-box">
                 <strong>记住这一条</strong>
-                <span>先让作品跑起来，再逐步加功能。每次只让 AI 改一小段。</span>
+                <span>先在编辑页改文字、卡片和结果，跑通后再做更复杂的功能。</span>
               </div>
             </div>
 
@@ -1346,9 +1321,9 @@
                   <h3>${pack.title}</h3>
                   <p class="hero-copy">${pack.goal}</p>
                 </div>
-                <button class="copy-button ${state.copiedKey === copyKey ? 'done' : ''}" type="button" data-copy="${copyKey}">
-                  ${state.copiedKey === copyKey ? '已复制' : '复制给 AI 的话'}
-                </button>
+                <a class="edit-button" href="./remix-editor.html?project=${project.id}&pack=${state.packIndex}">
+                  打开编辑页面
+                </a>
               </div>
               <div class="difficulty">
                 <span>我们准备难度 ${stars(pack.tech)}</span>
@@ -1373,9 +1348,9 @@
                   <ul><li>${pack.deploy}</li></ul>
                 </div>
               </div>
-              <div class="prompt-box">
-                <strong>复制这段话给 AI，让它帮你改</strong>
-                <pre>${pack.prompt}</pre>
+              <div class="edit-box">
+                <strong>下一步：直接进去改</strong>
+                <p>点“打开编辑页面”，你会看到可以填写的表单和实时预览。第一版先保存在自己的浏览器里，后面再接一键发布和作品提交。</p>
               </div>
             </div>
           </div>
@@ -1443,29 +1418,15 @@
         if (!button) return;
         state.projectId = button.dataset.project;
         state.packIndex = 0;
-        state.copiedKey = '';
         renderAll();
       });
 
-      detailPanel.addEventListener('click', async (event) => {
+      detailPanel.addEventListener('click', (event) => {
         const packButton = event.target.closest('[data-pack]');
         if (packButton) {
           state.packIndex = Number(packButton.dataset.pack);
-          state.copiedKey = '';
           renderDetail();
           return;
-        }
-
-        const copyButton = event.target.closest('[data-copy]');
-        if (!copyButton) return;
-        const project = getActiveProject();
-        const pack = project.packs[state.packIndex] || project.packs[0];
-        try {
-          await navigator.clipboard.writeText(pack.prompt);
-          state.copiedKey = copyButton.dataset.copy;
-          renderDetail();
-        } catch (error) {
-          copyButton.textContent = '请手动复制';
         }
       });
 
