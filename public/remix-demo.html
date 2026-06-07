@@ -269,6 +269,143 @@
         line-height: 1.62;
       }
 
+      .yuzhu-site {
+        min-height: 720px;
+        background:
+          radial-gradient(circle at 15% 12%, rgba(0, 153, 255, 0.12), transparent 28%),
+          linear-gradient(180deg, #f7fcff 0%, #ffffff 36%, #f8fbff 100%);
+        color: #172033;
+      }
+
+      .yuzhu-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: clamp(18px, 4vw, 30px);
+        border-bottom: 1px solid rgba(23, 32, 51, 0.08);
+        background: rgba(255, 255, 255, 0.72);
+      }
+
+      .yuzhu-top strong,
+      .yuzhu-top span {
+        display: block;
+      }
+
+      .yuzhu-top strong {
+        font-size: 1.18rem;
+      }
+
+      .yuzhu-top span,
+      .yuzhu-top nav {
+        color: #607084;
+        line-height: 1.5;
+      }
+
+      .yuzhu-hero {
+        display: grid;
+        grid-template-columns: 120px minmax(0, 1fr);
+        gap: 28px;
+        align-items: center;
+        padding: clamp(36px, 8vw, 86px);
+      }
+
+      .yuzhu-avatar {
+        display: grid;
+        width: 120px;
+        height: 120px;
+        place-items: center;
+        border: 5px solid #ffffff;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #09a3ff, #68d8ff);
+        color: #ffffff;
+        font-size: 3.4rem;
+        font-weight: 900;
+        box-shadow: 0 20px 42px rgba(0, 153, 255, 0.24);
+      }
+
+      .yuzhu-kicker {
+        display: inline-flex;
+        min-height: 30px;
+        align-items: center;
+        padding: 0 10px;
+        border-radius: 8px;
+        background: rgba(0, 153, 255, 0.12);
+        color: #0077c8;
+        font-size: 0.82rem;
+        font-weight: 850;
+      }
+
+      .yuzhu-hero h2 {
+        margin-top: 12px;
+        font-size: clamp(2.5rem, 7vw, 6rem);
+        line-height: 0.96;
+      }
+
+      .yuzhu-hero p,
+      .yuzhu-section p,
+      .yuzhu-contact p {
+        margin-top: 14px;
+        color: #526174;
+        font-size: 1.06rem;
+        line-height: 1.75;
+      }
+
+      .yuzhu-button {
+        width: fit-content;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        margin-top: 20px;
+        padding: 0 16px;
+        border-radius: 8px;
+        background: #09a3ff;
+        color: #ffffff;
+        font-weight: 850;
+      }
+
+      .yuzhu-section,
+      .yuzhu-contact {
+        padding: clamp(30px, 6vw, 64px);
+        border-top: 1px solid rgba(23, 32, 51, 0.08);
+      }
+
+      .yuzhu-section h3,
+      .yuzhu-contact h3 {
+        font-size: clamp(1.7rem, 4vw, 3.2rem);
+      }
+
+      .yuzhu-section-note {
+        margin: 0 0 10px;
+        color: #7a8798;
+      }
+
+      .yuzhu-card-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 20px;
+      }
+
+      .yuzhu-skills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .yuzhu-skills span {
+        min-height: 32px;
+        display: inline-flex;
+        align-items: center;
+        padding: 0 11px;
+        border-radius: 8px;
+        background: rgba(0, 153, 255, 0.1);
+        color: #0077c8;
+        font-size: 0.88rem;
+        font-weight: 850;
+      }
+
       .choice-area {
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(280px, 0.8fr);
@@ -349,12 +486,22 @@
       @media (max-width: 860px) {
         .demo-head,
         .choice-area,
-        .preview-grid {
+        .preview-grid,
+        .yuzhu-card-grid {
           grid-template-columns: 1fr;
         }
 
         .status-box {
           max-width: none;
+        }
+
+        .yuzhu-top {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .yuzhu-hero {
+          grid-template-columns: 1fr;
         }
       }
 
@@ -370,7 +517,10 @@
         }
 
         .preview-hero,
-        .preview-section {
+        .preview-section,
+        .yuzhu-hero,
+        .yuzhu-section,
+        .yuzhu-contact {
           padding: 24px;
         }
       }
@@ -406,7 +556,7 @@
     <script>
       const packCatalog = {
         'portfolio-page': [
-          { title: '做一个中文个人小站', kind: 'portfolio' },
+          { title: '直接改雨竹upon的小站', kind: 'portfolio' },
           { title: '改成兴趣作品页', kind: 'list' },
           { title: '改成项目导航页', kind: 'list' }
         ],
@@ -437,16 +587,25 @@
       const sampleDefaults = {
         'portfolio-page-0': {
           title: '雨竹upon的小站',
-          subtitle: '大家好，我是雨竹upon，一个热爱前端开发的人。这里放我的自我介绍、代表作、项目和联系入口。',
-          primary: '查看我的项目',
+          subtitle: '海内存知己，天涯若比邻。',
+          intro: '大家好，我是雨竹upon，一个热爱前端的高中生。HTML/CSS/JS 不精但专，喜欢一切可爱的事物！',
+          primary: '联系我',
           color: '#09a3ff',
-          kicker: '中文个人小站',
-          sectionTitle: '代表作和项目',
+          kicker: '欢迎来到我的小站！',
+          sectionTitle: '代表作',
+          skillsText: 'HTML / CSS / JavaScript / PHP / NodeJS / UI设计 / 视频制作',
           cards: [
             { title: 'QUIK 起始页', meta: '浏览器主页', note: '一个简洁、实用、个性化、无广告的浏览器主页。' },
             { title: '雨竹音乐盒', meta: '兴趣项目', note: '把喜欢的音乐整理成一个在线音乐盒子，方便自己和朋友打开。' },
             { title: 'Win10online', meta: '网页实验', note: '用标准网页技术复刻 Windows 10 体验，是一个很有记忆点的早期作品。' }
-          ]
+          ],
+          friends: [
+            { title: '川上星林', meta: '友链', note: '让生活充满色彩，让梦想更加绚丽。' },
+            { title: 'Alex', meta: '朋友的小站', note: '喜欢各种技术和网页小实验。' },
+            { title: '更多朋友', meta: '友链入口', note: '开发和学习路上，朋友们陪我一同前行。' }
+          ],
+          contactTitle: '联系我',
+          contactNote: '欢迎任何志同道合的小伙伴们与我交流，一起进步！'
         },
         'portfolio-page-1': {
           title: '我的兴趣小站',
@@ -565,7 +724,7 @@
       const packIndex = Math.min(Math.max(Number(params.get('pack') || 0), 0), packCatalog[projectId].length - 1);
       const mode = params.get('mode') === 'mine' ? 'mine' : 'sample';
       const pack = packCatalog[projectId][packIndex];
-      const storageVersion = 'real-site-frontends-v1';
+      const storageVersion = 'direct-yuzhu-site-v2';
       const storageKey = `remix-editor-${storageVersion}-${projectId}-${packIndex}`;
       const sampleData = clone(sampleDefaults[`${projectId}-${packIndex}`]);
       const hasSaved = Boolean(localStorage.getItem(storageKey));
@@ -587,7 +746,8 @@
             ...base,
             ...saved,
             cards: saved.cards || base.cards,
-            choices: saved.choices || base.choices
+            choices: saved.choices || base.choices,
+            friends: saved.friends || base.friends
           };
         } catch (error) {
           return base;
@@ -605,6 +765,10 @@
 
       function safeColor(value) {
         return /^#[0-9a-fA-F]{6}$/.test(String(value || '')) ? value : '#1769c2';
+      }
+
+      function isYuzhuPack() {
+        return projectId === 'portfolio-page' && packIndex === 0;
       }
 
       function cardHtml(items) {
@@ -633,6 +797,57 @@
             <h3>${escapeHtml(data.sectionTitle)}</h3>
             <div class="preview-grid">${cardHtml(data.cards)}</div>
           </section>
+        `;
+      }
+
+      function chipsHtml(text) {
+        return String(text || '')
+          .split('/')
+          .map((item) => item.trim())
+          .filter(Boolean)
+          .map((item) => `<span>${escapeHtml(item)}</span>`)
+          .join('');
+      }
+
+      function renderYuzhuPage() {
+        return `
+          <div class="yuzhu-site">
+            <header class="yuzhu-top">
+              <div>
+                <strong>${escapeHtml(data.title)}</strong>
+                <span>${escapeHtml(data.subtitle)}</span>
+              </div>
+              <nav>首页 · 介绍 · 项目 · 友链 · 联系我</nav>
+            </header>
+            <section class="yuzhu-hero">
+              <div class="yuzhu-avatar">雨</div>
+              <div>
+                <span class="yuzhu-kicker">${escapeHtml(data.kicker)}</span>
+                <h2>${escapeHtml(data.title)}</h2>
+                <p>${escapeHtml(data.intro)}</p>
+                <a class="yuzhu-button" href="#contact">${escapeHtml(data.primary)}</a>
+              </div>
+            </section>
+            <section class="yuzhu-section">
+              <p class="yuzhu-section-note">学任何东西最有成就感的时刻，莫过于自己的作品得到他人认可。</p>
+              <h3>${escapeHtml(data.sectionTitle)}</h3>
+              <div class="yuzhu-card-grid">${cardHtml(data.cards)}</div>
+            </section>
+            <section class="yuzhu-section yuzhu-about">
+              <h3>自我介绍</h3>
+              <p>${escapeHtml(data.intro)}</p>
+              <div class="yuzhu-skills">${chipsHtml(data.skillsText)}</div>
+            </section>
+            <section class="yuzhu-section">
+              <h3>我的小伙伴们</h3>
+              <p class="yuzhu-section-note">开发和学习路上，ta 们陪我一同前行。</p>
+              <div class="yuzhu-card-grid">${cardHtml(data.friends)}</div>
+            </section>
+            <section class="yuzhu-contact" id="contact">
+              <h3>${escapeHtml(data.contactTitle)}</h3>
+              <p>${escapeHtml(data.contactNote)}</p>
+            </section>
+          </div>
         `;
       }
 
@@ -700,7 +915,11 @@
           : `${projectNames[projectId]} · 第 ${packIndex + 1} 个改法`;
 
       demoRoot.style.setProperty('--accent', safeColor(data.color));
-      demoRoot.innerHTML = pack.kind === 'choice' ? renderChoicePage() : renderListPage();
+      demoRoot.innerHTML = isYuzhuPack()
+        ? renderYuzhuPage()
+        : pack.kind === 'choice'
+          ? renderChoicePage()
+          : renderListPage();
 
       demoRoot.addEventListener('click', (event) => {
         const choiceButton = event.target.closest('[data-choice]');
