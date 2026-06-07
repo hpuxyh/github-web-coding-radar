@@ -397,6 +397,15 @@
         line-height: 1.55;
       }
 
+      .source-line {
+        display: block;
+        margin-top: 8px;
+        color: #607084;
+        font-size: 0.84rem;
+        font-weight: 820;
+        line-height: 1.45;
+      }
+
       .tag-row {
         display: flex;
         flex-wrap: wrap;
@@ -432,6 +441,29 @@
         margin-top: 10px;
         color: rgba(255, 255, 255, 0.78);
         line-height: 1.7;
+      }
+
+      .detail-source {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        margin-top: 14px;
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 0.9rem;
+        font-weight: 760;
+      }
+
+      .detail-source a {
+        min-height: 30px;
+        display: inline-flex;
+        align-items: center;
+        padding: 0 10px;
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        color: #ffffff;
+        font-weight: 850;
       }
 
       .detail-meta {
@@ -1027,19 +1059,22 @@
       const projects = [
         {
           id: 'portfolio-page',
-          name: '个人主页模板',
-          type: '最适合新手：只改文字和图片',
+          name: '个人网页搭建模板',
+          type: '真实项目：Start Bootstrap Personal',
+          sourceName: 'StartBootstrap/startbootstrap-personal',
+          sourceUrl: 'https://github.com/StartBootstrap/startbootstrap-personal',
+          sourceNote: '一个开源个人简历 / 作品集网页模板，原项目已经有现成页面。',
           category: 'easy',
           score: 92,
           technicalDifficulty: 2,
           noviceDifficulty: 1.5,
           summary:
-            '适合把一个现成网页改成自己的个人主页、产品介绍页、作品展示页。',
+            '来自 GitHub 的个人网站模板，适合改成自己的主页、简历页和作品集。',
           whyGood:
-            '这类作品通常只需要换文字、图片、颜色和卡片。你不用先理解复杂工具，也不用准备后台。',
+            '这个真实项目原本就是做个人网站用的。你可以先换头像、介绍、作品和联系方式，不用一上来做复杂功能。',
           need: '先准备头像、3 到 5 张作品图、几段自我介绍、几个作品链接。',
           avoid: '第一次先不要做账号、评论、后台管理和收钱功能。',
-          tags: ['最容易开始', '适合第一单', '能发给别人看'],
+          tags: ['真实 GitHub 项目', '个人网页', '适合第一单'],
           packs: [
             {
               level: '第一步：换成自己的内容',
@@ -1084,19 +1119,22 @@
         },
         {
           id: 'dashboard-template',
-          name: '清单看板页面',
-          type: '稍微进阶：把内容整理成卡片',
+          name: '看板页面模板',
+          type: '真实项目：AdminKit',
+          sourceName: 'adminkit/adminkit',
+          sourceUrl: 'https://github.com/adminkit/adminkit',
+          sourceNote: '一个开源看板页面模板，里面有卡片、表格和数字区域。',
           category: 'list',
           score: 86,
           technicalDifficulty: 3,
           noviceDifficulty: 2.5,
           summary:
-            '适合把一堆内容整理成卡片和数字，比如收入记录、选题清单、产品灵感。',
+            '来自 GitHub 的看板网页模板，适合改成收入记录、选题清单、产品灵感页。',
           whyGood:
-            '它比个人主页多一点内容整理，但第一版只要把示例换成自己的清单就能看。',
+            '这个真实项目已经有很多卡片和数字模块。你可以先把示例内容换成自己的清单，做成一个能看的工具页。',
           need: '先准备 10 条样例内容。可以是收入记录、选题、产品、任务或任何清单。',
           avoid: '第一次不要做多人协作、复杂权限和自动同步。',
-          tags: ['适合做工具页', '主要换内容', '稍微进阶'],
+          tags: ['真实 GitHub 项目', '适合做工具页', '稍微进阶'],
           packs: [
             {
               level: '第一步：换成自己的清单',
@@ -1141,19 +1179,22 @@
         },
         {
           id: 'choice-tool',
-          name: '选择困难小工具',
-          type: '稍微进阶：有一点互动',
+          name: '随机选择小工具',
+          type: '真实项目：Picker',
+          sourceName: 'koddsson/picker',
+          sourceUrl: 'https://github.com/koddsson/picker',
+          sourceNote: '一个开源随机选择网页小工具，适合改成从几个选项里挑一个答案。',
           category: 'choice',
           score: 82,
           technicalDifficulty: 3,
           noviceDifficulty: 2.8,
           summary:
-            '适合改成餐厅选择器、礼物推荐器、旅行抽签器，做出来马上能玩。',
+            '来自 GitHub 的选择工具，适合改成餐厅选择器、礼物推荐器、旅行抽签器。',
           whyGood:
-            '它有一点互动，但大多数改造只需要换候选项、选择规则和结果文案。',
+            '这个真实项目本来就是“从几个人里选一个”的小工具。换成餐厅、礼物或旅行路线，就能变成更生活化的选择器。',
           need: '准备候选项、几个筛选条件、结果文案和少量图片。',
           avoid: '第一次不要做自动定位、外卖下单和复杂推荐。',
-          tags: ['有互动', '做完能玩', '适合展示'],
+          tags: ['真实 GitHub 项目', '有互动', '做完能玩'],
           packs: [
             {
               level: '第一步：换成自己的选择题',
@@ -1208,14 +1249,14 @@
       const starterWorks = [
         {
           title: '我的作品集第一页',
-          project: '个人主页模板',
+          project: '个人网页搭建模板',
           url: '',
           note: '先完成第一步：替换头像、项目卡片和联系方式，已经能在本地打开。',
           tag: '第一步'
         },
         {
           title: '周末吃什么选择器',
-          project: '选择困难小工具',
+          project: '随机选择小工具',
           url: '',
           note: '把候选项换成本地餐厅，结果页会解释为什么推荐。',
           tag: '第二步'
@@ -1283,6 +1324,7 @@
                 </span>
                 <h3>${project.name}</h3>
                 <p>${project.summary}</p>
+                <span class="source-line">来源项目：${project.sourceName}</span>
                 <span class="tag-row">${project.tags.map((tag) => `<span>${tag}</span>`).join('')}</span>
               </button>
             `
@@ -1298,6 +1340,10 @@
             <span class="pill">${project.type}</span>
             <h2>${project.name}</h2>
             <p>${project.whyGood}</p>
+            <div class="detail-source">
+              <span>来源项目：${project.sourceName}</span>
+              <a href="${project.sourceUrl}" target="_blank" rel="noreferrer">看原项目来源</a>
+            </div>
             <div class="detail-meta">
               <div>
                 <strong>${project.score}分</strong>
@@ -1324,8 +1370,8 @@
                 <span>${project.avoid}</span>
               </div>
               <div class="mini-box">
-                <strong>记住这一条</strong>
-                <span>先看一个能跑的示例前端，再在编辑页改成自己的版本。</span>
+                <strong>为什么选它</strong>
+                <span>${project.sourceNote}</span>
               </div>
             </div>
 
