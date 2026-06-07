@@ -1059,22 +1059,23 @@
       const projects = [
         {
           id: 'portfolio-page',
-          name: '个人网页搭建模板',
-          type: '真实项目：Start Bootstrap Personal',
-          sourceName: 'StartBootstrap/startbootstrap-personal',
-          sourceUrl: 'https://github.com/StartBootstrap/startbootstrap-personal',
-          sourceNote: '一个开源个人简历 / 作品集网页模板，原项目已经有现成页面。',
+          name: '酷炫个人作品集',
+          type: '真实项目：ProfilePalette',
+          sourceName: 'amitamrutiya/profilepalette',
+          sourceUrl: 'https://github.com/amitamrutiya/profilepalette',
+          sourceDemoUrl: 'https://profilepalette.vercel.app/',
+          sourceNote: '一个开源 3D 动效个人作品集，原项目有动画、项目区、关于我和联系方式。',
           category: 'easy',
-          score: 92,
-          technicalDifficulty: 2,
-          noviceDifficulty: 1.5,
+          score: 94,
+          technicalDifficulty: 3,
+          noviceDifficulty: 2,
           summary:
-            '来自 GitHub 的个人网站模板，适合改成自己的主页、简历页和作品集。',
+            '来自 GitHub 的酷炫个人作品集，适合改成自己的主页、简历页和作品展示页。',
           whyGood:
-            '这个真实项目原本就是做个人网站用的。你可以先换头像、介绍、作品和联系方式，不用一上来做复杂功能。',
+            '这个真实项目第一眼更有记忆点：有 3D 感和动画效果。你可以先换头像、介绍、作品和联系方式，不用一上来做复杂功能。',
           need: '先准备头像、3 到 5 张作品图、几段自我介绍、几个作品链接。',
           avoid: '第一次先不要做账号、评论、后台管理和收钱功能。',
-          tags: ['真实 GitHub 项目', '个人网页', '适合第一单'],
+          tags: ['真实 GitHub 项目', '更酷炫', '个人作品集'],
           packs: [
             {
               level: '第一步：换成自己的内容',
@@ -1249,7 +1250,7 @@
       const starterWorks = [
         {
           title: '我的作品集第一页',
-          project: '个人网页搭建模板',
+          project: '酷炫个人作品集',
           url: '',
           note: '先完成第一步：替换头像、项目卡片和联系方式，已经能在本地打开。',
           tag: '第一步'
@@ -1343,6 +1344,7 @@
             <div class="detail-source">
               <span>来源项目：${project.sourceName}</span>
               <a href="${project.sourceUrl}" target="_blank" rel="noreferrer">看原项目来源</a>
+              ${project.sourceDemoUrl ? `<a href="${project.sourceDemoUrl}" target="_blank" rel="noreferrer">看原项目效果</a>` : ''}
             </div>
             <div class="detail-meta">
               <div>
