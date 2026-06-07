@@ -1168,6 +1168,7 @@
       const sampleDemoUrl =
         sourceDemoUrls[projectId] || `./remix-demo.html?project=${projectId}&pack=${packIndex}&mode=sample`;
       const mineDemoUrl = `./remix-demo.html?project=${projectId}&pack=${packIndex}&mode=mine`;
+      const aiApiUrl = 'https://github-web-coding-radar-remix-ai.hpuxyh-taste-lens.workers.dev/api/remix-chat';
 
       let data = loadData();
       let lastChanges = ['还没开始修改，可以直接说你想要什么效果。'];
@@ -1396,6 +1397,38 @@
 
       function safeTheme(value) {
         return ['cute', 'clean', 'dark'].includes(String(value || '')) ? value : 'clean';
+      }
+
+      function cleanTextValue(value, fallback = '') {
+        return String(value || fallback || '').trim();
+      }
+
+      function normalizeCards(items, fallback) {
+        const source = Array.isArray(items) && items.length ? items : fallback;
+        return source.slice(0, 4).map((item) => ({
+          title: cleanTextValue(item?.title, '未命名作品'),
+          meta: cleanTextValue(item?.meta, '项目'),
+          note: cleanTextValue(item?.note, '这里放一句简单说明。')
+        }));
+      }
+
+      function normalizeAiData(next) {
+        return {
+          ...data,
+          title: cleanTextValue(next?.title, data.title),
+          subtitle: cleanTextValue(next?.subtitle, data.subtitle),
+          intro: cleanTextValue(next?.intro, data.intro),
+          primary: cleanTextValue(next?.primary, data.primary),
+          color: safeColor(next?.color || data.color),
+          visualStyle: safeTheme(next?.visualStyle || data.visualStyle),
+          kicker: cleanTextValue(next?.kicker, data.kicker),
+          sectionTitle: cleanTextValue(next?.sectionTitle, data.sectionTitle),
+          skillsText: cleanTextValue(next?.skillsText, data.skillsText),
+          contactTitle: cleanTextValue(next?.contactTitle, data.contactTitle),
+          contactNote: cleanTextValue(next?.contactNote, data.contactNote),
+          cards: normalizeCards(next?.cards, data.cards),
+          friends: normalizeCards(next?.friends, data.friends)
+        };
       }
 
       function isYuzhuPack() {
@@ -1627,19 +1660,57 @@
           return;
         }
         chatMessages.push({ role: 'user', text });
-        const changes = applyChatInstruction(text);
-        lastChanges = changes.length
-          ? changes
-          : ['这句话我还没完全理解，可以试试“改成摄影作品集”“颜色换成粉色”“加三个项目”。'];
         chatMessages.push({
           role: 'assistant',
-          text: changes.length
-            ? `已帮你改好：${changes.join('、')}。左边预览已经更新。`
-            : '我还没理解这句话要改哪里。你可以换成更直接的说法，比如“改成摄影作品集，颜色温柔一点”。'
+          text: '收到，我正在让 DeepSeek 帮你改左边页面。'
         });
-        renderPreview();
-        saveData();
+        saveNotice.textContent = 'DeepSeek 正在修改页面...';
         renderForm();
+        requestAiRemix(text);
+      }
+
+      async function requestAiRemix(text) {
+        try {
+          const response = await fetch(aiApiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              message: text,
+              current: data,
+              projectId,
+              packIndex
+            })
+          });
+          const result = await response.json();
+          if (!response.ok || !result?.data) {
+            throw new Error(result?.detail || result?.error || 'AI 接口暂时不可用');
+          }
+          data = normalizeAiData(result.data);
+          lastChanges = Array.isArray(result.changes) && result.changes.length
+            ? result.changes
+            : ['DeepSeek 已根据你的描述改了页面'];
+          chatMessages[chatMessages.length - 1] = {
+            role: 'assistant',
+            text: result.assistantMessage || `已帮你改好：${lastChanges.join('、')}。左边预览已经更新。`
+          };
+          renderPreview();
+          saveData();
+          renderForm();
+        } catch (error) {
+          const changes = applyChatInstruction(text);
+          lastChanges = changes.length
+            ? changes
+            : ['AI 接口暂时没通，本地也没完全理解这句话。可以试试“改成摄影作品集”。'];
+          chatMessages[chatMessages.length - 1] = {
+            role: 'assistant',
+            text: changes.length
+              ? `DeepSeek 接口暂时没通，我先用本地规则帮你改了：${changes.join('、')}。`
+              : `DeepSeek 接口暂时没通：${error.message}。你可以换个更直接的说法再试。`
+          };
+          renderPreview();
+          saveData();
+          renderForm();
+        }
       }
 
       function applyInput(target) {
