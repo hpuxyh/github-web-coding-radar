@@ -27,12 +27,7 @@
       body {
         min-width: 320px;
         margin: 0;
-        background:
-          linear-gradient(180deg, rgba(247, 251, 255, 0.92), #ffffff 46%),
-          url("assets/portfolio-hero.png");
-        background-attachment: fixed;
-        background-position: center top;
-        background-size: cover;
+        background: #f4f7fa;
       }
 
       button,
@@ -51,44 +46,6 @@
         text-decoration: none;
       }
 
-      .topbar {
-        position: sticky;
-        z-index: 20;
-        top: 0;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        padding: 14px 5vw;
-        border-bottom: 1px solid rgba(42, 67, 90, 0.12);
-        background: rgba(248, 252, 255, 0.9);
-        backdrop-filter: blur(18px);
-      }
-
-      .brand {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        font-weight: 860;
-      }
-
-      .brand-mark {
-        display: inline-grid;
-        width: 36px;
-        height: 36px;
-        place-items: center;
-        border-radius: 8px;
-        background: #172033;
-        color: #ffffff;
-        font-size: 0.8rem;
-      }
-
-      .top-actions {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
       .button {
         min-height: 42px;
         display: inline-flex;
@@ -96,12 +53,12 @@
         justify-content: center;
         gap: 8px;
         padding: 0 14px;
-        border: 1px solid rgba(31, 45, 64, 0.14);
+        border: 1px solid #d8dee7;
         border-radius: 8px;
         background: #ffffff;
         color: #1d2a3b;
         font-weight: 850;
-        box-shadow: 0 12px 28px rgba(31, 45, 64, 0.08);
+        box-shadow: none;
       }
 
       .button.primary {
@@ -111,127 +68,68 @@
       }
 
       .button.subtle {
-        box-shadow: none;
+        background: #f8fafc;
       }
 
       .button:hover {
-        transform: translateY(-1px);
+        border-color: #b9c5d4;
+        background: #f7f9fb;
       }
 
       .shell {
-        width: min(1240px, 100%);
+        width: min(1500px, 100%);
         margin: 0 auto;
-        padding: 34px 5vw 58px;
+        padding: 18px 24px;
       }
 
-      .intro {
-        display: grid;
-        grid-template-columns: minmax(0, 1.1fr) minmax(260px, 0.9fr);
-        gap: 18px;
-        align-items: end;
-        margin-bottom: 18px;
-      }
-
-      .intro-card {
-        padding: 24px;
-        border: 1px solid rgba(38, 59, 82, 0.1);
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.88);
-        box-shadow: 0 18px 40px rgba(39, 58, 77, 0.08);
-      }
-
-      .eyebrow {
-        display: inline-flex;
-        min-height: 30px;
-        align-items: center;
-        padding: 0 10px;
-        border-radius: 8px;
-        background: #e8f3fb;
-        color: #1769c2;
-        font-size: 0.8rem;
-        font-weight: 850;
-      }
-
-      h1,
       h2,
       h3,
       p {
         margin: 0;
       }
 
-      h1 {
-        margin-top: 14px;
-        color: #172033;
-        font-size: clamp(2rem, 5vw, 4.6rem);
-        line-height: 1;
-        letter-spacing: 0;
-      }
-
-      .lead {
-        max-width: 760px;
-        margin-top: 16px;
-        color: #526174;
-        font-size: 1.06rem;
-        line-height: 1.75;
-      }
-
-      .status-card {
-        min-height: 170px;
-        display: grid;
-        gap: 12px;
-        padding: 20px;
-        border: 1px solid rgba(38, 59, 82, 0.1);
-        border-radius: 8px;
-        background: #172033;
-        color: #ffffff;
-        box-shadow: 0 18px 40px rgba(39, 58, 77, 0.1);
-      }
-
-      .status-card span {
-        color: rgba(255, 255, 255, 0.72);
-        line-height: 1.6;
-      }
-
-      .status-card strong {
-        font-size: 1.26rem;
-        line-height: 1.34;
-      }
-
       .editor-layout {
         display: grid;
-        grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
-        gap: 18px;
+        grid-template-columns: minmax(0, 1fr) minmax(360px, 440px);
+        gap: 16px;
         align-items: start;
       }
 
       .edit-panel,
       .preview-panel {
-        border: 1px solid rgba(38, 59, 82, 0.1);
+        border: 1px solid #dfe5ec;
         border-radius: 8px;
-        background: rgba(255, 255, 255, 0.96);
-        box-shadow: 0 18px 40px rgba(39, 58, 77, 0.07);
+        background: #ffffff;
+        box-shadow: 0 12px 28px rgba(31, 45, 64, 0.06);
+      }
+
+      .edit-panel {
+        max-height: calc(100vh - 36px);
+        overflow: auto;
       }
 
       .panel-head {
-        padding: 20px;
-        border-bottom: 1px solid rgba(31, 45, 64, 0.1);
+        padding: 16px 18px;
+        border-bottom: 1px solid #e6ebf0;
       }
 
       .panel-head h2 {
         color: #172033;
-        font-size: 1.35rem;
+        font-size: 1.18rem;
+        line-height: 1.35;
       }
 
       .panel-head p {
-        margin-top: 8px;
+        margin-top: 6px;
         color: #607084;
+        font-size: 0.92rem;
         line-height: 1.58;
       }
 
       .form-grid {
         display: grid;
-        gap: 14px;
-        padding: 20px;
+        gap: 12px;
+        padding: 16px 18px;
       }
 
       label,
@@ -239,7 +137,7 @@
         display: grid;
         gap: 6px;
         color: #243044;
-        font-size: 0.92rem;
+        font-size: 0.9rem;
         font-weight: 820;
       }
 
@@ -247,7 +145,7 @@
       textarea,
       select {
         width: 100%;
-        border: 1px solid rgba(31, 45, 64, 0.16);
+        border: 1px solid #d8dee7;
         border-radius: 8px;
         background: #ffffff;
         color: #172033;
@@ -255,7 +153,7 @@
 
       input,
       select {
-        min-height: 42px;
+        min-height: 40px;
         padding: 0 12px;
       }
 
@@ -274,9 +172,9 @@
         display: grid;
         gap: 10px;
         padding: 12px;
-        border: 1px solid rgba(31, 45, 64, 0.1);
+        border: 1px solid #e1e6ee;
         border-radius: 8px;
-        background: #f8fbfd;
+        background: #f8fafc;
       }
 
       .item-group h3 {
@@ -291,11 +189,16 @@
       }
 
       .form-actions {
+        position: sticky;
+        z-index: 3;
+        bottom: 0;
         display: flex;
         flex-wrap: wrap;
         align-items: center;
         gap: 10px;
-        padding: 0 20px 20px;
+        padding: 12px 18px;
+        border-top: 1px solid #e6ebf0;
+        background: rgba(255, 255, 255, 0.96);
       }
 
       .notice {
@@ -306,19 +209,20 @@
 
       .preview-panel {
         position: sticky;
-        top: 82px;
+        top: 18px;
         overflow: hidden;
       }
 
       .preview-frame {
-        padding: 22px;
-        background: #f3f7fb;
+        padding: 8px;
+        background: #edf2f7;
       }
 
       .site-preview {
-        min-height: 620px;
+        height: calc(100vh - 128px);
+        min-height: 660px;
         overflow: hidden;
-        border: 1px solid rgba(31, 45, 64, 0.12);
+        border: 1px solid #d9e1ea;
         border-radius: 8px;
         background: #ffffff;
         color: #172033;
@@ -326,7 +230,7 @@
 
       .source-site-frame {
         width: 100%;
-        height: min(760px, 78vh);
+        height: 100%;
         display: block;
         border: 0;
         background: #ffffff;
@@ -622,7 +526,6 @@
       }
 
       @media (max-width: 1020px) {
-        .intro,
         .editor-layout {
           grid-template-columns: 1fr;
         }
@@ -630,11 +533,14 @@
         .preview-panel {
           position: static;
         }
+
+        .edit-panel {
+          max-height: none;
+          overflow: visible;
+        }
       }
 
       @media (max-width: 680px) {
-        .topbar,
-        .top-actions,
         .form-actions {
           align-items: stretch;
           flex-direction: column;
@@ -645,11 +551,9 @@
         }
 
         .shell {
-          padding-top: 20px;
+          padding: 12px;
         }
 
-        .intro-card,
-        .status-card,
         .panel-head,
         .form-grid,
         .preview-frame {
@@ -682,35 +586,7 @@
     </style>
   </head>
   <body>
-    <header class="topbar">
-      <a class="brand" href="./remix-mvp.html">
-        <span class="brand-mark">改</span>
-        <span>直接修改网页模板</span>
-      </a>
-      <div class="top-actions">
-        <a class="button subtle" href="./remix-mvp.html#library">换一个改法</a>
-        <a class="button subtle" id="sampleDemoTop" href="#">看示例前端</a>
-        <a class="button subtle" id="mineDemoTop" href="#">看我的前端</a>
-        <button class="button primary" type="button" id="saveTop">保存</button>
-      </div>
-    </header>
-
     <main class="shell">
-      <section class="intro" aria-labelledby="pageTitle">
-        <div class="intro-card">
-          <span class="eyebrow" id="packLabel">正在打开编辑页</span>
-          <h1 id="pageTitle">在这里直接改，马上看到预览。</h1>
-          <p class="lead" id="pageLead">
-            左边填你自己的内容，右边马上看到网页长什么样。第一版先改文字、卡片、颜色和结果文案。
-          </p>
-        </div>
-        <aside class="status-card">
-          <span>当前改法</span>
-          <strong id="currentPack">正在读取...</strong>
-          <span id="helperText">内容会先保存到你自己的浏览器里。</span>
-        </aside>
-      </section>
-
       <section class="editor-layout">
         <section class="preview-panel" aria-labelledby="previewTitle">
           <div class="panel-head">
@@ -729,8 +605,10 @@
           </div>
           <form class="form-grid" id="editorForm"></form>
           <div class="form-actions">
-            <button class="button primary" type="button" id="saveButton">保存到我的浏览器</button>
+            <button class="button primary" type="button" id="saveButton">保存</button>
             <a class="button" id="mineDemoButton" href="#">查看我的前端</a>
+            <a class="button subtle" id="sampleDemoButton" href="#">看原网站</a>
+            <a class="button subtle" href="./remix-mvp.html#library">换模板</a>
             <button class="button" type="button" id="resetButton">清空重来</button>
             <span class="notice" id="saveNotice">还没有保存。</span>
           </div>
@@ -897,7 +775,6 @@
       const form = document.getElementById('editorForm');
       const preview = document.getElementById('preview');
       const saveButton = document.getElementById('saveButton');
-      const saveTop = document.getElementById('saveTop');
       const resetButton = document.getElementById('resetButton');
       const saveNotice = document.getElementById('saveNotice');
       const sampleDemoUrl =
@@ -1422,22 +1299,17 @@
         saveNotice.textContent = '已恢复成示例内容，并保存到当前浏览器。';
       }
 
-      const sampleDemoTop = document.getElementById('sampleDemoTop');
-      sampleDemoTop.href = sampleDemoUrl;
+      const sampleDemoButton = document.getElementById('sampleDemoButton');
+      sampleDemoButton.href = sampleDemoUrl;
       if (sourceDemoUrls[projectId]) {
-        sampleDemoTop.target = '_blank';
-        sampleDemoTop.rel = 'noreferrer';
+        sampleDemoButton.target = '_blank';
+        sampleDemoButton.rel = 'noreferrer';
+      } else {
+        sampleDemoButton.textContent = '看示例前端';
       }
-      document.getElementById('mineDemoTop').href = mineDemoUrl;
       document.getElementById('mineDemoButton').href = mineDemoUrl;
-      document.getElementById('packLabel').textContent = `${projectNames[projectId]} · 第 ${packIndex + 1} 个改法`;
-      document.getElementById('currentPack').textContent = isYuzhuPack() ? '正在直接修改：雨竹upon的小站' : pack.title;
-      document.getElementById('helperText').textContent = pack.helper;
       document.getElementById('editHint').textContent = pack.helper;
       if (isYuzhuPack()) {
-        document.getElementById('pageTitle').textContent = '直接修改雨竹upon的小站。';
-        document.getElementById('pageLead').textContent =
-          '左侧直接显示原来的雨竹upon的小站；右侧列出可以替换的具体内容。';
         document.getElementById('editTitle').textContent = '具体修改 case';
         document.getElementById('editHint').textContent = '按这些字段把雨竹upon的小站换成你的内容。';
         document.getElementById('previewTitle').textContent = '预览雨竹upon的小站';
@@ -1450,7 +1322,6 @@
       });
 
       saveButton.addEventListener('click', saveData);
-      saveTop.addEventListener('click', saveData);
       resetButton.addEventListener('click', resetData);
 
       renderForm();
