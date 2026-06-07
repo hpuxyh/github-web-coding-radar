@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="把 GitHub 上的好项目，用白话讲清楚，并一步步改成自己的网页作品。"
+      content="把 GitHub 上已经能打开的 HTML 网页，整理成小白可以直接修改、预览和展示的作品模板。"
     />
-    <title>把 GitHub 好项目改成我的作品</title>
+    <title>把 GitHub 网页模板改成我的作品</title>
     <style>
       :root {
         color: #172033;
@@ -900,10 +900,10 @@
     <header class="topbar">
       <a class="brand" href="./">
         <span class="brand-mark">改</span>
-        <span>把好项目改成我的作品</span>
+        <span>把网页模板改成我的作品</span>
       </a>
       <nav class="nav" aria-label="页面导航">
-        <a href="#library">选项目</a>
+        <a href="#library">选模板</a>
         <a href="#workflow">怎么做</a>
         <a href="#showcase">晒作品</a>
         <a href="./remix-community.html">为什么做</a>
@@ -913,16 +913,16 @@
     <main>
       <section class="hero">
         <div class="hero-inner">
-          <span class="eyebrow">不用先学会 GitHub，也能开始做网页作品</span>
-          <h1>每天帮你找能改的好项目</h1>
+          <span class="eyebrow">不用先学 GitHub，也能改出自己的网页</span>
+          <h1>找现成网页，直接改成你的作品</h1>
           <p class="hero-lead">
-            GitHub 可以理解成一个很大的“代码资料库”。问题是普通人进去容易迷路：不知道哪个项目能改，不知道从哪里下手，也不知道改完怎么发出去。
+            GitHub 上有很多已经做好的 HTML 页面，但普通人进去会被代码、文件和英文说明劝退。我们先把适合的网页拉过来，整理成能直接编辑的模板。
           </p>
           <p class="hero-copy">
-            这个网站会先帮你挑出适合新手的项目，再告诉你能改成什么、主要改哪里、哪些地方先别碰。选好方向后，直接打开编辑页，在我们的网站里填内容、看预览、保存作品。
+            你不用先理解代码。先看这个网页长什么样，再选一个改法，最后在我们网站里改标题、图片、卡片和按钮，右边马上看到自己的版本。
           </p>
           <div class="actions">
-            <a class="button primary" href="#library">先选一个想做的</a>
+            <a class="button primary" href="#library">先选一个模板</a>
             <a class="button" href="#showcase">看看别人改了什么</a>
           </div>
         </div>
@@ -932,19 +932,19 @@
         <div class="metrics">
           <div class="metric">
             <strong>3</strong>
-            <span>先给 3 种最容易开始的作品：个人主页、清单页面、选择工具。</span>
+            <span>先给 3 种能直接改的网页模板：个人主页、看板页面、选择工具。</span>
           </div>
           <div class="metric">
-            <strong>9</strong>
-            <span>每种作品给 3 个改法：先做简单版，再试进阶版。</span>
+            <strong>只填内容</strong>
+            <span>先改标题、介绍、卡片、按钮和颜色，不让小白一开始碰复杂代码。</span>
           </div>
           <div class="metric">
-            <strong>避难题</strong>
-            <span>先不做账号、收钱、多人填写这些容易卡住的部分。</span>
+            <strong>能预览</strong>
+            <span>先看原网页效果，再看示例前端，最后看自己改出来的版本。</span>
           </div>
           <div class="metric">
             <strong>能展示</strong>
-            <span>目标不是看懂代码，而是做出一个能发给别人看的网页。</span>
+            <span>目标不是学会 GitHub，而是做出一个能发给别人看的网页作品。</span>
           </div>
         </div>
       </section>
@@ -952,15 +952,15 @@
       <section class="section alt" id="library">
         <div class="section-inner">
           <div class="section-heading">
-            <span>选项目</span>
-            <h2>先选一个你想做的小作品。</h2>
+            <span>选模板</span>
+            <h2>先选一个现成网页模板。</h2>
             <p>
-              不用先看代码。你先看它能改成什么、适不适合新手、你要准备什么。点左边的项目，右边会出现三种改法。
+              这些都是 GitHub 上已经能打开的网页。我们先判断它适不适合拉进来，再告诉你可以改成什么。点左边的模板，右边会出现三种改法。
             </p>
           </div>
 
           <div class="app-layout">
-            <aside class="tool-panel" aria-label="适合改造的项目列表">
+            <aside class="tool-panel" aria-label="适合改造的网页模板列表">
               <div class="filter-bar" id="filterBar"></div>
               <div class="project-list" id="projectList"></div>
             </aside>
@@ -973,31 +973,31 @@
         <div class="section-inner">
           <div class="section-heading">
             <span>怎么做</span>
-            <h2>每次只做一步，不要一上来改太多。</h2>
+            <h2>先从一个能打开的网页开始。</h2>
             <p>
-              这个网站不是让你变成程序员，而是先让你看到示例前端，再在网页里把它改成自己的作品。
+              这个网站不是让你变成程序员，而是把原来的 HTML 页面整理成表单和预览。你负责换内容，我们负责把它变成一个可编辑的作品模板。
             </p>
           </div>
           <div class="workflow">
             <article class="step">
               <strong>1</strong>
-              <h3>先选容易开始的</h3>
-              <p>优先选只换文字、图片、清单和页面的作品。先避开账号、收钱和复杂表单。</p>
+              <h3>先找现成网页</h3>
+              <p>优先选打开就能看的 HTML 页面，比如个人主页、看板、小游戏和小工具。</p>
             </article>
             <article class="step">
               <strong>2</strong>
-              <h3>先照着简单版改</h3>
-              <p>先改标题、图片、卡片和文案。第一次成功跑起来，比一次加很多功能更重要。</p>
+              <h3>平台先整理好</h3>
+              <p>我们把原网页拆成可填写的内容项：标题、介绍、图片、卡片、按钮和颜色。</p>
             </article>
             <article class="step">
               <strong>3</strong>
-              <h3>看示例，再直接改</h3>
-              <p>先打开示例前端确认效果，再进入编辑页改标题、卡片、颜色和结果文案。</p>
+              <h3>你直接在网页改</h3>
+              <p>先看示例，再进入编辑页填写自己的内容，右边马上出现新的网页效果。</p>
             </article>
             <article class="step">
               <strong>4</strong>
               <h3>做完就晒出来</h3>
-              <p>把你改好的网页、截图和说明放进案例区，后来的人也能照着做。</p>
+              <p>保存后先放进自己的案例列表，后面再接一键发布和作品提交。</p>
             </article>
           </div>
         </div>
@@ -1009,7 +1009,7 @@
             <span>晒作品</span>
             <h2>先让大家看到“别人真的改出来了”。</h2>
             <p>
-              这里先做一个演示版。你可以把自己的作品名称、来源项目、链接和改造说明加进来，看它应该怎么展示。
+              这里先做一个演示版。你可以把自己的作品名称、来源模板、链接和改了什么加进来，看它应该怎么展示。
             </p>
           </div>
 
@@ -1022,7 +1022,7 @@
                   <input id="workTitle" name="title" required placeholder="例如：我的 AI 工具清单" />
                 </label>
                 <label>
-                  我是从哪个项目改的
+                  我是从哪个模板改的
                   <select id="workProject" name="project"></select>
                 </label>
                 <label>
@@ -1031,7 +1031,7 @@
                 </label>
                 <label>
                   我改了什么
-                  <textarea id="workNote" name="note" required placeholder="例如：我把原来的个人主页改成了 AI 工具清单，主要替换了标题、卡片和链接"></textarea>
+                  <textarea id="workNote" name="note" required placeholder="例如：我把原来的个人主页模板改成了 AI 工具清单，主要替换了标题、卡片和链接"></textarea>
                 </label>
                 <div class="submit-row">
                   <button class="button primary" type="submit">放进我的案例列表</button>
@@ -1051,7 +1051,7 @@
 
     <footer>
       <div>
-        这一版先验证一件事：普通人能不能从一个现成网页开始，做出自己的作品。更新日期：2026-06-07。
+        这一版先验证一件事：普通人能不能从一个现成 HTML 网页开始，直接改出自己的作品。更新日期：2026-06-07。
       </div>
     </footer>
 
@@ -1059,23 +1059,23 @@
       const projects = [
         {
           id: 'portfolio-page',
-          name: '酷炫个人作品集',
-          type: '真实项目：ProfilePalette',
-          sourceName: 'amitamrutiya/profilepalette',
-          sourceUrl: 'https://github.com/amitamrutiya/profilepalette',
-          sourceDemoUrl: 'https://profilepalette.vercel.app/',
-          sourceNote: '一个开源 3D 动效个人作品集，原项目有动画、项目区、关于我和联系方式。',
+          name: '个人主页 HTML 模板',
+          type: '可拉取 HTML：Cleanfolio Minimal',
+          sourceName: 'rjshkhr/cleanfolio-minimal',
+          sourceUrl: 'https://github.com/rjshkhr/cleanfolio-minimal',
+          sourceDemoUrl: 'https://rjshkhr.github.io/cleanfolio-minimal/',
+          sourceNote: '这是一个 HTML、CSS、JS 组成的作品集模板，适合先整理成“填写内容 + 实时预览”的站内模板。',
           category: 'easy',
-          score: 94,
-          technicalDifficulty: 3,
-          noviceDifficulty: 2,
+          score: 96,
+          technicalDifficulty: 1.5,
+          noviceDifficulty: 1,
           summary:
-            '来自 GitHub 的酷炫个人作品集，适合改成自己的主页、简历页和作品展示页。',
+            '来自 GitHub 的个人主页网页模板，适合改成自己的主页、简历页和作品展示页。',
           whyGood:
-            '这个真实项目第一眼更有记忆点：有 3D 感和动画效果。你可以先换头像、介绍、作品和联系方式，不用一上来做复杂功能。',
+            '这个模板文件少、结构清楚，原本就是给个人作品集用的。我们可以先把它拉成站内编辑版，你只换名字、介绍、作品和联系方式。',
           need: '先准备头像、3 到 5 张作品图、几段自我介绍、几个作品链接。',
           avoid: '第一次先不要做账号、评论、后台管理和收钱功能。',
-          tags: ['真实 GitHub 项目', '更酷炫', '个人作品集'],
+          tags: ['现成 HTML', '个人主页', '最容易开始'],
           packs: [
             {
               level: '第一步：换成自己的内容',
@@ -1120,22 +1120,23 @@
         },
         {
           id: 'dashboard-template',
-          name: '看板页面模板',
-          type: '真实项目：AdminKit',
-          sourceName: 'adminkit/adminkit',
-          sourceUrl: 'https://github.com/adminkit/adminkit',
-          sourceNote: '一个开源看板页面模板，里面有卡片、表格和数字区域。',
+          name: '清单看板 HTML 模板',
+          type: '可拉取 HTML：Admin Template',
+          sourceName: 'tailwindtoolbox/Admin-Template',
+          sourceUrl: 'https://github.com/tailwindtoolbox/Admin-Template',
+          sourceDemoUrl: 'https://tailwindtoolbox.github.io/Admin-Template/',
+          sourceNote: '这是一个单 HTML 看板模板，适合把数字、卡片和清单整理成可填写的工具页。',
           category: 'list',
-          score: 86,
-          technicalDifficulty: 3,
-          noviceDifficulty: 2.5,
+          score: 88,
+          technicalDifficulty: 2,
+          noviceDifficulty: 2,
           summary:
             '来自 GitHub 的看板网页模板，适合改成收入记录、选题清单、产品灵感页。',
           whyGood:
-            '这个真实项目已经有很多卡片和数字模块。你可以先把示例内容换成自己的清单，做成一个能看的工具页。',
+            '这个模板本身就是一张看板页。我们可以把卡片、数字和列表变成可填写内容，让小白先做出一个能看的工具页。',
           need: '先准备 10 条样例内容。可以是收入记录、选题、产品、任务或任何清单。',
           avoid: '第一次不要做多人协作、复杂权限和自动同步。',
-          tags: ['真实 GitHub 项目', '适合做工具页', '稍微进阶'],
+          tags: ['现成 HTML', '适合工具页', '稍微进阶'],
           packs: [
             {
               level: '第一步：换成自己的清单',
@@ -1180,22 +1181,23 @@
         },
         {
           id: 'choice-tool',
-          name: '随机选择小工具',
-          type: '真实项目：Picker',
-          sourceName: 'koddsson/picker',
-          sourceUrl: 'https://github.com/koddsson/picker',
-          sourceNote: '一个开源随机选择网页小工具，适合改成从几个选项里挑一个答案。',
+          name: '转盘选择 HTML 小工具',
+          type: '可拉取 HTML：Spin Wheel Game',
+          sourceName: 'nikpatil2123/Spin-wheel-Game',
+          sourceUrl: 'https://github.com/nikpatil2123/Spin-wheel-Game',
+          sourceDemoUrl: 'https://nikpatil2123.github.io/Spin-wheel-Game/',
+          sourceNote: '这是一个能直接打开的转盘网页，适合把选项换成餐厅、礼物、旅行路线或抽签结果。',
           category: 'choice',
-          score: 82,
-          technicalDifficulty: 3,
-          noviceDifficulty: 2.8,
+          score: 84,
+          technicalDifficulty: 2.5,
+          noviceDifficulty: 2.3,
           summary:
-            '来自 GitHub 的选择工具，适合改成餐厅选择器、礼物推荐器、旅行抽签器。',
+            '来自 GitHub 的转盘网页小工具，适合改成餐厅选择器、礼物推荐器、旅行抽签器。',
           whyGood:
-            '这个真实项目本来就是“从几个人里选一个”的小工具。换成餐厅、礼物或旅行路线，就能变成更生活化的选择器。',
+            '这个模板本来就有“随机选一个”的互动。把转盘选项换成餐厅、礼物或旅行路线，就能变成更生活化的小工具。',
           need: '准备候选项、几个筛选条件、结果文案和少量图片。',
           avoid: '第一次不要做自动定位、外卖下单和复杂推荐。',
-          tags: ['真实 GitHub 项目', '有互动', '做完能玩'],
+          tags: ['现成 HTML', '有互动', '做完能玩'],
           packs: [
             {
               level: '第一步：换成自己的选择题',
@@ -1250,7 +1252,7 @@
       const starterWorks = [
         {
           title: '我的作品集第一页',
-          project: '酷炫个人作品集',
+          project: '个人主页 HTML 模板',
           url: '',
           note: '先完成第一步：替换头像、项目卡片和联系方式，已经能在本地打开。',
           tag: '第一步'
@@ -1325,7 +1327,7 @@
                 </span>
                 <h3>${project.name}</h3>
                 <p>${project.summary}</p>
-                <span class="source-line">来源项目：${project.sourceName}</span>
+                <span class="source-line">原始网页：${project.sourceName}</span>
                 <span class="tag-row">${project.tags.map((tag) => `<span>${tag}</span>`).join('')}</span>
               </button>
             `
@@ -1342,9 +1344,9 @@
             <h2>${project.name}</h2>
             <p>${project.whyGood}</p>
             <div class="detail-source">
-              <span>来源项目：${project.sourceName}</span>
-              <a href="${project.sourceUrl}" target="_blank" rel="noreferrer">看原项目来源</a>
-              ${project.sourceDemoUrl ? `<a href="${project.sourceDemoUrl}" target="_blank" rel="noreferrer">看原项目效果</a>` : ''}
+              <span>原始网页：${project.sourceName}</span>
+              <a href="${project.sourceUrl}" target="_blank" rel="noreferrer">看 GitHub 来源</a>
+              ${project.sourceDemoUrl ? `<a href="${project.sourceDemoUrl}" target="_blank" rel="noreferrer">看原网页效果</a>` : ''}
             </div>
             <div class="detail-meta">
               <div>
@@ -1353,7 +1355,7 @@
               </div>
               <div>
                 <strong>${stars(project.technicalDifficulty)}</strong>
-                <span>平台准备工作</span>
+                <span>平台整理难度</span>
               </div>
               <div>
                 <strong>${stars(project.noviceDifficulty)}</strong>
@@ -1372,7 +1374,7 @@
                 <span>${project.avoid}</span>
               </div>
               <div class="mini-box">
-                <strong>为什么选它</strong>
+                <strong>为什么适合拉进来</strong>
                 <span>${project.sourceNote}</span>
               </div>
             </div>
@@ -1429,8 +1431,8 @@
                 </div>
               </div>
               <div class="edit-box">
-                <strong>下一步：先看效果，再改自己的</strong>
-                <p>点“查看示例前端”可以先看这个改法长什么样；点“打开编辑页面”可以直接在网页里修改，修改后再打开“我的前端”查看自己的版本。</p>
+                <strong>下一步：先看模板效果，再改自己的</strong>
+                <p>点“查看示例前端”可以先看这个模板被整理后的样子；点“打开编辑页面”可以直接在网页里修改，修改后再打开“我的前端”查看自己的版本。</p>
               </div>
             </div>
           </div>
