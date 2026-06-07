@@ -1,0 +1,704 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="打开一个可以演示的前端页面，查看示例版本或自己修改后的版本。" />
+    <title>前端演示</title>
+    <style>
+      :root {
+        color: #172033;
+        background: #f7fbff;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-width: 320px;
+        margin: 0;
+        background: #f7fbff;
+      }
+
+      button {
+        cursor: pointer;
+        font: inherit;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .topbar {
+        position: sticky;
+        z-index: 20;
+        top: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 5vw;
+        border-bottom: 1px solid rgba(42, 67, 90, 0.12);
+        background: rgba(248, 252, 255, 0.9);
+        backdrop-filter: blur(18px);
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 860;
+      }
+
+      .brand-mark {
+        display: inline-grid;
+        width: 36px;
+        height: 36px;
+        place-items: center;
+        border-radius: 8px;
+        background: #172033;
+        color: #ffffff;
+        font-size: 0.8rem;
+      }
+
+      .top-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .button {
+        min-height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 14px;
+        border: 1px solid rgba(31, 45, 64, 0.14);
+        border-radius: 8px;
+        background: #ffffff;
+        color: #1d2a3b;
+        font-weight: 850;
+        box-shadow: 0 12px 28px rgba(31, 45, 64, 0.08);
+      }
+
+      .button.primary {
+        border-color: #172033;
+        background: #172033;
+        color: #ffffff;
+      }
+
+      .demo-shell {
+        width: min(1180px, 100%);
+        margin: 0 auto;
+        padding: 28px 5vw 56px;
+      }
+
+      .demo-head {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 16px;
+        align-items: end;
+        margin-bottom: 18px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        min-height: 30px;
+        align-items: center;
+        padding: 0 10px;
+        border-radius: 8px;
+        background: #e8f3fb;
+        color: #1769c2;
+        font-size: 0.8rem;
+        font-weight: 850;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        max-width: 760px;
+        margin-top: 12px;
+        color: #172033;
+        font-size: clamp(2rem, 5vw, 4.2rem);
+        line-height: 1.02;
+        letter-spacing: 0;
+      }
+
+      .demo-note {
+        max-width: 720px;
+        margin-top: 12px;
+        color: #607084;
+        line-height: 1.7;
+      }
+
+      .status-box {
+        max-width: 320px;
+        padding: 16px;
+        border: 1px solid rgba(31, 45, 64, 0.1);
+        border-radius: 8px;
+        background: #ffffff;
+        color: #526174;
+        line-height: 1.58;
+      }
+
+      .demo-stage {
+        overflow: hidden;
+        border: 1px solid rgba(31, 45, 64, 0.12);
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 24px 54px rgba(39, 58, 77, 0.09);
+      }
+
+      .site-preview {
+        min-height: 720px;
+        background: #ffffff;
+        color: #172033;
+      }
+
+      .preview-hero {
+        min-height: 430px;
+        display: grid;
+        align-content: center;
+        gap: 18px;
+        padding: clamp(32px, 8vw, 82px);
+        background:
+          linear-gradient(90deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.7)),
+          url("assets/portfolio-hero.png");
+        background-position: center;
+        background-size: cover;
+      }
+
+      .preview-kicker {
+        width: fit-content;
+        min-height: 30px;
+        display: inline-flex;
+        align-items: center;
+        padding: 0 10px;
+        border-radius: 8px;
+        background: color-mix(in srgb, var(--accent, #1769c2) 12%, #ffffff);
+        color: var(--accent, #1769c2);
+        font-size: 0.82rem;
+        font-weight: 850;
+      }
+
+      .preview-hero h2 {
+        max-width: 760px;
+        color: #172033;
+        font-size: clamp(2.4rem, 8vw, 6.4rem);
+        line-height: 0.96;
+        letter-spacing: 0;
+      }
+
+      .preview-hero p {
+        max-width: 720px;
+        color: #526174;
+        font-size: clamp(1.08rem, 2vw, 1.3rem);
+        line-height: 1.7;
+      }
+
+      .preview-cta,
+      .choice-action {
+        width: fit-content;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 16px;
+        border: 0;
+        border-radius: 8px;
+        background: var(--accent, #1769c2);
+        color: #ffffff;
+        font-weight: 850;
+      }
+
+      .preview-section {
+        padding: clamp(28px, 6vw, 64px);
+      }
+
+      .preview-section h3 {
+        color: #172033;
+        font-size: clamp(1.6rem, 4vw, 3rem);
+      }
+
+      .preview-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 20px;
+      }
+
+      .preview-card {
+        min-height: 180px;
+        padding: 18px;
+        border: 1px solid rgba(31, 45, 64, 0.1);
+        border-radius: 8px;
+        background: #ffffff;
+      }
+
+      .preview-card strong {
+        display: block;
+        color: #172033;
+        font-size: 1.08rem;
+        line-height: 1.35;
+      }
+
+      .preview-card span {
+        display: block;
+        margin-top: 8px;
+        color: var(--accent, #1769c2);
+        font-size: 0.84rem;
+        font-weight: 850;
+      }
+
+      .preview-card p {
+        margin-top: 10px;
+        color: #526174;
+        line-height: 1.62;
+      }
+
+      .choice-area {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(280px, 0.8fr);
+        gap: 18px;
+        margin-top: 22px;
+      }
+
+      .choice-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .choice-row {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 38px minmax(0, 1fr);
+        gap: 12px;
+        align-items: start;
+        padding: 14px;
+        border: 1px solid rgba(31, 45, 64, 0.1);
+        border-radius: 8px;
+        background: #f8fbfd;
+        color: inherit;
+        text-align: left;
+      }
+
+      .choice-row b {
+        display: grid;
+        width: 38px;
+        height: 38px;
+        place-items: center;
+        border-radius: 8px;
+        background: var(--accent, #1769c2);
+        color: #ffffff;
+      }
+
+      .choice-row strong {
+        display: block;
+      }
+
+      .choice-row p {
+        margin-top: 6px;
+        color: #526174;
+        line-height: 1.55;
+      }
+
+      .result-box {
+        min-height: 210px;
+        padding: 20px;
+        border: 1px solid color-mix(in srgb, var(--accent, #1769c2) 24%, #ffffff);
+        border-radius: 8px;
+        background: color-mix(in srgb, var(--accent, #1769c2) 8%, #ffffff);
+      }
+
+      .result-box strong {
+        display: block;
+        color: #172033;
+        font-size: 1.26rem;
+      }
+
+      .result-box p {
+        margin-top: 10px;
+        color: #526174;
+        line-height: 1.66;
+      }
+
+      .result-actions {
+        margin-top: 16px;
+      }
+
+      @supports not (color: color-mix(in srgb, #000 10%, #fff)) {
+        .preview-kicker,
+        .result-box {
+          background: #eef7ff;
+        }
+      }
+
+      @media (max-width: 860px) {
+        .demo-head,
+        .choice-area,
+        .preview-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .status-box {
+          max-width: none;
+        }
+      }
+
+      @media (max-width: 620px) {
+        .topbar,
+        .top-actions {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .button {
+          width: 100%;
+        }
+
+        .preview-hero,
+        .preview-section {
+          padding: 24px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="./remix-mvp.html">
+        <span class="brand-mark">演</span>
+        <span>前端演示</span>
+      </a>
+      <div class="top-actions">
+        <a class="button" id="sampleLink" href="#">看示例前端</a>
+        <a class="button primary" id="editLink" href="#">修改这个页面</a>
+      </div>
+    </header>
+
+    <main class="demo-shell">
+      <section class="demo-head" aria-labelledby="demoTitle">
+        <div>
+          <span class="eyebrow" id="modeLabel">示例前端</span>
+          <h1 id="demoTitle">打开一个能看的前端页面。</h1>
+          <p class="demo-note" id="demoNote">这是当前改法的网页端演示。</p>
+        </div>
+        <aside class="status-box" id="statusBox">正在读取内容...</aside>
+      </section>
+
+      <section class="demo-stage" aria-label="前端页面演示">
+        <div class="site-preview" id="demoRoot"></div>
+      </section>
+    </main>
+
+    <script>
+      const packCatalog = {
+        'portfolio-page': [
+          { title: '做一个个人作品集', kind: 'portfolio' },
+          { title: '改成小红书选题工具', kind: 'list' },
+          { title: '改成 AI 工具榜单', kind: 'list' }
+        ],
+        'dashboard-template': [
+          { title: '改成个人收入看板', kind: 'list' },
+          { title: '改成产品灵感雷达', kind: 'list' },
+          { title: '改成团队周报看板', kind: 'list' }
+        ],
+        'choice-tool': [
+          { title: '改成餐厅选择器', kind: 'choice' },
+          { title: '改成礼物推荐器', kind: 'choice' },
+          { title: '改成旅行路线抽签器', kind: 'choice' }
+        ]
+      };
+
+      const projectNames = {
+        'portfolio-page': '个人主页模板',
+        'dashboard-template': '清单看板页面',
+        'choice-tool': '选择困难小工具'
+      };
+
+      const sampleDefaults = {
+        'portfolio-page-0': {
+          title: '林一的网页作品集',
+          subtitle: '我把自己做过的网页、小工具和内容实验整理在这里，方便别人快速了解我能做什么。',
+          primary: '查看作品',
+          color: '#1769c2',
+          kicker: '个人作品集',
+          sectionTitle: '精选作品',
+          cards: [
+            { title: 'AI 工具清单', meta: '网页作品', note: '整理常用 AI 工具，按写作、图片、代码分类。' },
+            { title: '周末去哪儿', meta: '选择工具', note: '根据预算和距离，帮朋友快速选一个去处。' },
+            { title: '联系我', meta: '微信 / 邮箱', note: '想合作或交流，可以从这里找到我。' }
+          ]
+        },
+        'portfolio-page-1': {
+          title: '小红书选题工作台',
+          subtitle: '把想写的选题整理成卡片，先看爆点、适合人群和素材状态。',
+          primary: '查看选题',
+          color: '#d94686',
+          kicker: '选题工具',
+          sectionTitle: '今天可以写的选题',
+          cards: [
+            { title: 'AI 做头像的 5 个坑', meta: '适合新手', note: '爆点是避坑和前后对比，素材状态：已有截图。' },
+            { title: '租房收纳清单', meta: '适合独居人群', note: '爆点是低预算改造，建议晚上 9 点发布。' },
+            { title: '周末恢复力计划', meta: '适合上班族', note: '爆点是不用花钱也能放松，素材状态：待拍照。' }
+          ]
+        },
+        'portfolio-page-2': {
+          title: 'AI 工具榜单',
+          subtitle: '只收录我真正试过的工具，说明它适合谁、能解决什么问题。',
+          primary: '看工具',
+          color: '#1d6fae',
+          kicker: '工具清单',
+          sectionTitle: '本周推荐',
+          cards: [
+            { title: '写作助手', meta: '适合内容整理', note: '能把零散想法整理成大纲，适合写笔记和脚本。' },
+            { title: '图片生成器', meta: '适合做封面', note: '输入主题后能生成多种风格，适合做首图灵感。' },
+            { title: '代码助手', meta: '适合改网页', note: '适合让它帮你改文案、样式和简单交互。' }
+          ]
+        },
+        'dashboard-template-0': {
+          title: '个人收入看板',
+          subtitle: '把每月收入、支出和结余放在一个页面里，先看清钱去了哪里。',
+          primary: '查看本月',
+          color: '#26734d',
+          kicker: '收入看板',
+          sectionTitle: '本月记录',
+          cards: [
+            { title: '收入 12800', meta: '主业 + 副业', note: '本月比上月多 1800，主要来自项目尾款。' },
+            { title: '支出 6200', meta: '房租 / 生活 / 学习', note: '学习支出偏高，下月可以控制课程购买。' },
+            { title: '结余 6600', meta: '可储蓄', note: '先留 3000 做备用金，剩余再考虑投资。' }
+          ]
+        },
+        'dashboard-template-1': {
+          title: '产品灵感雷达',
+          subtitle: '记录最近看到的新产品：适合谁、为什么值得看、可以改成什么。',
+          primary: '查看灵感',
+          color: '#1769c2',
+          kicker: '灵感清单',
+          sectionTitle: '值得观察的产品',
+          cards: [
+            { title: '浏览器记忆工具', meta: '适合重度信息用户', note: '机会点：自动整理看过的网页和关键句。' },
+            { title: 'AI 表格助手', meta: '适合运营和销售', note: '机会点：把自然语言变成筛选和分析。' },
+            { title: '作品展示社区', meta: '适合新手创作者', note: '机会点：降低从模板到作品的门槛。' }
+          ]
+        },
+        'dashboard-template-2': {
+          title: '团队周报看板',
+          subtitle: '把本周完成、遇到的问题和下周计划放在一个页面，开会前快速扫一遍。',
+          primary: '查看周报',
+          color: '#955018',
+          kicker: '周报页面',
+          sectionTitle: '本周进展',
+          cards: [
+            { title: '产品', meta: '已完成', note: '完成新手编辑页流程，下一步补作品提交。' },
+            { title: '设计', meta: '进行中', note: '正在整理移动端样式，重点检查按钮和输入框。' },
+            { title: '技术', meta: '有风险', note: '一键发布还没接，需要先验证静态版本。' }
+          ]
+        },
+        'choice-tool-0': {
+          title: '今晚吃什么',
+          subtitle: '选人数、预算和口味后，从候选餐厅里给一个推荐。',
+          primary: '帮我选一个',
+          color: '#1769c2',
+          kicker: '餐厅选择器',
+          question: '今天更适合去哪家？',
+          choices: [
+            { title: '巷口小馆', meta: '人均 48 / 家常菜', note: '近、不用排队，适合临时决定。' },
+            { title: '热辣火锅', meta: '人均 110 / 适合多人', note: '适合 3 人以上，但周末可能要等位。' },
+            { title: '轻食咖啡', meta: '人均 65 / 清淡', note: '适合不想吃太撑的时候，还能聊天。' }
+          ],
+          resultTitle: '推荐：巷口小馆',
+          resultReason: '距离近、价格稳、不用等位，最适合今天快速解决晚饭。'
+        },
+        'choice-tool-1': {
+          title: '礼物推荐器',
+          subtitle: '根据关系、预算和场景，先给出几个不容易踩雷的礼物方向。',
+          primary: '帮我挑礼物',
+          color: '#d94686',
+          kicker: '礼物工具',
+          question: '这次送什么更合适？',
+          choices: [
+            { title: '香薰礼盒', meta: '200 元内 / 朋友', note: '适合乔迁或生日，不太挑尺码。' },
+            { title: '桌面小音箱', meta: '300 元内 / 同事', note: '实用但不太私人，适合感谢礼。' },
+            { title: '手写卡片 + 鲜花', meta: '150 元内 / 重要关系', note: '情绪价值高，适合纪念日。' }
+          ],
+          resultTitle: '推荐：香薰礼盒',
+          resultReason: '预算可控、场景通用，也不需要知道太多私人信息，踩雷概率低。'
+        },
+        'choice-tool-2': {
+          title: '旅行路线抽签器',
+          subtitle: '输入天数、预算和旅行风格后，先给一条轻量路线灵感。',
+          primary: '抽一条路线',
+          color: '#1d6fae',
+          kicker: '旅行小工具',
+          question: '这次可以去哪儿？',
+          choices: [
+            { title: '杭州两日慢逛', meta: '2 天 / 轻松', note: '西湖、茶馆、城市散步，适合不赶路。' },
+            { title: '厦门三日海边', meta: '3 天 / 拍照', note: '海边、老街和咖啡店，适合朋友出游。' },
+            { title: '成都周末吃喝', meta: '2 天 / 美食', note: '火锅、小吃和公园，预算弹性大。' }
+          ],
+          resultTitle: '推荐：杭州两日慢逛',
+          resultReason: '行程轻、不用做太多攻略，适合先把周末旅行跑起来。'
+        }
+      };
+
+      const params = new URLSearchParams(window.location.search);
+      const projectId = packCatalog[params.get('project')] ? params.get('project') : 'portfolio-page';
+      const packIndex = Math.min(Math.max(Number(params.get('pack') || 0), 0), packCatalog[projectId].length - 1);
+      const mode = params.get('mode') === 'mine' ? 'mine' : 'sample';
+      const pack = packCatalog[projectId][packIndex];
+      const storageKey = `remix-editor-${projectId}-${packIndex}`;
+      const sampleData = clone(sampleDefaults[`${projectId}-${packIndex}`]);
+      const hasSaved = Boolean(localStorage.getItem(storageKey));
+      const data = mode === 'mine' ? loadMineData(sampleData) : sampleData;
+      const demoRoot = document.getElementById('demoRoot');
+      const editUrl = `./remix-editor.html?project=${projectId}&pack=${packIndex}`;
+      const sampleUrl = `./remix-demo.html?project=${projectId}&pack=${packIndex}&mode=sample`;
+
+      function clone(value) {
+        return JSON.parse(JSON.stringify(value));
+      }
+
+      function loadMineData(base) {
+        try {
+          const saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
+          if (!saved || typeof saved !== 'object') return base;
+          return {
+            ...base,
+            ...saved,
+            cards: saved.cards || base.cards,
+            choices: saved.choices || base.choices
+          };
+        } catch (error) {
+          return base;
+        }
+      }
+
+      function escapeHtml(value) {
+        return String(value || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      function safeColor(value) {
+        return /^#[0-9a-fA-F]{6}$/.test(String(value || '')) ? value : '#1769c2';
+      }
+
+      function cardHtml(items) {
+        return items
+          .map(
+            (item) => `
+              <article class="preview-card">
+                <strong>${escapeHtml(item.title)}</strong>
+                <span>${escapeHtml(item.meta)}</span>
+                <p>${escapeHtml(item.note)}</p>
+              </article>
+            `
+          )
+          .join('');
+      }
+
+      function renderListPage() {
+        return `
+          <div class="preview-hero">
+            <span class="preview-kicker">${escapeHtml(data.kicker)}</span>
+            <h2>${escapeHtml(data.title)}</h2>
+            <p>${escapeHtml(data.subtitle)}</p>
+            <span class="preview-cta">${escapeHtml(data.primary)}</span>
+          </div>
+          <section class="preview-section">
+            <h3>${escapeHtml(data.sectionTitle)}</h3>
+            <div class="preview-grid">${cardHtml(data.cards)}</div>
+          </section>
+        `;
+      }
+
+      function renderChoicePage() {
+        return `
+          <div class="preview-hero">
+            <span class="preview-kicker">${escapeHtml(data.kicker)}</span>
+            <h2>${escapeHtml(data.title)}</h2>
+            <p>${escapeHtml(data.subtitle)}</p>
+            <button class="preview-cta" type="button" data-random>${escapeHtml(data.primary)}</button>
+          </div>
+          <section class="preview-section">
+            <h3>${escapeHtml(data.question)}</h3>
+            <div class="choice-area">
+              <div class="choice-list">
+                ${data.choices
+                  .map(
+                    (item, index) => `
+                      <button class="choice-row" type="button" data-choice="${index}">
+                        <b>${index + 1}</b>
+                        <div>
+                          <strong>${escapeHtml(item.title)}</strong>
+                          <p>${escapeHtml(item.meta)} · ${escapeHtml(item.note)}</p>
+                        </div>
+                      </button>
+                    `
+                  )
+                  .join('')}
+              </div>
+              <div class="result-box">
+                <strong id="resultTitle">${escapeHtml(data.resultTitle)}</strong>
+                <p id="resultReason">${escapeHtml(data.resultReason)}</p>
+                <div class="result-actions">
+                  <button class="choice-action" type="button" data-random>换一个推荐</button>
+                </div>
+              </div>
+            </div>
+          </section>
+        `;
+      }
+
+      function showChoice(index) {
+        const choice = data.choices[index] || data.choices[0];
+        document.getElementById('resultTitle').textContent = `推荐：${choice.title}`;
+        document.getElementById('resultReason').textContent = choice.note;
+      }
+
+      document.getElementById('sampleLink').href = sampleUrl;
+      document.getElementById('editLink').href = editUrl;
+      document.getElementById('modeLabel').textContent = mode === 'mine' ? '我的前端' : '示例前端';
+      document.getElementById('demoTitle').textContent =
+        mode === 'mine' ? `我的版本：${pack.title}` : `示例：${pack.title}`;
+      document.getElementById('demoNote').textContent =
+        mode === 'mine'
+          ? '这里会显示你在编辑页保存过的内容。'
+          : '这是这个改造方向先给出的前端样子。';
+      document.getElementById('statusBox').textContent =
+        mode === 'mine' && !hasSaved
+          ? '你还没有保存过自己的内容。现在先显示示例内容，点“修改这个页面”后就能改成你的版本。'
+          : `${projectNames[projectId]} · 第 ${packIndex + 1} 个改法`;
+
+      demoRoot.style.setProperty('--accent', safeColor(data.color));
+      demoRoot.innerHTML = pack.kind === 'choice' ? renderChoicePage() : renderListPage();
+
+      demoRoot.addEventListener('click', (event) => {
+        const choiceButton = event.target.closest('[data-choice]');
+        if (choiceButton) {
+          showChoice(Number(choiceButton.dataset.choice));
+          return;
+        }
+        if (event.target.closest('[data-random]')) {
+          showChoice(Math.floor(Math.random() * data.choices.length));
+        }
+      });
+    </script>
+  </body>
+</html>

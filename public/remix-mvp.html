@@ -321,7 +321,8 @@
       .chip-button,
       .project-button,
       .pack-tab,
-      .edit-button {
+      .edit-button,
+      .demo-button {
         border: 1px solid rgba(31, 45, 64, 0.12);
         border-radius: 8px;
         background: #ffffff;
@@ -534,6 +535,13 @@
         gap: 14px;
       }
 
+      .pack-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: flex-end;
+      }
+
       .pack-title-row h3 {
         font-size: 1.56rem;
         line-height: 1.25;
@@ -611,6 +619,17 @@
         background: #1769c2;
         border-radius: 8px;
         color: #ffffff;
+        font-weight: 850;
+      }
+
+      .demo-button {
+        min-height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 12px;
+        background: #ffffff;
+        color: #1769c2;
         font-weight: 850;
       }
 
@@ -825,7 +844,12 @@
         }
 
         .button,
-        .edit-button {
+        .edit-button,
+        .demo-button {
+          width: 100%;
+        }
+
+        .pack-actions {
           width: 100%;
         }
 
@@ -919,7 +943,7 @@
             <span>怎么做</span>
             <h2>每次只做一步，不要一上来改太多。</h2>
             <p>
-              这个网站不是让你变成程序员，而是帮你借助 AI 把一个现成项目改成自己的作品。
+              这个网站不是让你变成程序员，而是先让你看到示例前端，再在网页里把它改成自己的作品。
             </p>
           </div>
           <div class="workflow">
@@ -935,8 +959,8 @@
             </article>
             <article class="step">
               <strong>3</strong>
-              <h3>进入编辑页直接改</h3>
-              <p>不用复制提示词。打开编辑页后，先改标题、卡片、颜色和结果文案。</p>
+              <h3>看示例，再直接改</h3>
+              <p>先打开示例前端确认效果，再进入编辑页改标题、卡片、颜色和结果文案。</p>
             </article>
             <article class="step">
               <strong>4</strong>
@@ -1298,7 +1322,7 @@
               </div>
               <div class="mini-box">
                 <strong>记住这一条</strong>
-                <span>先在编辑页改文字、卡片和结果，跑通后再做更复杂的功能。</span>
+                <span>先看一个能跑的示例前端，再在编辑页改成自己的版本。</span>
               </div>
             </div>
 
@@ -1321,9 +1345,14 @@
                   <h3>${pack.title}</h3>
                   <p class="hero-copy">${pack.goal}</p>
                 </div>
-                <a class="edit-button" href="./remix-editor.html?project=${project.id}&pack=${state.packIndex}">
-                  打开编辑页面
-                </a>
+                <div class="pack-actions">
+                  <a class="demo-button" href="./remix-demo.html?project=${project.id}&pack=${state.packIndex}&mode=sample">
+                    查看示例前端
+                  </a>
+                  <a class="edit-button" href="./remix-editor.html?project=${project.id}&pack=${state.packIndex}">
+                    打开编辑页面
+                  </a>
+                </div>
               </div>
               <div class="difficulty">
                 <span>我们准备难度 ${stars(pack.tech)}</span>
@@ -1349,8 +1378,8 @@
                 </div>
               </div>
               <div class="edit-box">
-                <strong>下一步：直接进去改</strong>
-                <p>点“打开编辑页面”，你会看到可以填写的表单和实时预览。第一版先保存在自己的浏览器里，后面再接一键发布和作品提交。</p>
+                <strong>下一步：先看效果，再改自己的</strong>
+                <p>点“查看示例前端”可以先看这个改法长什么样；点“打开编辑页面”可以直接在网页里修改，修改后再打开“我的前端”查看自己的版本。</p>
               </div>
             </div>
           </div>

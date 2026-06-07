@@ -531,6 +531,8 @@
       </a>
       <div class="top-actions">
         <a class="button subtle" href="./remix-mvp.html#library">换一个改法</a>
+        <a class="button subtle" id="sampleDemoTop" href="#">看示例前端</a>
+        <a class="button subtle" id="mineDemoTop" href="#">看我的前端</a>
         <button class="button primary" type="button" id="saveTop">保存</button>
       </div>
     </header>
@@ -560,6 +562,7 @@
           <form class="form-grid" id="editorForm"></form>
           <div class="form-actions">
             <button class="button primary" type="button" id="saveButton">保存到我的浏览器</button>
+            <a class="button" id="mineDemoButton" href="#">查看我的前端</a>
             <button class="button" type="button" id="resetButton">清空重来</button>
             <span class="notice" id="saveNotice">还没有保存。</span>
           </div>
@@ -732,6 +735,8 @@
       const saveTop = document.getElementById('saveTop');
       const resetButton = document.getElementById('resetButton');
       const saveNotice = document.getElementById('saveNotice');
+      const sampleDemoUrl = `./remix-demo.html?project=${projectId}&pack=${packIndex}&mode=sample`;
+      const mineDemoUrl = `./remix-demo.html?project=${projectId}&pack=${packIndex}&mode=mine`;
 
       let data = loadData();
 
@@ -739,8 +744,169 @@
         return JSON.parse(JSON.stringify(value));
       }
 
-      function loadData() {
+      function defaultDataForPack() {
         const base = clone(defaults[pack.kind]);
+        const title = pack.title;
+
+        if (title.includes('作品集')) {
+          return {
+            ...base,
+            title: '林一的网页作品集',
+            subtitle: '我把自己做过的网页、小工具和内容实验整理在这里，方便别人快速了解我能做什么。',
+            primary: '查看作品',
+            kicker: '个人作品集',
+            sectionTitle: '精选作品',
+            cards: [
+              { title: 'AI 工具清单', meta: '网页作品', note: '整理常用 AI 工具，按写作、图片、代码分类。' },
+              { title: '周末去哪儿', meta: '选择工具', note: '根据预算和距离，帮朋友快速选一个去处。' },
+              { title: '联系我', meta: '微信 / 邮箱', note: '想合作或交流，可以从这里找到我。' }
+            ]
+          };
+        }
+
+        if (title.includes('小红书')) {
+          return {
+            ...base,
+            title: '小红书选题工作台',
+            subtitle: '把想写的选题整理成卡片，先看爆点、适合人群和素材状态。',
+            primary: '查看选题',
+            color: '#d94686',
+            kicker: '选题工具',
+            sectionTitle: '今天可以写的选题',
+            cards: [
+              { title: 'AI 做头像的 5 个坑', meta: '适合新手', note: '爆点是避坑和前后对比，素材状态：已有截图。' },
+              { title: '租房收纳清单', meta: '适合独居人群', note: '爆点是低预算改造，建议晚上 9 点发布。' },
+              { title: '周末恢复力计划', meta: '适合上班族', note: '爆点是不用花钱也能放松，素材状态：待拍照。' }
+            ]
+          };
+        }
+
+        if (title.includes('AI 工具')) {
+          return {
+            ...base,
+            title: 'AI 工具榜单',
+            subtitle: '只收录我真正试过的工具，说明它适合谁、能解决什么问题。',
+            primary: '看工具',
+            kicker: '工具清单',
+            sectionTitle: '本周推荐',
+            cards: [
+              { title: '写作助手', meta: '适合内容整理', note: '能把零散想法整理成大纲，适合写笔记和脚本。' },
+              { title: '图片生成器', meta: '适合做封面', note: '输入主题后能生成多种风格，适合做首图灵感。' },
+              { title: '代码助手', meta: '适合改网页', note: '适合让它帮你改文案、样式和简单交互。' }
+            ]
+          };
+        }
+
+        if (title.includes('收入')) {
+          return {
+            ...base,
+            title: '个人收入看板',
+            subtitle: '把每月收入、支出和结余放在一个页面里，先看清钱去了哪里。',
+            primary: '查看本月',
+            color: '#26734d',
+            kicker: '收入看板',
+            sectionTitle: '本月记录',
+            cards: [
+              { title: '收入 12800', meta: '主业 + 副业', note: '本月比上月多 1800，主要来自项目尾款。' },
+              { title: '支出 6200', meta: '房租 / 生活 / 学习', note: '学习支出偏高，下月可以控制课程购买。' },
+              { title: '结余 6600', meta: '可储蓄', note: '先留 3000 做备用金，剩余再考虑投资。' }
+            ]
+          };
+        }
+
+        if (title.includes('产品灵感')) {
+          return {
+            ...base,
+            title: '产品灵感雷达',
+            subtitle: '记录最近看到的新产品：适合谁、为什么值得看、可以改成什么。',
+            primary: '查看灵感',
+            kicker: '灵感清单',
+            sectionTitle: '值得观察的产品',
+            cards: [
+              { title: '浏览器记忆工具', meta: '适合重度信息用户', note: '机会点：自动整理看过的网页和关键句。' },
+              { title: 'AI 表格助手', meta: '适合运营和销售', note: '机会点：把自然语言变成筛选和分析。' },
+              { title: '作品展示社区', meta: '适合新手创作者', note: '机会点：降低从模板到作品的门槛。' }
+            ]
+          };
+        }
+
+        if (title.includes('周报')) {
+          return {
+            ...base,
+            title: '团队周报看板',
+            subtitle: '把本周完成、遇到的问题和下周计划放在一个页面，开会前快速扫一遍。',
+            primary: '查看周报',
+            color: '#955018',
+            kicker: '周报页面',
+            sectionTitle: '本周进展',
+            cards: [
+              { title: '产品', meta: '已完成', note: '完成新手编辑页流程，下一步补作品提交。' },
+              { title: '设计', meta: '进行中', note: '正在整理移动端样式，重点检查按钮和输入框。' },
+              { title: '技术', meta: '有风险', note: '一键发布还没接，需要先验证静态版本。' }
+            ]
+          };
+        }
+
+        if (title.includes('餐厅')) {
+          return {
+            ...base,
+            title: '今晚吃什么',
+            subtitle: '选人数、预算和口味后，从候选餐厅里给一个推荐。',
+            primary: '帮我选一个',
+            kicker: '餐厅选择器',
+            question: '今天更适合去哪家？',
+            choices: [
+              { title: '巷口小馆', meta: '人均 48 / 家常菜', note: '近、不用排队，适合临时决定。' },
+              { title: '热辣火锅', meta: '人均 110 / 适合多人', note: '适合 3 人以上，但周末可能要等位。' },
+              { title: '轻食咖啡', meta: '人均 65 / 清淡', note: '适合不想吃太撑的时候，还能聊天。' }
+            ],
+            resultTitle: '推荐：巷口小馆',
+            resultReason: '距离近、价格稳、不用等位，最适合今天快速解决晚饭。'
+          };
+        }
+
+        if (title.includes('礼物')) {
+          return {
+            ...base,
+            title: '礼物推荐器',
+            subtitle: '根据关系、预算和场景，先给出几个不容易踩雷的礼物方向。',
+            primary: '帮我挑礼物',
+            color: '#d94686',
+            kicker: '礼物工具',
+            question: '这次送什么更合适？',
+            choices: [
+              { title: '香薰礼盒', meta: '200 元内 / 朋友', note: '适合乔迁或生日，不太挑尺码。' },
+              { title: '桌面小音箱', meta: '300 元内 / 同事', note: '实用但不太私人，适合感谢礼。' },
+              { title: '手写卡片 + 鲜花', meta: '150 元内 / 重要关系', note: '情绪价值高，适合纪念日。' }
+            ],
+            resultTitle: '推荐：香薰礼盒',
+            resultReason: '预算可控、场景通用，也不需要知道太多私人信息，踩雷概率低。'
+          };
+        }
+
+        if (title.includes('旅行')) {
+          return {
+            ...base,
+            title: '旅行路线抽签器',
+            subtitle: '输入天数、预算和旅行风格后，先给一条轻量路线灵感。',
+            primary: '抽一条路线',
+            kicker: '旅行小工具',
+            question: '这次可以去哪儿？',
+            choices: [
+              { title: '杭州两日慢逛', meta: '2 天 / 轻松', note: '西湖、茶馆、城市散步，适合不赶路。' },
+              { title: '厦门三日海边', meta: '3 天 / 拍照', note: '海边、老街和咖啡店，适合朋友出游。' },
+              { title: '成都周末吃喝', meta: '2 天 / 美食', note: '火锅、小吃和公园，预算弹性大。' }
+            ],
+            resultTitle: '推荐：杭州两日慢逛',
+            resultReason: '行程轻、不用做太多攻略，适合先把周末旅行跑起来。'
+          };
+        }
+
+        return base;
+      }
+
+      function loadData() {
+        const base = defaultDataForPack();
         try {
           const saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
           if (!saved || typeof saved !== 'object') return base;
@@ -757,7 +923,7 @@
 
       function saveData() {
         localStorage.setItem(storageKey, JSON.stringify(data));
-        saveNotice.textContent = '已保存到当前浏览器。';
+        saveNotice.textContent = '已保存到当前浏览器。现在可以打开“我的前端”。';
       }
 
       function escapeHtml(value) {
@@ -872,8 +1038,8 @@
         } else {
           data[name] = value;
         }
-        saveNotice.textContent = '有新修改，记得保存。';
         renderPreview();
+        saveData();
       }
 
       function cardHtml(items) {
@@ -944,13 +1110,16 @@
       }
 
       function resetData() {
-        data = clone(defaults[pack.kind]);
-        localStorage.removeItem(storageKey);
+        data = defaultDataForPack();
+        localStorage.setItem(storageKey, JSON.stringify(data));
         renderForm();
         renderPreview();
-        saveNotice.textContent = '已恢复成示例内容。';
+        saveNotice.textContent = '已恢复成示例内容，并保存到当前浏览器。';
       }
 
+      document.getElementById('sampleDemoTop').href = sampleDemoUrl;
+      document.getElementById('mineDemoTop').href = mineDemoUrl;
+      document.getElementById('mineDemoButton').href = mineDemoUrl;
       document.getElementById('packLabel').textContent = `${projectNames[projectId]} · 第 ${packIndex + 1} 个改法`;
       document.getElementById('currentPack').textContent = pack.title;
       document.getElementById('helperText').textContent = pack.helper;
