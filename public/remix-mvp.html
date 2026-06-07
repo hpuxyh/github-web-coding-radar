@@ -31,6 +31,7 @@
       body {
         min-width: 320px;
         margin: 0;
+        padding-top: 65px;
         background: #f4f7fb;
         overflow-x: hidden;
       }
@@ -52,9 +53,11 @@
       }
 
       .topbar {
-        position: sticky;
+        position: fixed;
         z-index: 20;
         top: 0;
+        left: 0;
+        right: 0;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -89,20 +92,29 @@
         gap: 8px;
       }
 
-      .nav a {
+      .nav a,
+      .nav button {
         min-height: 36px;
         display: inline-flex;
         align-items: center;
         padding: 0 12px;
+        border: 0;
         border-radius: 8px;
+        background: transparent;
         color: #526174;
         font-size: 0.92rem;
         font-weight: 760;
       }
 
-      .nav a:hover {
+      .nav a:hover,
+      .nav button:hover,
+      .nav button.active {
         background: rgba(47, 128, 237, 0.1);
         color: #1769c2;
+      }
+
+      .nav button.active {
+        font-weight: 900;
       }
 
       .hero {
@@ -345,6 +357,14 @@
         padding: 64px 5vw;
       }
 
+      .section[hidden] {
+        display: none;
+      }
+
+      .tab-panel {
+        scroll-margin-top: 84px;
+      }
+
       .section.alt {
         background: #ffffff;
       }
@@ -359,7 +379,7 @@
         margin-bottom: 24px;
       }
 
-      #library {
+      [data-panel="library"] {
         padding-top: 56px;
       }
 
@@ -878,7 +898,8 @@
         gap: 12px;
       }
 
-      .step {
+      .step,
+      .why-card {
         min-height: 180px;
         padding: 18px;
         border: 1px solid rgba(31, 45, 64, 0.1);
@@ -905,6 +926,27 @@
         margin-top: 9px;
         color: #526174;
         line-height: 1.62;
+      }
+
+      .why-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .why-card strong {
+        color: #172033;
+        font-size: 1.08rem;
+      }
+
+      .why-card p {
+        margin-top: 10px;
+        color: #526174;
+        line-height: 1.62;
+      }
+
+      .compact-actions {
+        margin-top: 18px;
       }
 
       .showcase-grid {
@@ -1065,6 +1107,7 @@
         .simple-pack-layout,
         .tiny-browser,
         .workflow,
+        .why-grid,
         .showcase-grid {
           grid-template-columns: 1fr;
         }
@@ -1150,11 +1193,11 @@
         <span class="brand-mark">改</span>
         <span>把网页模板改成我的作品</span>
       </a>
-      <nav class="nav" aria-label="页面导航">
-        <a href="#library">选模板</a>
-        <a href="#workflow">怎么做</a>
-        <a href="#showcase">晒作品</a>
-        <a href="./remix-community.html">为什么做</a>
+      <nav class="nav" aria-label="页面模块" role="tablist">
+        <button class="active" type="button" data-tab="library" role="tab" aria-selected="true">选模板</button>
+        <button type="button" data-tab="workflow" role="tab" aria-selected="false">怎么做</button>
+        <button type="button" data-tab="showcase" role="tab" aria-selected="false">晒作品</button>
+        <button type="button" data-tab="why" role="tab" aria-selected="false">为什么做</button>
       </nav>
     </header>
 
@@ -1173,7 +1216,7 @@
               <span>3 看自己的页面</span>
             </div>
             <div class="actions">
-              <a class="button primary" href="#library">先选模板</a>
+              <button class="button primary" type="button" data-open-tab="library">先选模板</button>
               <a class="button" href="./remix-editor.html?project=portfolio-page&pack=0">直接试改</a>
             </div>
           </div>
@@ -1214,7 +1257,7 @@
         </div>
       </section>
 
-      <section class="section alt" id="library">
+      <section class="section alt tab-panel" id="panel-library" data-panel="library" role="tabpanel">
         <div class="section-inner">
           <div class="section-heading">
             <span>选模板</span>
@@ -1234,7 +1277,7 @@
         </div>
       </section>
 
-      <section class="section" id="workflow">
+      <section class="section tab-panel" id="panel-workflow" data-panel="workflow" role="tabpanel" hidden>
         <div class="section-inner">
           <div class="section-heading">
             <span>怎么做</span>
@@ -1268,7 +1311,7 @@
         </div>
       </section>
 
-      <section class="section alt" id="showcase">
+      <section class="section alt tab-panel" id="panel-showcase" data-panel="showcase" role="tabpanel" hidden>
         <div class="section-inner">
           <div class="section-heading">
             <span>晒作品</span>
@@ -1309,6 +1352,36 @@
               <h3 id="worksTitle">别人已经做出来的例子</h3>
               <div class="work-list" id="workList"></div>
             </section>
+          </div>
+        </div>
+      </section>
+
+      <section class="section alt tab-panel" id="panel-why" data-panel="why" role="tabpanel" hidden>
+        <div class="section-inner">
+          <div class="section-heading">
+            <span>为什么做</span>
+            <h2>因为很多人想做网页，但不想先被代码拦住。</h2>
+            <p>
+              GitHub 上有很多已经能打开的好页面。我们先把这些页面整理成可编辑模板，让新手先做出一个能展示的作品，再慢慢理解背后的代码。
+            </p>
+          </div>
+          <div class="why-grid">
+            <article class="why-card">
+              <strong>需求在变多</strong>
+              <p>越来越多人想做个人主页、小工具、作品集和内容页，但直接看 GitHub 项目太难。</p>
+            </article>
+            <article class="why-card">
+              <strong>第一步要更轻</strong>
+              <p>新手先需要“能看、能改、能展示”，不是一开始就学命令行、目录结构和部署。</p>
+            </article>
+            <article class="why-card">
+              <strong>我们能做出来</strong>
+              <p>第一版先选静态 HTML 页面，拆成标题、卡片、图片和按钮，让 AI 对话直接改预览。</p>
+            </article>
+          </div>
+          <div class="actions compact-actions">
+            <a class="button primary" href="./remix-community.html">看完整分析</a>
+            <button class="button" type="button" data-open-tab="library">回去选模板</button>
           </div>
         </div>
       </section>
@@ -1554,6 +1627,26 @@
       const workForm = document.getElementById('workForm');
       const workList = document.getElementById('workList');
       const formNotice = document.getElementById('formNotice');
+      const tabButtons = Array.from(document.querySelectorAll('[data-tab]'));
+      const tabPanels = Array.from(document.querySelectorAll('[data-panel]'));
+      const tabIds = tabPanels.map((panel) => panel.dataset.panel);
+
+      function activateTab(tabId, options = {}) {
+        const nextTab = tabIds.includes(tabId) ? tabId : 'library';
+        tabButtons.forEach((button) => {
+          const isActive = button.dataset.tab === nextTab;
+          button.classList.toggle('active', isActive);
+          button.setAttribute('aria-selected', String(isActive));
+        });
+        tabPanels.forEach((panel) => {
+          panel.hidden = panel.dataset.panel !== nextTab;
+        });
+        if (options.scroll) {
+          document
+            .querySelector(`[data-panel="${nextTab}"]`)
+            ?.scrollIntoView({ behavior: options.behavior || 'smooth', block: 'start' });
+        }
+      }
 
       function scoreLabel(score) {
         if (score >= 90) return '高成功率';
@@ -1755,6 +1848,13 @@
         }
       });
 
+      document.addEventListener('click', (event) => {
+        const tabButton = event.target.closest('[data-tab], [data-open-tab]');
+        if (!tabButton) return;
+        const tabId = tabButton.dataset.tab || tabButton.dataset.openTab;
+        activateTab(tabId, { scroll: true });
+      });
+
       workForm.addEventListener('submit', (event) => {
         event.preventDefault();
         const formData = new FormData(workForm);
@@ -1774,6 +1874,8 @@
       });
 
       renderAll();
+      const initialTab = window.location.hash.replace('#', '') || 'library';
+      activateTab(initialTab);
     </script>
   </body>
 </html>
