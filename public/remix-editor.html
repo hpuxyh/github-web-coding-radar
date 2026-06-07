@@ -1031,9 +1031,9 @@
           </div>
           <div class="chat-editor" id="editorForm"></div>
           <div class="form-actions">
-            <button class="button primary" type="button" id="saveButton">保存</button>
-            <a class="button" id="mineDemoButton" href="#">查看我的前端</a>
-            <span class="notice" id="saveNotice">保存后再查看效果。</span>
+            <button class="button" type="button" id="saveButton">保存</button>
+            <a class="button primary" id="generateProductButton" href="#">生成我的产品</a>
+            <span class="notice" id="saveNotice">生成前会自动保存。</span>
           </div>
         </section>
       </section>
@@ -1409,9 +1409,9 @@
         }
       }
 
-      function saveData() {
+      function saveData(message = '已保存，可以生成产品。') {
         localStorage.setItem(storageKey, JSON.stringify(data));
-        saveNotice.textContent = '已保存，可以查看效果。';
+        saveNotice.textContent = message;
       }
 
       function escapeHtml(value) {
@@ -1946,7 +1946,8 @@
             : renderPortfolioPreview();
       }
 
-      document.getElementById('mineDemoButton').href = mineDemoUrl;
+      const generateProductButton = document.getElementById('generateProductButton');
+      generateProductButton.href = mineDemoUrl;
       document.getElementById('editHint').textContent = pack.helper;
       if (isYuzhuPack()) {
         document.getElementById('editTitle').textContent = 'AI 修改助手';
@@ -2004,7 +2005,10 @@
         }
       });
 
-      saveButton.addEventListener('click', saveData);
+      saveButton.addEventListener('click', () => saveData());
+      generateProductButton.addEventListener('click', () => {
+        saveData('已生成，正在打开你的产品。');
+      });
 
       renderForm();
       renderPreview();
