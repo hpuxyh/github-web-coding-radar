@@ -324,6 +324,14 @@
         color: #172033;
       }
 
+      .source-site-frame {
+        width: 100%;
+        height: min(760px, 78vh);
+        display: block;
+        border: 0;
+        background: #ffffff;
+      }
+
       .preview-hero {
         min-height: 280px;
         display: grid;
@@ -721,7 +729,7 @@
         <section class="preview-panel" aria-labelledby="previewTitle">
           <div class="panel-head">
             <h2 id="previewTitle">预览我的作品</h2>
-            <p>这里会跟着左边输入的内容一起变化。</p>
+            <p id="previewHint">这里会跟着左边输入的内容一起变化。</p>
           </div>
           <div class="preview-frame">
             <div class="site-preview" id="preview"></div>
@@ -1387,6 +1395,18 @@
 
       function renderPreview() {
         preview.style.setProperty('--accent', safeColor(data.color));
+        if (isYuzhuPack()) {
+          preview.innerHTML = `
+            <iframe
+              class="source-site-frame"
+              src="${sourceDemoUrls[projectId]}"
+              title="雨竹upon的小站"
+              loading="lazy"
+              referrerpolicy="no-referrer"
+            ></iframe>
+          `;
+          return;
+        }
         preview.innerHTML = isYuzhuPack()
           ? renderYuzhuPreview()
           : pack.kind === 'choice'
@@ -1417,7 +1437,10 @@
       if (isYuzhuPack()) {
         document.getElementById('pageTitle').textContent = '直接修改雨竹upon的小站。';
         document.getElementById('pageLead').textContent =
-          '左边改小站里的名字、欢迎语、代表作、友链和联系方式，右边马上看到雨竹小站结构的预览。';
+          '左边先列出这个小站里可以替换的内容；右边直接显示原来的雨竹upon的小站。';
+        document.getElementById('previewTitle').textContent = '预览雨竹upon的小站';
+        document.getElementById('previewHint').textContent =
+          '这里直接显示原网站，第一版先让小白看着真实页面改内容。';
       }
 
       form.addEventListener('input', (event) => {
