@@ -908,7 +908,7 @@
           </div>
           <div class="metric">
             <strong>避难题</strong>
-            <span>先不碰登录、支付、保存用户数据这些容易卡住的东西。</span>
+            <span>先不做账号、收钱、多人填写这些容易卡住的部分。</span>
           </div>
           <div class="metric">
             <strong>能展示</strong>
@@ -950,7 +950,7 @@
             <article class="step">
               <strong>1</strong>
               <h3>先选容易开始的</h3>
-              <p>优先选只改文字、图片、清单和页面的项目。先避开登录、支付、保存用户数据。</p>
+              <p>优先选只换文字、图片、清单和页面的作品。先避开账号、收钱和复杂表单。</p>
             </article>
             <article class="step">
               <strong>2</strong>
@@ -1019,7 +1019,7 @@
 
     <footer>
       <div>
-        这一版先验证一件事：普通人能不能从一个 GitHub 项目开始，借助 AI 做出自己的网页作品。更新日期：2026-06-07。
+        这一版先验证一件事：普通人能不能从一个现成网页开始，做出自己的作品。更新日期：2026-06-07。
       </div>
     </footer>
 
@@ -1036,9 +1036,9 @@
           summary:
             '适合把一个现成网页改成自己的个人主页、产品介绍页、作品展示页。',
           whyGood:
-            '这类项目通常只需要换文字、图片、颜色和卡片。你不用懂服务器，也不用准备保存数据的系统。',
+            '这类作品通常只需要换文字、图片、颜色和卡片。你不用先理解复杂工具，也不用准备后台。',
           need: '先准备头像、3 到 5 张作品图、几段自我介绍、几个作品链接。',
-          avoid: '第一次先不要加登录、评论、后台管理和支付。',
+          avoid: '第一次先不要做账号、评论、后台管理和收钱功能。',
           tags: ['最容易开始', '适合第一单', '能发给别人看'],
           packs: [
             {
@@ -1048,11 +1048,11 @@
               novice: 1,
               goal:
                 '把模板里的默认内容换成你的头像、作品、介绍和联系方式，先做一个能发出去的个人主页。',
-              files: ['src/data/profile.js', 'src/App.jsx', 'src/styles.css', 'public/assets/'],
-              stayAway: ['package.json', 'vite.config.js', '构建脚本'],
-              commands: ['npm install', 'npm run dev', 'npm run build'],
+              files: ['头像和昵称', '个人介绍', '作品卡片', '联系方式'],
+              stayAway: ['账号功能', '评论区', '收钱功能', '后台管理'],
+              commands: ['先点“查看示例前端”看看长什么样', '再点“打开编辑页面”替换成你的内容', '改完点“查看我的前端”确认效果'],
               deploy:
-                '优先发到 GitHub Pages 或 Cloudflare Pages。它们适合这种纯网页作品。'
+                '第一版可以先把链接发给朋友看；后面再做正式公开发布。'
             },
             {
               level: '第二步：换成一个小工具',
@@ -1061,11 +1061,11 @@
               novice: 2.5,
               goal:
                 '把原来的作品卡片，换成小红书选题卡片，用来整理标题、爆点、适合人群和发布时间。',
-              files: ['src/data/topics.js', 'src/App.jsx', 'src/styles.css'],
-              stayAway: ['需要服务器的功能', '保存用户数据的功能', '登录功能'],
-              commands: ['npm install', 'npm run dev', 'npm run build'],
+              files: ['选题标题', '适合人群', '爆点说明', '素材状态'],
+              stayAway: ['多人一起填写', '自动保存到云端', '账号功能'],
+              commands: ['先看示例选题页', '把示例卡片换成你的选题', '打开“我的前端”检查手机上是否好看'],
               deploy:
-                '先把选题放在本地数据文件里，做成一个静态网页；以后再考虑多人填写。'
+                '第一版先自己使用或发给朋友看；多人填写和团队协作以后再做。'
             },
             {
               level: '以后可以做',
@@ -1074,11 +1074,11 @@
               novice: 3,
               goal:
                 '把页面改成一个 AI 工具清单，展示每个工具是干什么的、适合谁、为什么推荐。',
-              files: ['src/data/tools.js', 'src/App.jsx', 'src/styles.css'],
-              stayAway: ['自动爬虫', '用户账号', '在线评分系统'],
-              commands: ['npm install', 'npm run dev', 'npm run build'],
+              files: ['工具名称', '适合谁', '能帮你做什么', '推荐理由'],
+              stayAway: ['自动更新工具信息', '用户账号', '在线评分'],
+              commands: ['先看示例榜单', '把工具卡片换成你试过的工具', '打开“我的前端”看看是否清楚'],
               deploy:
-                '第一版手工维护清单就够了。自动抓取、登录收藏、评分系统都放到以后。'
+                '第一版手动整理就够了；收藏、评分和自动更新以后再做。'
             }
           ]
         },
@@ -1093,9 +1093,9 @@
           summary:
             '适合把一堆内容整理成卡片和数字，比如收入记录、选题清单、产品灵感。',
           whyGood:
-            '它比个人主页多一点数据和筛选，但只要数据先手工写在文件里，新手也能完成第一版。',
+            '它比个人主页多一点内容整理，但第一版只要把示例换成自己的清单就能看。',
           need: '先准备 10 条样例内容。可以是收入记录、选题、产品、任务或任何清单。',
-          avoid: '第一次不要接实时保存数据、多人协作和复杂权限。',
+          avoid: '第一次不要做多人协作、复杂权限和自动同步。',
           tags: ['适合做工具页', '主要换内容', '稍微进阶'],
           packs: [
             {
@@ -1105,9 +1105,9 @@
               novice: 2,
               goal:
                 '把原来的示例数据换成收入、支出、结余和来源，做一个自己能看的小面板。',
-              files: ['src/data/finance.js', 'src/components/Chart.jsx', 'src/App.jsx'],
-              stayAway: ['真实支付接口', '银行接口', '保存数据的系统'],
-              commands: ['npm install', 'npm run dev', 'npm run build'],
+              files: ['收入数字', '支出数字', '结余说明', '收入来源'],
+              stayAway: ['真实账户信息', '付款功能', '公开个人隐私'],
+              commands: ['先看示例看板', '把数字换成你的脱敏数据', '打开“我的前端”确认别人能看懂'],
               deploy:
                 '如果里面有真实收入，先不要公开发出去。可以只发一个脱敏样例版。'
             },
@@ -1118,9 +1118,9 @@
               novice: 3,
               goal:
                 '把看板变成一个产品灵感清单，记录新工具、适合人群、为什么值得看。',
-              files: ['src/data/products.js', 'src/App.jsx', 'src/styles.css'],
-              stayAway: ['自动抓取', '登录收藏', '复杂推荐算法'],
-              commands: ['npm install', 'npm run dev', 'npm run build'],
+              files: ['产品名称', '适合人群', '为什么值得看', '可以改成什么'],
+              stayAway: ['自动收集信息', '收藏按钮', '复杂推荐'],
+              commands: ['先看示例灵感页', '把卡片换成你最近看到的产品', '打开“我的前端”检查表达是否清楚'],
               deploy:
                 '第一版用手工整理的数据就够了，先验证别人愿不愿意看。'
             },
@@ -1131,9 +1131,9 @@
               novice: 4,
               goal:
                 '把每个人这周做了什么、遇到什么问题、下周要做什么，整理成一个页面。',
-              files: ['src/data/weekly.js', 'src/components/', 'src/App.jsx'],
-              stayAway: ['飞书/Slack 自动同步', '多人权限', '保存数据的系统'],
-              commands: ['npm install', 'npm run dev', 'npm run build'],
+              files: ['成员名字', '本周完成', '遇到的问题', '下周计划'],
+              stayAway: ['自动同步群消息', '公司权限', '敏感项目内容'],
+              commands: ['先看示例周报', '把示例内容换成团队周报', '打开“我的前端”给同事预览'],
               deploy:
                 '如果涉及公司内容，不要公开发布。可以先做一个示例版给团队看。'
             }
@@ -1152,7 +1152,7 @@
           whyGood:
             '它有一点互动，但大多数改造只需要换候选项、选择规则和结果文案。',
           need: '准备候选项、几个筛选条件、结果文案和少量图片。',
-          avoid: '第一次不要接地图定位、外卖接口和复杂 AI 推荐。',
+          avoid: '第一次不要做自动定位、外卖下单和复杂推荐。',
           tags: ['有互动', '做完能玩', '适合展示'],
           packs: [
             {
@@ -1162,9 +1162,9 @@
               novice: 2,
               goal:
                 '输入人数、预算、口味和距离偏好，页面从本地餐厅数据里给一个推荐。',
-              files: ['src/data/restaurants.js', 'src/App.jsx', 'src/styles.css'],
-              stayAway: ['地图 API', '真实定位', '外卖平台接口'],
-              commands: ['npm install', 'npm run dev', 'npm run build'],
+              files: ['餐厅名称', '人均价格', '适合几个人', '推荐理由'],
+              stayAway: ['自动定位', '外卖下单', '实时排队信息'],
+              commands: ['先看示例餐厅选择器', '把候选餐厅换成你熟悉的店', '打开“我的前端”试着点几个选项'],
               deploy:
                 '如果餐厅信息可以公开，就能发到网上；如果有私人地址，先删掉敏感信息。'
             },
@@ -1175,9 +1175,9 @@
               novice: 3,
               goal:
                 '根据关系、预算、年龄段和场景推荐礼物，并给购买前提醒。',
-              files: ['src/data/gifts.js', 'src/App.jsx', 'src/styles.css'],
-              stayAway: ['电商接口', '支付', '真实价格同步'],
-              commands: ['npm install', 'npm run dev', 'npm run build'],
+              files: ['礼物名称', '适合送谁', '预算范围', '避雷提醒'],
+              stayAway: ['直接下单', '收款付款', '实时比价'],
+              commands: ['先看示例礼物推荐器', '把礼物换成你想推荐的东西', '打开“我的前端”试试推荐结果'],
               deploy:
                 '第一版只做手工整理的推荐清单，链接可以自己填，不要承诺实时价格。'
             },
@@ -1188,11 +1188,11 @@
               novice: 3.5,
               goal:
                 '从候选城市、预算和时间里抽出一条轻旅行路线。',
-              files: ['src/data/trips.js', 'src/App.jsx', 'src/styles.css'],
-              stayAway: ['机票酒店接口', '实时天气', '地图路线规划'],
-              commands: ['npm install', 'npm run dev', 'npm run build'],
+              files: ['城市名称', '天数预算', '旅行风格', '路线提醒'],
+              stayAway: ['订机票酒店', '实时天气', '复杂路线规划'],
+              commands: ['先看示例旅行路线', '把路线换成你熟悉的城市', '打开“我的前端”看看是否像一个能分享的小工具'],
               deploy:
-                '先做路线灵感页，真实订票、天气和地图都放到以后。'
+                '先做路线灵感页，订票、天气和路线细节都放到以后。'
             }
           ]
         }
@@ -1243,7 +1243,10 @@
       }
 
       function stars(value) {
-        return `${value} 星`;
+        if (value <= 1.5) return '很容易';
+        if (value <= 2.5) return '容易上手';
+        if (value <= 3.2) return '有一点挑战';
+        return '以后再试';
       }
 
       function visibleProjects() {
@@ -1302,11 +1305,11 @@
               </div>
               <div>
                 <strong>${stars(project.technicalDifficulty)}</strong>
-                <span>我们准备它有多难</span>
+                <span>平台准备工作</span>
               </div>
               <div>
                 <strong>${stars(project.noviceDifficulty)}</strong>
-                <span>你照着做有多难</span>
+                <span>你的上手难度</span>
               </div>
             </div>
           </div>
@@ -1355,25 +1358,25 @@
                 </div>
               </div>
               <div class="difficulty">
-                <span>我们准备难度 ${stars(pack.tech)}</span>
-                <span>你操作难度 ${stars(pack.novice)}</span>
+                <span>平台准备：${stars(pack.tech)}</span>
+                <span>你上手：${stars(pack.novice)}</span>
                 <span>${pack.level}</span>
               </div>
               <div class="pack-grid">
                 <div class="info-block">
-                  <h4>主要改这里</h4>
+                  <h4>你主要换这些</h4>
                   <ul>${pack.files.map((item) => `<li>${item}</li>`).join('')}</ul>
                 </div>
                 <div class="info-block">
-                  <h4>先别动这里</h4>
+                  <h4>先不用管这些</h4>
                   <ul>${pack.stayAway.map((item) => `<li>${item}</li>`).join('')}</ul>
                 </div>
                 <div class="info-block">
-                  <h4>让它跑起来</h4>
-                  <ul>${pack.commands.map((item) => `<li><code>${item}</code></li>`).join('')}</ul>
+                  <h4>怎么看到效果</h4>
+                  <ul>${pack.commands.map((item) => `<li>${item}</li>`).join('')}</ul>
                 </div>
                 <div class="info-block">
-                  <h4>怎么发到网上</h4>
+                  <h4>怎么给别人看</h4>
                   <ul><li>${pack.deploy}</li></ul>
                 </div>
               </div>
