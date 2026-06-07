@@ -228,14 +228,6 @@
         color: #172033;
       }
 
-      .source-site-frame {
-        width: 100%;
-        height: 100%;
-        display: block;
-        border: 0;
-        background: #ffffff;
-      }
-
       .preview-hero {
         min-height: 280px;
         display: grid;
@@ -336,126 +328,347 @@
       }
 
       .yuzhu-site {
-        min-height: 620px;
+        height: 100%;
+        min-height: 660px;
+        overflow: auto;
+        padding: 18px;
         background:
-          radial-gradient(circle at 15% 12%, rgba(0, 153, 255, 0.12), transparent 28%),
-          linear-gradient(180deg, #f7fcff 0%, #ffffff 36%, #f8fbff 100%);
-        color: #172033;
+          radial-gradient(circle at 18% 16%, rgba(188, 255, 196, 0.32), transparent 18%),
+          radial-gradient(circle at 72% 10%, rgba(196, 188, 255, 0.28), transparent 16%),
+          linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+        color: #222222;
+        font-family:
+          "Noto Sans SC", "Noto Sans JP", Inter, ui-sans-serif, system-ui,
+          -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       }
 
-      .yuzhu-top {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 14px;
-        padding: 18px 22px;
-        border-bottom: 1px solid rgba(23, 32, 51, 0.08);
-        background: rgba(255, 255, 255, 0.72);
-      }
-
-      .yuzhu-top strong,
-      .yuzhu-top span {
-        display: block;
-      }
-
-      .yuzhu-top strong {
-        font-size: 1.02rem;
-      }
-
-      .yuzhu-top span,
-      .yuzhu-top nav {
-        color: #607084;
-        font-size: 0.82rem;
-        line-height: 1.5;
-      }
-
-      .yuzhu-hero {
+      .yuzhu-stage {
+        min-height: 780px;
+        position: relative;
         display: grid;
-        grid-template-columns: 92px minmax(0, 1fr);
-        gap: 20px;
-        align-items: center;
-        padding: 42px 32px 34px;
+        grid-template-columns: minmax(220px, 0.34fr) minmax(0, 0.66fr);
+        overflow: hidden;
+        border: 1px solid rgba(30, 42, 58, 0.12);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 14px 34px rgba(31, 45, 64, 0.16);
+      }
+
+      .yuzhu-bubbles {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        pointer-events: none;
+      }
+
+      .yuzhu-bubbles span {
+        position: absolute;
+        width: 22px;
+        height: 22px;
+        border: 2px solid rgba(31, 45, 64, 0.05);
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.5);
+        box-shadow: 0 2px 8px rgba(31, 45, 64, 0.08);
+      }
+
+      .yuzhu-bubbles span:nth-child(1) {
+        top: 10%;
+        left: 14%;
+        background: rgba(195, 255, 194, 0.65);
+      }
+
+      .yuzhu-bubbles span:nth-child(2) {
+        top: 18%;
+        right: 23%;
+        background: rgba(255, 196, 196, 0.64);
+      }
+
+      .yuzhu-bubbles span:nth-child(3) {
+        top: 33%;
+        left: 33%;
+      }
+
+      .yuzhu-bubbles span:nth-child(4) {
+        top: 36%;
+        right: 6%;
+      }
+
+      .yuzhu-bubbles span:nth-child(5) {
+        top: 54%;
+        left: 8%;
+      }
+
+      .yuzhu-bubbles span:nth-child(6) {
+        top: 62%;
+        right: 18%;
+      }
+
+      .yuzhu-bubbles span:nth-child(7) {
+        bottom: 16%;
+        left: 18%;
+      }
+
+      .yuzhu-bubbles span:nth-child(8) {
+        bottom: 8%;
+        right: 8%;
+      }
+
+      .yuzhu-sidebar {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        align-content: start;
+        justify-items: center;
+        gap: 16px;
+        min-height: 780px;
+        padding: 92px 22px 36px;
+        border-right: 1px solid rgba(31, 45, 64, 0.16);
+        text-align: center;
       }
 
       .yuzhu-avatar {
+        width: 132px;
+        height: 132px;
         display: grid;
-        width: 92px;
-        height: 92px;
         place-items: center;
-        border: 4px solid #ffffff;
         border-radius: 50%;
-        background: linear-gradient(135deg, #09a3ff, #68d8ff);
-        color: #ffffff;
-        font-size: 2.5rem;
+        background: rgba(255, 255, 255, 0.96);
+        box-shadow: 0 0 18px rgba(31, 45, 64, 0.18);
+      }
+
+      .yuzhu-face {
+        width: 68px;
+        height: 68px;
+        position: relative;
+        border: 4px solid #111111;
+        border-radius: 14px;
+      }
+
+      .yuzhu-face::before,
+      .yuzhu-face::after {
+        content: "";
+        position: absolute;
+        bottom: 11px;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #111111;
+      }
+
+      .yuzhu-face::before {
+        left: 22px;
+      }
+
+      .yuzhu-face::after {
+        right: 14px;
+      }
+
+      .yuzhu-name {
+        color: #000000;
+        font-size: 1.1rem;
         font-weight: 900;
-        box-shadow: 0 18px 34px rgba(0, 153, 255, 0.24);
       }
 
-      .yuzhu-kicker {
-        display: inline-flex;
-        min-height: 28px;
-        align-items: center;
-        padding: 0 10px;
-        border-radius: 8px;
-        background: rgba(0, 153, 255, 0.12);
-        color: #0077c8;
-        font-size: 0.78rem;
-        font-weight: 850;
-      }
-
-      .yuzhu-hero h2 {
-        margin-top: 10px;
-        font-size: clamp(2rem, 4vw, 4rem);
-        line-height: 1;
-      }
-
-      .yuzhu-hero p,
-      .yuzhu-section p,
-      .yuzhu-contact p {
-        margin-top: 12px;
-        color: #526174;
+      .yuzhu-say {
+        color: #333333;
+        font-size: 0.92rem;
         line-height: 1.7;
       }
 
-      .yuzhu-button {
-        width: fit-content;
-        min-height: 40px;
+      .yuzhu-socials {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 10px;
+      }
+
+      .yuzhu-social {
+        width: 30px;
+        height: 30px;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        color: #222222;
+        font-size: 0.78rem;
+        font-weight: 900;
+      }
+
+      .yuzhu-social:hover {
+        background: rgba(31, 45, 64, 0.08);
+      }
+
+      .yuzhu-player {
+        width: min(220px, 100%);
+        display: grid;
+        grid-template-columns: 52px minmax(0, 1fr);
+        gap: 12px;
+        align-items: center;
+        margin-top: 20px;
+        text-align: left;
+      }
+
+      .yuzhu-cover {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background:
+          linear-gradient(135deg, rgba(9, 163, 255, 0.2), rgba(255, 112, 112, 0.3)),
+          #f3f6fb;
+        box-shadow: 0 4px 14px rgba(31, 45, 64, 0.14);
+      }
+
+      .yuzhu-track strong,
+      .yuzhu-track span {
+        display: block;
+      }
+
+      .yuzhu-track span {
+        color: #7a8798;
+        font-size: 0.82rem;
+      }
+
+      .yuzhu-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        grid-column: 2;
+        color: #111111;
+        font-weight: 900;
+      }
+
+      .yuzhu-main {
+        position: relative;
+        z-index: 1;
+        min-width: 0;
+        padding: 24px 42px 54px;
+        text-align: center;
+      }
+
+      .yuzhu-nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px 18px;
+        color: #222222;
+        font-size: 1rem;
+        font-weight: 800;
+      }
+
+      .yuzhu-nav span {
+        min-height: 36px;
         display: inline-flex;
         align-items: center;
-        margin-top: 16px;
-        padding: 0 14px;
+        padding: 0 12px;
         border-radius: 8px;
-        background: #09a3ff;
-        color: #ffffff;
-        font-weight: 850;
+      }
+
+      .yuzhu-nav span:first-child {
+        background: #eeeeee;
+      }
+
+      .yuzhu-hero {
+        min-height: 360px;
+        display: grid;
+        align-content: center;
+        justify-items: center;
+        gap: 18px;
+        padding: 44px 0;
+      }
+
+      .yuzhu-kicker {
+        color: var(--accent, #09a3ff);
+        font-weight: 900;
+      }
+
+      .yuzhu-hero h2 {
+        max-width: 760px;
+        color: #000000;
+        font-size: clamp(1.9rem, 4vw, 3.3rem);
+        line-height: 1.18;
+        letter-spacing: 0;
+      }
+
+      .yuzhu-intro-lines {
+        display: grid;
+        gap: 8px;
+        color: #333333;
+        font-size: 1rem;
+        line-height: 1.7;
+      }
+
+      .yuzhu-dot {
+        color: #222222;
+        font-size: 1.2rem;
       }
 
       .yuzhu-section,
       .yuzhu-contact {
-        padding: 26px 32px;
-        border-top: 1px solid rgba(23, 32, 51, 0.08);
+        padding: 28px 0;
       }
 
       .yuzhu-section h3,
       .yuzhu-contact h3 {
-        font-size: 1.34rem;
+        color: #000000;
+        font-size: clamp(1.45rem, 3vw, 2.3rem);
+        line-height: 1.2;
       }
 
       .yuzhu-section-note {
-        margin: 0 0 8px;
-        color: #7a8798;
+        max-width: 560px;
+        margin: 8px auto 0;
+        color: #333333;
+        line-height: 1.7;
       }
 
       .yuzhu-card-grid {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 12px;
-        margin-top: 16px;
+        margin-top: 18px;
+      }
+
+      .yuzhu-card {
+        min-height: 138px;
+        padding: 16px;
+        border: 1px solid rgba(31, 45, 64, 0.1);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.9);
+        text-align: left;
+      }
+
+      .yuzhu-card strong,
+      .yuzhu-card span,
+      .yuzhu-card p {
+        display: block;
+      }
+
+      .yuzhu-card strong {
+        color: #111111;
+        font-size: 1rem;
+      }
+
+      .yuzhu-card span {
+        margin-top: 8px;
+        color: var(--accent, #09a3ff);
+        font-size: 0.82rem;
+        font-weight: 850;
+      }
+
+      .yuzhu-card p {
+        margin-top: 10px;
+        color: #526174;
+        line-height: 1.62;
+      }
+
+      .yuzhu-about {
+        border-top: 1px solid rgba(31, 45, 64, 0.08);
+        border-bottom: 1px solid rgba(31, 45, 64, 0.08);
       }
 
       .yuzhu-skills {
         display: flex;
         flex-wrap: wrap;
+        justify-content: center;
         gap: 8px;
         margin-top: 14px;
       }
@@ -467,9 +680,22 @@
         padding: 0 10px;
         border-radius: 8px;
         background: rgba(0, 153, 255, 0.1);
-        color: #0077c8;
+        color: var(--accent, #09a3ff);
         font-size: 0.82rem;
         font-weight: 850;
+      }
+
+      .yuzhu-contact {
+        margin-top: 8px;
+        padding: 22px;
+        border-radius: 8px;
+        background: rgba(9, 163, 255, 0.08);
+      }
+
+      .yuzhu-contact p {
+        margin-top: 10px;
+        color: #526174;
+        line-height: 1.7;
       }
 
       .choice-list {
@@ -566,21 +792,27 @@
           grid-template-columns: 1fr;
         }
 
+        .yuzhu-stage {
+          grid-template-columns: 1fr;
+        }
+
+        .yuzhu-sidebar {
+          min-height: auto;
+          padding: 36px 20px;
+          border-right: 0;
+          border-bottom: 1px solid rgba(31, 45, 64, 0.14);
+        }
+
+        .yuzhu-main {
+          padding: 20px;
+        }
+
         .preview-hero,
         .preview-section,
         .yuzhu-hero,
         .yuzhu-section,
         .yuzhu-contact {
           padding: 22px;
-        }
-
-        .yuzhu-top {
-          align-items: flex-start;
-          flex-direction: column;
-        }
-
-        .yuzhu-hero {
-          grid-template-columns: 1fr;
         }
       }
     </style>
@@ -607,7 +839,7 @@
           <div class="form-actions">
             <button class="button primary" type="button" id="saveButton">保存</button>
             <a class="button" id="mineDemoButton" href="#">查看我的前端</a>
-            <a class="button subtle" id="sampleDemoButton" href="#">看原网站</a>
+            <a class="button subtle" id="sampleDemoButton" href="#">看原站副本</a>
             <a class="button subtle" href="./remix-mvp.html#library">换模板</a>
             <button class="button" type="button" id="resetButton">清空重来</button>
             <span class="notice" id="saveNotice">还没有保存。</span>
@@ -1180,44 +1412,93 @@
           .join('');
       }
 
+      function shortSiteName() {
+        return String(data.title || '雨竹upon的小站').replace(/的小站$/, '');
+      }
+
+      function introLinesHtml() {
+        const intro = String(data.intro || '')
+          .split(/[。.!！?？]/)
+          .map((item) => item.trim())
+          .filter(Boolean)
+          .slice(0, 4);
+        return intro.map((item) => `<p>${escapeHtml(item)}</p>`).join('');
+      }
+
+      function yuzhuCardsHtml(items) {
+        return items
+          .map(
+            (item) => `
+              <article class="yuzhu-card">
+                <strong>${escapeHtml(item.title)}</strong>
+                <span>${escapeHtml(item.meta)}</span>
+                <p>${escapeHtml(item.note)}</p>
+              </article>
+            `
+          )
+          .join('');
+      }
+
       function renderYuzhuPreview() {
+        const name = shortSiteName();
         return `
           <div class="yuzhu-site">
-            <header class="yuzhu-top">
-              <div>
-                <strong>${escapeHtml(data.title)}</strong>
-                <span>${escapeHtml(data.subtitle)}</span>
+            <div class="yuzhu-stage">
+              <div class="yuzhu-bubbles" aria-hidden="true">
+                <span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span>
               </div>
-              <nav>首页 · 介绍 · 项目 · 友链 · 联系我</nav>
-            </header>
-            <section class="yuzhu-hero">
-              <div class="yuzhu-avatar">雨</div>
-              <div>
-                <span class="yuzhu-kicker">${escapeHtml(data.kicker)}</span>
-                <h2>${escapeHtml(data.title)}</h2>
-                <p>${escapeHtml(data.intro)}</p>
-                <a class="yuzhu-button" href="#contact">${escapeHtml(data.primary)}</a>
-              </div>
-            </section>
-            <section class="yuzhu-section">
-              <p class="yuzhu-section-note">学任何东西最有成就感的时刻，莫过于自己的作品得到他人认可。</p>
-              <h3>${escapeHtml(data.sectionTitle)}</h3>
-              <div class="yuzhu-card-grid">${cardHtml(data.cards)}</div>
-            </section>
-            <section class="yuzhu-section yuzhu-about">
-              <h3>自我介绍</h3>
-              <p>${escapeHtml(data.intro)}</p>
-              <div class="yuzhu-skills">${chipsHtml(data.skillsText)}</div>
-            </section>
-            <section class="yuzhu-section">
-              <h3>我的小伙伴们</h3>
-              <p class="yuzhu-section-note">开发和学习路上，ta 们陪我一同前行。</p>
-              <div class="yuzhu-card-grid">${cardHtml(data.friends)}</div>
-            </section>
-            <section class="yuzhu-contact" id="contact">
-              <h3>${escapeHtml(data.contactTitle)}</h3>
-              <p>${escapeHtml(data.contactNote)}</p>
-            </section>
+              <aside class="yuzhu-sidebar">
+                <div class="yuzhu-avatar"><span class="yuzhu-face"></span></div>
+                <div class="yuzhu-name">${escapeHtml(name)}</div>
+                <p class="yuzhu-say">${escapeHtml(data.subtitle)}</p>
+                <div class="yuzhu-socials" aria-label="社交入口">
+                  <span class="yuzhu-social">GH</span>
+                  <span class="yuzhu-social">QQ</span>
+                  <span class="yuzhu-social">B</span>
+                  <span class="yuzhu-social">@</span>
+                </div>
+                <div class="yuzhu-player" aria-label="静态音乐播放器">
+                  <div class="yuzhu-cover"></div>
+                  <div class="yuzhu-track">
+                    <strong>我的歌单</strong>
+                    <span>静态展示，不接外部音乐服务</span>
+                  </div>
+                  <div class="yuzhu-controls">◀ ▶ ▶|</div>
+                </div>
+              </aside>
+              <section class="yuzhu-main">
+                <nav class="yuzhu-nav" aria-label="页面导航">
+                  <span>首页</span><b>·</b><span>介绍</span><b>·</b><span>项目</span><b>·</b><span>博客</span>
+                </nav>
+                <section class="yuzhu-hero">
+                  <h2>👋 ${escapeHtml(data.kicker)}</h2>
+                  <a class="yuzhu-kicker" href="${escapeHtml(sourceDemoUrls[projectId])}" target="_blank" rel="noreferrer">原站静态副本</a>
+                  <div class="yuzhu-intro-lines">${introLinesHtml()}</div>
+                  <p class="yuzhu-section-note">${escapeHtml(data.subtitle)}</p>
+                  <p class="yuzhu-dot">·</p>
+                </section>
+                <section class="yuzhu-section">
+                  <h3>${escapeHtml(data.sectionTitle)}</h3>
+                  <p class="yuzhu-section-note">学任何东西最有成就感的时刻，莫过于自己的作品得到他人认可。</p>
+                  <div class="yuzhu-card-grid">${yuzhuCardsHtml(data.cards)}</div>
+                </section>
+                <section class="yuzhu-section yuzhu-about">
+                  <h3>自我介绍</h3>
+                  <p class="yuzhu-section-note">${escapeHtml(data.intro)}</p>
+                  <div class="yuzhu-skills">${chipsHtml(data.skillsText)}</div>
+                </section>
+                <section class="yuzhu-section">
+                  <h3>我的小伙伴们</h3>
+                  <p class="yuzhu-section-note">开发和学习路上，ta 们陪我一同前行。</p>
+                  <div class="yuzhu-card-grid">${yuzhuCardsHtml(data.friends)}</div>
+                </section>
+                <section class="yuzhu-contact" id="contact">
+                  <h3>${escapeHtml(data.contactTitle)}</h3>
+                  <p>${escapeHtml(data.contactNote)}</p>
+                </section>
+              </section>
+            </div>
           </div>
         `;
       }
@@ -1273,20 +1554,10 @@
       function renderPreview() {
         preview.style.setProperty('--accent', safeColor(data.color));
         if (isYuzhuPack()) {
-          preview.innerHTML = `
-            <iframe
-              class="source-site-frame"
-              src="${sourceDemoUrls[projectId]}"
-              title="雨竹upon的小站"
-              loading="lazy"
-              referrerpolicy="no-referrer"
-            ></iframe>
-          `;
+          preview.innerHTML = renderYuzhuPreview();
           return;
         }
-        preview.innerHTML = isYuzhuPack()
-          ? renderYuzhuPreview()
-          : pack.kind === 'choice'
+        preview.innerHTML = pack.kind === 'choice'
             ? renderChoicePreview()
             : renderPortfolioPreview();
       }
@@ -1312,9 +1583,9 @@
       if (isYuzhuPack()) {
         document.getElementById('editTitle').textContent = '具体修改 case';
         document.getElementById('editHint').textContent = '按这些字段把雨竹upon的小站换成你的内容。';
-        document.getElementById('previewTitle').textContent = '预览雨竹upon的小站';
+        document.getElementById('previewTitle').textContent = '我方重写的静态预览';
         document.getElementById('previewHint').textContent =
-          '这里直接显示原网站，第一版先让小白看着真实页面改内容。';
+          '不是 iframe 原网页，而是按雨竹upon小站结构重写的可编辑静态版本。';
       }
 
       form.addEventListener('input', (event) => {
