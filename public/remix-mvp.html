@@ -178,7 +178,7 @@
       }
 
       .hero-lead {
-        max-width: 640px;
+        max-width: 560px;
         margin-top: 18px;
         color: #243044;
         font-size: clamp(1.02rem, 1.6vw, 1.24rem);
@@ -186,39 +186,11 @@
         font-weight: 850;
       }
 
-      .hero-copy {
-        max-width: 760px;
-        margin-top: 16px;
-        color: #526174;
-        font-size: 1.04rem;
-        line-height: 1.78;
-      }
-
       .actions {
         display: flex;
         flex-wrap: wrap;
         gap: 12px;
         margin-top: 22px;
-      }
-
-      .hero-steps {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 18px;
-      }
-
-      .hero-steps span {
-        min-height: 34px;
-        display: inline-flex;
-        align-items: center;
-        padding: 0 12px;
-        border: 1px solid rgba(31, 45, 64, 0.12);
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.74);
-        color: #435269;
-        font-size: 0.92rem;
-        font-weight: 850;
       }
 
       .button {
@@ -244,112 +216,6 @@
 
       .button:hover {
         transform: translateY(-1px);
-      }
-
-      .hero-board {
-        border: 1px solid rgba(31, 45, 64, 0.12);
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.88);
-        box-shadow: 0 22px 48px rgba(31, 45, 64, 0.1);
-        overflow: hidden;
-      }
-
-      .hero-board-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        padding: 14px 16px;
-        border-bottom: 1px solid rgba(31, 45, 64, 0.1);
-      }
-
-      .hero-board-title {
-        display: grid;
-        gap: 3px;
-      }
-
-      .hero-board-title strong {
-        color: #172033;
-        font-size: 1rem;
-      }
-
-      .hero-board-title span,
-      .board-card span {
-        color: #607084;
-        font-size: 0.84rem;
-        line-height: 1.45;
-      }
-
-      .board-status {
-        min-height: 28px;
-        display: inline-flex;
-        align-items: center;
-        padding: 0 9px;
-        border-radius: 8px;
-        background: #eaf8f0;
-        color: #25734d;
-        font-size: 0.78rem;
-        font-weight: 850;
-        white-space: nowrap;
-      }
-
-      .hero-board-body {
-        display: grid;
-        gap: 10px;
-        padding: 14px;
-      }
-
-      .board-card {
-        display: grid;
-        grid-template-columns: 74px minmax(0, 1fr);
-        gap: 12px;
-        align-items: center;
-        padding: 12px;
-        border: 1px solid rgba(31, 45, 64, 0.1);
-        border-radius: 8px;
-        background: #ffffff;
-      }
-
-      .board-index {
-        min-height: 48px;
-        display: grid;
-        place-items: center;
-        border-radius: 8px;
-        background: #f5f8fb;
-        color: #1769c2;
-        font-weight: 920;
-      }
-
-      .board-card strong {
-        display: block;
-        margin-bottom: 4px;
-        color: #172033;
-      }
-
-      .board-chat {
-        padding: 14px;
-        border-radius: 8px;
-        background: #172033;
-        color: #ffffff;
-      }
-
-      .board-chat small {
-        display: block;
-        color: rgba(255, 255, 255, 0.58);
-        font-weight: 760;
-      }
-
-      .board-chat p {
-        margin-top: 8px;
-        line-height: 1.55;
-        font-weight: 850;
-      }
-
-      .board-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        padding: 0 14px 14px;
       }
 
       .section {
@@ -395,7 +261,7 @@
       }
 
       .section-heading h2 {
-        margin-top: 14px;
+        margin-top: 0;
         color: #172033;
         font-size: clamp(1.8rem, 3.2vw, 2.8rem);
         line-height: 1.08;
@@ -427,7 +293,8 @@
       }
 
       .tool-panel {
-        padding: 14px;
+        padding: 0;
+        overflow: hidden;
       }
 
       .filter-bar {
@@ -463,31 +330,38 @@
 
       .project-list {
         display: grid;
-        gap: 8px;
+        gap: 0;
       }
 
       .project-button {
         width: 100%;
         min-height: auto;
-        padding: 14px;
+        padding: 18px;
+        border: 0;
+        border-left: 3px solid transparent;
+        border-radius: 0;
         text-align: left;
       }
 
+      .project-button + .project-button {
+        border-top: 1px solid rgba(31, 45, 64, 0.1);
+      }
+
       .project-button.active {
-        border-color: rgba(23, 105, 194, 0.42);
+        border-left-color: #1769c2;
         background: #f5f9ff;
       }
 
-      .project-topline {
+      .project-row-head {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        gap: 10px;
+        gap: 12px;
       }
 
-      .project-type {
-        color: #607084;
-        font-size: 0.78rem;
+      .project-index {
+        min-width: 32px;
+        color: #1769c2;
+        font-size: 0.86rem;
         font-weight: 850;
       }
 
@@ -505,7 +379,7 @@
       }
 
       .project-button h3 {
-        margin-top: 8px;
+        margin-top: 0;
         font-size: 1.08rem;
         line-height: 1.3;
       }
@@ -553,7 +427,7 @@
 
       .detail-head {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-columns: 1fr;
         gap: 18px;
         align-items: end;
         padding: 22px;
@@ -563,7 +437,7 @@
       }
 
       .detail-head h2 {
-        margin-top: 8px;
+        margin-top: 0;
         font-size: 1.72rem;
         line-height: 1.18;
       }
@@ -574,30 +448,6 @@
         color: #526174;
         font-size: 0.98rem;
         line-height: 1.62;
-      }
-
-      .detail-source {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        align-items: center;
-        justify-content: flex-end;
-        margin-top: 0;
-        color: #607084;
-        font-size: 0.9rem;
-        font-weight: 760;
-      }
-
-      .detail-source a {
-        min-height: 30px;
-        display: inline-flex;
-        align-items: center;
-        padding: 0 10px;
-        border: 1px solid rgba(23, 105, 194, 0.18);
-        border-radius: 8px;
-        background: #e8f3fb;
-        color: #1769c2;
-        font-weight: 850;
       }
 
       .detail-body {
@@ -776,8 +626,9 @@
       }
 
       .simple-change-card.featured {
-        border-color: rgba(23, 105, 194, 0.26);
-        background: #ffffff;
+        border-color: rgba(23, 105, 194, 0.22);
+        border-left: 3px solid #1769c2;
+        background: #f7fbff;
       }
 
       .prompt-list,
@@ -1230,10 +1081,6 @@
           gap: 24px;
         }
 
-        .hero-board {
-          max-width: 620px;
-        }
-
         .app-layout,
         .simple-pack-layout,
         .tiny-browser,
@@ -1270,8 +1117,7 @@
           word-break: break-all;
         }
 
-        .hero-lead,
-        .board-chat p {
+        .hero-lead {
           overflow-wrap: anywhere;
         }
 
@@ -1293,20 +1139,6 @@
 
         .pack-actions {
           width: 100%;
-        }
-
-        .hero-board-head,
-        .board-card {
-          grid-template-columns: 1fr;
-          align-items: flex-start;
-        }
-
-        .hero-board-head {
-          display: grid;
-        }
-
-        .board-index {
-          min-height: 36px;
         }
 
         .work-item {
@@ -1338,19 +1170,14 @@
       <section class="hero">
         <div class="hero-inner">
           <div>
-            <span class="eyebrow">不用先学代码，也能改出自己的网页</span>
-            <h1>选一个网页，<br />改成你的作品。</h1>
+            <span class="eyebrow">不用先学代码</span>
+            <h1>把现成网页，<br />改成你的作品。</h1>
             <p class="hero-lead">
-              我们把能打开的网页整理好。你只要选模板、对 AI 说想法、看预览。
+              选一个能打开的页面，告诉 AI 想改什么，马上看结果。
             </p>
-            <div class="hero-steps" aria-label="使用步骤">
-              <span>1 选模板</span>
-              <span>2 对 AI 说想法</span>
-              <span>3 看自己的页面</span>
-            </div>
             <div class="actions">
-              <button class="button primary" type="button" data-open-tab="library">先选模板</button>
-              <a class="button" href="./remix-editor.html?project=portfolio-page&pack=0">直接试改</a>
+              <button class="button primary" type="button" data-open-tab="library">选模板</button>
+              <a class="button" href="./remix-editor.html?project=portfolio-page&pack=0">试改一下</a>
             </div>
           </div>
 
@@ -1360,10 +1187,9 @@
       <section class="section alt tab-panel" id="panel-library" data-panel="library" role="tabpanel">
         <div class="section-inner">
           <div class="section-heading">
-            <span>选模板</span>
-            <h2>选一个能改的网页。</h2>
+            <h2>先挑一个起点。</h2>
             <p>
-              先看原网页缩小预览，再点“打开编辑页面”，直接用对话把它改成自己的。
+              别从空白页开始。先看真实截图，再让 AI 改成你的版本。
             </p>
           </div>
 
@@ -1380,17 +1206,16 @@
       <section class="section tab-panel" id="panel-hot" data-panel="hot" role="tabpanel" hidden>
         <div class="section-inner">
           <div class="section-heading">
-            <span>热点项目</span>
-            <h2>把网上值得看的项目先挑出来。</h2>
+            <h2>看看最近什么值得改。</h2>
             <p>
-              这个模块来自之前做的热点项目雷达。它不是让新手直接看代码，而是先知道最近哪些项目值得看、值得学、也可能值得改造成自己的作品。
+              这里先把值得看的项目挑出来。普通人不用先看复杂页面，只看它能不能变成自己的作品。
             </p>
           </div>
 
           <div class="hot-radar-layout">
             <article class="hot-radar-main">
               <div>
-                <span class="hot-radar-label">热点项目雷达 · 2026-06-06</span>
+                <span class="hot-radar-label">每天挑一批</span>
                 <h3>先看趋势，再决定改什么。</h3>
                 <p>
                   雷达会把项目分成“大佬在看”“产品灵感”“正在变火”和“经典项目”。小白不用先看复杂项目页，只要从这里挑一个方向，再回到模板区改成自己的页面。
@@ -1448,7 +1273,6 @@
       <section class="section alt tab-panel" id="panel-showcase" data-panel="showcase" role="tabpanel" hidden>
         <div class="section-inner">
           <div class="section-heading">
-            <span>晒作品</span>
             <h2>先让大家看到“别人真的改出来了”。</h2>
             <p>
               这里先做一个演示版。你可以把自己的作品名称、来源模板、链接和改了什么加进来，看它应该怎么展示。
@@ -1493,7 +1317,6 @@
       <section class="section alt tab-panel" id="panel-why" data-panel="why" role="tabpanel" hidden>
         <div class="section-inner">
           <div class="section-heading">
-            <span>为什么做</span>
             <h2>因为很多人想做网页，但不想先被代码拦住。</h2>
             <p>
               GitHub 上有很多已经能打开的好页面。我们先把这些页面整理成可编辑模板，让新手先做出一个能展示的作品，再慢慢理解背后的代码。
@@ -1523,7 +1346,7 @@
 
     <footer>
       <div>
-        这一版先验证一件事：普通人能不能从一个现成网页开始，直接改出自己的作品。更新日期：2026-06-07。
+        先做出一个能给别人看的页面，再慢慢学代码。
       </div>
     </footer>
 
@@ -1807,6 +1630,10 @@
         return ['改成餐厅选择器', '换成礼物推荐器', '加几个选项'];
       }
 
+      function packStepLabel(index) {
+        return ['换内容', '换方向', '以后再做'][index] || '更多想法';
+      }
+
       function renderFilters() {
         filterBar.innerHTML = filters
           .map(
@@ -1824,9 +1651,12 @@
         }
         projectList.innerHTML = items
           .map(
-            (project) => `
+            (project, index) => `
               <button class="project-button ${project.id === state.projectId ? 'active' : ''}" type="button" data-project="${project.id}">
-                <h3>${project.name}</h3>
+                <div class="project-row-head">
+                  <span class="project-index">${String(index + 1).padStart(2, '0')}</span>
+                  <h3>${project.name}</h3>
+                </div>
                 <p>${project.summary}</p>
               </button>
             `
@@ -1841,15 +1671,12 @@
           project.sourceDemoUrl ||
           `./remix-demo.html?project=${project.id}&pack=${state.packIndex}&mode=sample`;
         const sampleTarget = project.sourceDemoUrl ? ' target="_blank" rel="noreferrer"' : '';
+        const sampleLabel = project.sourceDemoUrl ? '看原网页' : '看示例';
         detailPanel.innerHTML = `
           <div class="detail-head">
             <div>
-              <span class="pill">适合新手</span>
               <h2>${project.name}</h2>
               <p>${project.summary}</p>
-            </div>
-            <div class="detail-source">
-              ${project.sourceDemoUrl ? `<a href="${project.sourceDemoUrl}" target="_blank" rel="noreferrer">看原网页</a>` : ''}
             </div>
           </div>
           <div class="detail-body">
@@ -1858,7 +1685,7 @@
                 .map(
                   (item, index) => `
                     <button class="pack-tab ${index === state.packIndex ? 'active' : ''}" type="button" data-pack="${index}">
-                      <strong>${item.level}</strong>
+                      <strong>${packStepLabel(index)}</strong>
                       <span>${item.title}</span>
                     </button>
                   `
@@ -1887,7 +1714,7 @@
                         打开编辑页面
                       </a>
                       <a class="demo-button" href="${sampleHref}"${sampleTarget}>
-                        看原网页
+                        ${sampleLabel}
                       </a>
                     </div>
                   </div>
