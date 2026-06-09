@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="把网上已经能打开的网页，整理成小白可以直接修改、预览和展示的作品模板。"
+      content="把现成网页和小工具整理成普通人能直接修改、预览、发布的产品起点。"
     />
-    <title>把网页模板改成我的作品</title>
+    <title>普通人的产品起步器</title>
     <style>
       :root {
         color: #172033;
@@ -186,6 +186,14 @@
         font-weight: 850;
       }
 
+      .hero-note {
+        max-width: 610px;
+        margin-top: 12px;
+        color: #526174;
+        font-size: 0.98rem;
+        line-height: 1.7;
+      }
+
       .actions {
         display: flex;
         flex-wrap: wrap;
@@ -273,6 +281,73 @@
         color: #526174;
         font-size: 1.06rem;
         line-height: 1.75;
+      }
+
+      .idea-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .idea-card {
+        min-height: 190px;
+        display: grid;
+        align-content: space-between;
+        gap: 16px;
+        padding: 18px;
+        border: 1px solid rgba(31, 45, 64, 0.1);
+        border-radius: 8px;
+        background: #ffffff;
+      }
+
+      .idea-card strong {
+        color: #172033;
+        font-size: 1.08rem;
+      }
+
+      .idea-card p {
+        margin-top: 8px;
+        color: #526174;
+        font-size: 0.94rem;
+        line-height: 1.55;
+      }
+
+      .idea-card button,
+      .idea-card a {
+        width: fit-content;
+        min-height: 34px;
+        display: inline-flex;
+        align-items: center;
+        padding: 0 11px;
+        border: 1px solid rgba(23, 105, 194, 0.16);
+        border-radius: 8px;
+        background: #eef7ff;
+        color: #1769c2;
+        font-weight: 850;
+      }
+
+      .source-strip {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 16px;
+        align-items: center;
+        margin-top: 16px;
+        padding: 18px;
+        border: 1px solid rgba(31, 45, 64, 0.1);
+        border-radius: 8px;
+        background: #f8fbfd;
+      }
+
+      .source-strip strong {
+        display: block;
+        color: #172033;
+        font-size: 1.05rem;
+      }
+
+      .source-strip p {
+        margin-top: 6px;
+        color: #526174;
+        line-height: 1.62;
       }
 
       .app-layout {
@@ -631,6 +706,27 @@
         background: #f7fbff;
       }
 
+      .mini-info-card {
+        margin-top: 10px;
+        padding: 14px;
+        border: 1px solid rgba(31, 45, 64, 0.1);
+        border-radius: 8px;
+        background: #ffffff;
+      }
+
+      .mini-info-card h4 {
+        margin: 0;
+        color: #172033;
+        font-size: 0.95rem;
+      }
+
+      .mini-info-card p {
+        margin-top: 10px;
+        color: #607084;
+        font-size: 0.88rem;
+        line-height: 1.58;
+      }
+
       .prompt-list,
       .change-tags {
         display: flex;
@@ -843,6 +939,159 @@
         flex-wrap: wrap;
         gap: 8px;
         justify-content: flex-start;
+      }
+
+      .workshop-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(360px, 0.9fr);
+        gap: 16px;
+        align-items: stretch;
+      }
+
+      .product-preview,
+      .chat-panel {
+        border: 1px solid rgba(31, 45, 64, 0.1);
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 12px 30px rgba(39, 58, 77, 0.05);
+      }
+
+      .product-preview {
+        overflow: hidden;
+      }
+
+      .preview-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 18px;
+        border-bottom: 1px solid rgba(31, 45, 64, 0.1);
+      }
+
+      .preview-top strong {
+        color: #172033;
+      }
+
+      .preview-top span {
+        color: #607084;
+        font-size: 0.9rem;
+      }
+
+      .preview-stage {
+        padding: 28px;
+        background: linear-gradient(135deg, #fbfdff, #edf6ff);
+      }
+
+      .mock-page {
+        min-height: 360px;
+        padding: 28px;
+        border: 1px solid rgba(31, 45, 64, 0.1);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.88);
+      }
+
+      .mock-page h3 {
+        max-width: 520px;
+        color: #172033;
+        font-size: clamp(1.9rem, 3.4vw, 3.2rem);
+        line-height: 1.04;
+      }
+
+      .mock-page p {
+        max-width: 560px;
+        margin-top: 14px;
+        color: #526174;
+        line-height: 1.65;
+      }
+
+      .mock-cards {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 26px;
+      }
+
+      .mock-cards span {
+        min-height: 110px;
+        display: grid;
+        align-content: center;
+        gap: 6px;
+        padding: 14px;
+        border: 1px solid rgba(31, 45, 64, 0.1);
+        border-radius: 8px;
+        background: #ffffff;
+        color: #607084;
+        font-size: 0.88rem;
+      }
+
+      .mock-cards strong {
+        color: #172033;
+        font-size: 1rem;
+      }
+
+      .chat-panel {
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        overflow: hidden;
+      }
+
+      .chat-head,
+      .chat-actions {
+        padding: 18px;
+        border-bottom: 1px solid rgba(31, 45, 64, 0.1);
+      }
+
+      .chat-actions {
+        border-top: 1px solid rgba(31, 45, 64, 0.1);
+        border-bottom: 0;
+      }
+
+      .chat-head h3 {
+        color: #172033;
+        font-size: 1.2rem;
+      }
+
+      .chat-head p {
+        margin-top: 6px;
+        color: #526174;
+        line-height: 1.55;
+      }
+
+      .chat-body {
+        display: grid;
+        align-content: start;
+        gap: 10px;
+        padding: 18px;
+        background: #f8fbfd;
+      }
+
+      .chat-bubble {
+        max-width: 92%;
+        padding: 12px 14px;
+        border-radius: 8px;
+        color: #172033;
+        line-height: 1.55;
+      }
+
+      .chat-bubble.user {
+        justify-self: end;
+        background: #172033;
+        color: #ffffff;
+      }
+
+      .chat-bubble.ai {
+        justify-self: start;
+        border: 1px solid rgba(31, 45, 64, 0.1);
+        background: #ffffff;
+      }
+
+      .chat-input {
+        min-height: 48px;
+        padding: 12px 14px;
+        border: 1px solid rgba(31, 45, 64, 0.12);
+        border-radius: 8px;
+        background: #ffffff;
+        color: #607084;
       }
 
       .pack-title-row h3 {
@@ -1085,6 +1334,10 @@
         .simple-pack-layout,
         .tiny-browser,
         .workflow,
+        .idea-grid,
+        .source-strip,
+        .workshop-layout,
+        .mock-cards,
         .hot-radar-layout,
         .hot-stats,
         .why-grid,
@@ -1156,11 +1409,12 @@
     <header class="topbar">
       <a class="brand" href="./">
         <span class="brand-mark">改</span>
-        <span>把网页模板改成我的作品</span>
+        <span>普通人的产品起步器</span>
       </a>
       <nav class="nav" aria-label="页面模块" role="tablist">
-        <button class="active" type="button" data-tab="library" role="tab" aria-selected="true">选模板</button>
-        <button type="button" data-tab="hot" role="tab" aria-selected="false">热点项目</button>
+        <button class="active" type="button" data-tab="hot" role="tab" aria-selected="true">灵感库</button>
+        <button type="button" data-tab="library" role="tab" aria-selected="false">模板库</button>
+        <button type="button" data-tab="workshop" role="tab" aria-selected="false">改造台</button>
         <button type="button" data-tab="showcase" role="tab" aria-selected="false">晒作品</button>
         <button type="button" data-tab="why" role="tab" aria-selected="false">为什么做</button>
       </nav>
@@ -1170,26 +1424,29 @@
       <section class="hero">
         <div class="hero-inner">
           <div>
-            <span class="eyebrow">不用先学代码</span>
-            <h1>把现成网页，<br />改成你的作品。</h1>
+            <span class="eyebrow">给完全小白的 Web Coding 入口</span>
+            <h1>把现成网页，<br />改成你的产品。</h1>
             <p class="hero-lead">
-              选一个能打开的页面，告诉 AI 想改什么，马上看结果。
+              不用懂 GitHub，不用先学代码。先选一个想法，再让 AI 帮你改成能发布的网页工具。
+            </p>
+            <p class="hero-note">
+              素材可以来自开源项目、真实网页、常见 App 功能和热门产品形态；用户只负责说清楚自己想做什么。
             </p>
             <div class="actions">
-              <button class="button primary" type="button" data-open-tab="library">选模板</button>
-              <a class="button" href="./remix-editor.html?project=portfolio-page&pack=0">试改一下</a>
+              <button class="button primary" type="button" data-open-tab="hot">先看能做什么</button>
+              <a class="button" href="./remix-editor.html?project=portfolio-page&pack=0">直接试改</a>
             </div>
           </div>
 
         </div>
       </section>
 
-      <section class="section alt tab-panel" id="panel-library" data-panel="library" role="tabpanel">
+      <section class="section alt tab-panel" id="panel-library" data-panel="library" role="tabpanel" hidden>
         <div class="section-inner">
           <div class="section-heading">
-            <h2>先挑一个起点。</h2>
+            <h2>再选一个能改的模板。</h2>
             <p>
-              别从空白页开始。先看真实截图，再让 AI 改成你的版本。
+              这里展示的不是技术项目列表，而是已经整理好的产品起点：能预览、能对话修改、能保存成自己的版本。
             </p>
           </div>
 
@@ -1203,69 +1460,131 @@
         </div>
       </section>
 
-      <section class="section tab-panel" id="panel-hot" data-panel="hot" role="tabpanel" hidden>
+      <section class="section tab-panel" id="panel-hot" data-panel="hot" role="tabpanel">
         <div class="section-inner">
           <div class="section-heading">
-            <h2>看看最近什么值得改。</h2>
+            <h2>先选你想做成什么。</h2>
             <p>
-              这里先把值得看的项目挑出来。普通人不用先看复杂页面，只看它能不能变成自己的作品。
+              普通用户不需要先理解项目来源，只要先选一个目标。我们负责把合适的网页、工具和产品形态整理成能改的模板。
             </p>
           </div>
 
-          <div class="hot-radar-layout">
-            <article class="hot-radar-main">
+          <div class="idea-grid" aria-label="可改造成的产品方向">
+            <article class="idea-card">
               <div>
-                <span class="hot-radar-label">每天挑一批</span>
-                <h3>先看趋势，再决定改什么。</h3>
-                <p>
-                  雷达会把项目分成“大佬在看”“产品灵感”“正在变火”和“经典项目”。小白不用先看复杂项目页，只要从这里挑一个方向，再回到模板区改成自己的页面。
-                </p>
-                <div class="hot-stats" aria-label="GitHub 热点项目统计">
-                  <span><strong>4</strong>个榜单</span>
-                  <span><strong>60</strong>个候选项目</span>
-                  <span><strong>可打开</strong>不用安装</span>
-                </div>
+                <strong>个人主页</strong>
+                <p>把别人的小站换成自己的名字、介绍、作品和联系方式。</p>
               </div>
-              <div class="actions compact-actions">
-                <a class="button primary" href="./radar.html">打开完整雷达</a>
-                <button class="button" type="button" data-open-tab="library">回去选模板</button>
-              </div>
+              <button type="button" data-idea-project="portfolio-page" data-idea-pack="0">用这个开始</button>
             </article>
+            <article class="idea-card">
+              <div>
+                <strong>AI 工具榜单</strong>
+                <p>把个人页或看板改成工具合集，适合做自己的推荐页。</p>
+              </div>
+              <button type="button" data-idea-project="portfolio-page" data-idea-pack="2">做工具榜单</button>
+            </article>
+            <article class="idea-card">
+              <div>
+                <strong>小红书选题工具</strong>
+                <p>把卡片页改成选题、标题、爆点和素材状态的整理工具。</p>
+              </div>
+              <button type="button" data-idea-project="ai-profile-page" data-idea-pack="2">做内容工具</button>
+            </article>
+            <article class="idea-card">
+              <div>
+                <strong>餐厅选择器</strong>
+                <p>把转盘小工具改成“今天去哪吃”“送什么礼物”这种生活工具。</p>
+              </div>
+              <button type="button" data-idea-project="choice-tool" data-idea-pack="0">做选择器</button>
+            </article>
+            <article class="idea-card">
+              <div>
+                <strong>作品集</strong>
+                <p>把主页改成作品展示页，适合学生、设计师、创作者和接单用户。</p>
+              </div>
+              <button type="button" data-idea-project="portfolio-page" data-idea-pack="1">做作品集</button>
+            </article>
+            <article class="idea-card">
+              <div>
+                <strong>服务介绍页</strong>
+                <p>把 AI 个人主页改成接单页，说明你能帮别人做什么。</p>
+              </div>
+              <button type="button" data-idea-project="ai-profile-page" data-idea-pack="1">做服务页</button>
+            </article>
+            <article class="idea-card">
+              <div>
+                <strong>活动页</strong>
+                <p>把普通页面改成活动介绍、报名入口和分享页。</p>
+              </div>
+              <button type="button" data-idea-project="portfolio-page" data-idea-pack="2">做活动页</button>
+            </article>
+            <article class="idea-card">
+              <div>
+                <strong>产品官网</strong>
+                <p>把现成网页改成你的产品介绍页，先验证有没有人感兴趣。</p>
+              </div>
+              <button type="button" data-idea-project="ai-profile-page" data-idea-pack="0">做官网</button>
+            </article>
+          </div>
 
-            <div class="hot-radar-list" aria-label="GitHub 热点项目精选">
-              <a class="hot-radar-item" href="./radar.html">
-                <div>
-                  <small>大佬在看</small>
-                  <strong>AI 设计工具</strong>
-                  <p>本地优先的 AI 设计和原型工具，适合观察 AI 生成网页、海报、幻灯片的方向。</p>
-                </div>
-                <span class="hot-score"><strong>约 5.9 万</strong>人关注</span>
-              </a>
-              <a class="hot-radar-item" href="./radar.html">
-                <div>
-                  <small>产品灵感</small>
-                  <strong>AI 网页编辑器</strong>
-                  <p>用 AI 生成网页并预览发布，和“普通人改网页”这个方向很接近。</p>
-                </div>
-                <span class="hot-score"><strong>约 6000</strong>人关注</span>
-              </a>
-              <a class="hot-radar-item" href="./radar.html">
-                <div>
-                  <small>正在变火</small>
-                  <strong>AI 交易助手</strong>
-                  <p>个人交易助手项目，适合观察“AI 帮人做具体任务”的产品化路径。</p>
-                </div>
-                <span class="hot-score"><strong>约 1.1 万</strong>人关注</span>
-              </a>
-              <a class="hot-radar-item" href="./radar.html">
-                <div>
-                  <small>经典项目</small>
-                  <strong>AI 工作流工具</strong>
-                  <p>面向 AI 写代码工具的工作流优化系统，适合看长期能力建设。</p>
-                </div>
-                <span class="hot-score"><strong>约 20.8 万</strong>人关注</span>
-              </a>
+          <div class="source-strip">
+            <div>
+              <strong>素材来源不只 GitHub</strong>
+              <p>我们会从能打开的网页、开源项目、常见 App 功能和热点项目里挑“适合被小白改造”的东西，重新整理成可编辑模板。</p>
             </div>
+            <a class="button" href="./radar.html">看热点来源</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="section alt tab-panel" id="panel-workshop" data-panel="workshop" role="tabpanel" hidden>
+        <div class="section-inner">
+          <div class="section-heading">
+            <h2>修改过程就是和 AI 说话。</h2>
+            <p>
+              用户不用知道文件在哪里，也不用复制提示词。右侧说需求，左侧页面马上变，最后保存成自己的前端。
+            </p>
+          </div>
+          <div class="workshop-layout">
+            <section class="product-preview" aria-label="改造后的网页预览">
+              <div class="preview-top">
+                <div>
+                  <strong>左侧实时预览</strong>
+                  <span>每次修改都会直接反映到页面上</span>
+                </div>
+                <span>可保存</span>
+              </div>
+              <div class="preview-stage">
+                <div class="mock-page">
+                  <h3>我的 AI 工具榜单</h3>
+                  <p>整理我常用的写作、图片、代码和效率工具，方便朋友快速找到适合自己的工具。</p>
+                  <div class="mock-cards">
+                    <span><strong>写作工具</strong>适合写笔记、脚本和朋友圈文案。</span>
+                    <span><strong>图片工具</strong>适合做封面、海报和配图。</span>
+                    <span><strong>代码工具</strong>适合改网页、做小工具和查问题。</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <aside class="chat-panel" aria-label="AI 改造助手示例">
+              <div class="chat-head">
+                <h3>AI 改造助手</h3>
+                <p>直接说你想要的效果，不用一个字段一个字段填。</p>
+              </div>
+              <div class="chat-body">
+                <div class="chat-bubble user">把这个个人主页改成 AI 工具榜单，颜色温柔一点。</div>
+                <div class="chat-bubble ai">已帮你改标题、介绍、三张工具卡片和主色。左侧可以直接预览。</div>
+                <div class="chat-bubble user">再加一个“生成我的产品”的按钮。</div>
+                <div class="chat-bubble ai">按钮已经加好。保存后可以打开你的前端链接。</div>
+              </div>
+              <div class="chat-actions">
+                <div class="chat-input">例如：改成我的小红书选题工具，放 6 个选题卡片</div>
+                <div class="actions compact-actions">
+                  <a class="button primary" href="./remix-editor.html?project=portfolio-page&pack=2">打开改造台</a>
+                </div>
+              </div>
+            </aside>
           </div>
         </div>
       </section>
@@ -1273,9 +1592,9 @@
       <section class="section alt tab-panel" id="panel-showcase" data-panel="showcase" role="tabpanel" hidden>
         <div class="section-inner">
           <div class="section-heading">
-            <h2>先让大家看到“别人真的改出来了”。</h2>
+            <h2>做完以后，要能发出去。</h2>
             <p>
-              这里先做一个演示版。你可以把自己的作品名称、来源模板、链接和改了什么加进来，看它应该怎么展示。
+              第一版先让用户拿到一个公开链接，再把作品放进案例列表。让新手看到：别人能做出来，我也能做出来。
             </p>
           </div>
 
@@ -1317,28 +1636,28 @@
       <section class="section alt tab-panel" id="panel-why" data-panel="why" role="tabpanel" hidden>
         <div class="section-inner">
           <div class="section-heading">
-            <h2>因为很多人想做网页，但不想先被代码拦住。</h2>
+            <h2>这不是 GitHub 社区，而是产品起步器。</h2>
             <p>
-              GitHub 上有很多已经能打开的好页面。我们先把这些页面整理成可编辑模板，让新手先做出一个能展示的作品，再慢慢理解背后的代码。
+              GitHub、开源项目和真实网页只是素材来源。用户真正需要的是：我有一个想法，你帮我从现成东西开始，改成一个能发布的小产品。
             </p>
           </div>
           <div class="why-grid">
             <article class="why-card">
-              <strong>需求在变多</strong>
-              <p>越来越多人想做个人主页、小工具、作品集和内容页，但直接看 GitHub 项目太难。</p>
+              <strong>用户不想先学工具</strong>
+              <p>他们不会 GitHub、不会部署、也不一定能访问国外网站，但想把自己的想法变成网页。</p>
             </article>
             <article class="why-card">
-              <strong>第一步要更轻</strong>
-              <p>新手先需要“能看、能改、能展示”，不是一开始就学命令行、目录结构和部署。</p>
+              <strong>我们先整理现成能力</strong>
+              <p>把已有网页、常见 App 功能和开源项目拆成可编辑模板，让用户不用从零开始。</p>
             </article>
             <article class="why-card">
-              <strong>我们能做出来</strong>
-              <p>第一版先选能直接打开的网页，拆成标题、卡片、图片和按钮，让 AI 对话直接改预览。</p>
+              <strong>闭环必须很短</strong>
+              <p>选目标、说需求、看预览、保存发布。这个闭环跑通，比做复杂社区更重要。</p>
             </article>
           </div>
           <div class="actions compact-actions">
             <a class="button primary" href="./remix-community.html">看完整分析</a>
-            <button class="button" type="button" data-open-tab="library">回去选模板</button>
+            <button class="button" type="button" data-open-tab="library">回模板库</button>
           </div>
         </div>
       </section>
@@ -1346,7 +1665,7 @@
 
     <footer>
       <div>
-        先做出一个能给别人看的页面，再慢慢学代码。
+        普通人的产品起步器：先做出来，再慢慢学代码。
       </div>
     </footer>
 
@@ -1354,7 +1673,7 @@
       const projects = [
         {
           id: 'portfolio-page',
-          name: '中文个人小站模板',
+          name: '个人主页起点',
           type: '可改网页：雨竹upon的小站',
           sourceDemoUrl: './static-sites/yuzhu-upon/index.html',
           screenshot: './assets/remix-previews/yuzhu-upon-home.png',
@@ -1364,7 +1683,7 @@
           technicalDifficulty: 2,
           noviceDifficulty: 1.5,
           summary:
-            '一个已经能打开的中文个人小站，适合改成自己的主页、兴趣页和项目展示页。',
+            '从一个真实中文小站开始，改成自己的主页、作品集、兴趣页或工具导航。',
           whyGood:
             '这个站点更贴近国内用户：有中文介绍、个人项目、朋友链接和联系入口。我们可以先把它整理成站内编辑版，你只换名字、介绍、项目和联系方式。',
           need: '先准备头像、个人介绍、3 到 5 个项目、社交链接和联系方式。',
@@ -1373,20 +1692,20 @@
           packs: [
             {
               level: '第一步：换成自己的内容',
-              title: '直接改雨竹upon的小站',
+              title: '先改成自己的主页',
               tech: 1,
               novice: 1,
               goal:
                 '直接从雨竹upon的小站开始，把站点名字、欢迎语、代表作、项目、友链和联系方式换成自己的。',
               files: ['站点名字', '欢迎语', '代表作', '项目列表', '友链', '联系方式'],
               stayAway: ['账号功能', '评论区', '后台管理', '真实隐私信息'],
-              commands: ['先点“查看示例前端”看看长什么样', '再点“打开编辑页面”替换成你的内容', '改完点“查看我的前端”确认效果'],
+              commands: ['先点“查看示例前端”看看长什么样', '再点“进入改造台”替换成你的内容', '改完点“查看我的前端”确认效果'],
               deploy:
                 '第一版可以先把链接发给朋友看；联系方式先放公开账号，不要放私人地址。'
             },
             {
               level: '第二步：换成兴趣作品页',
-              title: '改成兴趣作品页',
+              title: '再改成兴趣作品页',
               tech: 2,
               novice: 2,
               goal:
@@ -1399,7 +1718,7 @@
             },
             {
               level: '以后可以做',
-              title: '改成项目导航页',
+              title: '也能改成项目导航页',
               tech: 2.5,
               novice: 2.5,
               goal:
@@ -1414,7 +1733,7 @@
         },
         {
           id: 'ai-profile-page',
-          name: 'AI 个人主页模板',
+          name: '个人品牌起点',
           type: '可改网页：流星玩AI个人主页',
           sourceDemoUrl: 'https://xiestar.github.io/',
           screenshot: './assets/remix-previews/xiestar-home.png',
@@ -1424,7 +1743,7 @@
           technicalDifficulty: 2,
           noviceDifficulty: 2,
           summary:
-            '一个已经能打开的 AI 个人主页，适合改成个人品牌、服务介绍和作品展示页。',
+            '从一个 AI 创作者主页开始，改成个人品牌页、服务介绍页或内容账号主页。',
           whyGood:
             '这个站点结构很清楚：先说我是谁，再展示作品，再说明能提供什么服务，最后留下联系方式。适合想做 AI 个人品牌、接单页或内容账号主页的人。',
           need: '先准备一句定位、个人介绍、3 个作品或服务、公开联系方式。',
@@ -1433,7 +1752,7 @@
           packs: [
             {
               level: '第一步：换成自己的介绍',
-              title: '做一个 AI 个人主页',
+              title: '先做一个个人品牌页',
               tech: 2,
               novice: 2,
               goal:
@@ -1446,7 +1765,7 @@
             },
             {
               level: '第二步：换成服务介绍页',
-              title: '改成接单服务页',
+              title: '再改成接单服务页',
               tech: 3,
               novice: 3,
               goal:
@@ -1459,7 +1778,7 @@
             },
             {
               level: '以后可以做',
-              title: '改成内容账号主页',
+              title: '也能改成内容账号主页',
               tech: 3,
               novice: 3,
               goal:
@@ -1474,7 +1793,7 @@
         },
         {
           id: 'choice-tool',
-          name: '转盘选择小工具',
+          name: '选择工具起点',
           type: '可改网页：转盘选择小工具',
           screenshot: './assets/remix-previews/spin-wheel-home.png',
           sourceNote: '这是一个能直接打开的转盘网页，适合把选项换成餐厅、礼物、旅行路线或抽签结果。',
@@ -1483,7 +1802,7 @@
           technicalDifficulty: 2.5,
           noviceDifficulty: 2.3,
           summary:
-            '一个已经能打开的转盘网页小工具，适合改成餐厅选择器、礼物推荐器、旅行抽签器。',
+            '从一个有互动的小工具开始，改成餐厅选择器、礼物推荐器或旅行抽签器。',
           whyGood:
             '这个模板本来就有“随机选一个”的互动。把转盘选项换成餐厅、礼物或旅行路线，就能变成更生活化的小工具。',
           need: '准备候选项、几个筛选条件、结果文案和少量图片。',
@@ -1492,7 +1811,7 @@
           packs: [
             {
               level: '第一步：换成自己的选择题',
-              title: '改成餐厅选择器',
+              title: '先改成餐厅选择器',
               tech: 2,
               novice: 2,
               goal:
@@ -1505,7 +1824,7 @@
             },
             {
               level: '第二步：做成推荐工具',
-              title: '改成礼物推荐器',
+              title: '再改成礼物推荐器',
               tech: 2.5,
               novice: 3,
               goal:
@@ -1518,7 +1837,7 @@
             },
             {
               level: '以后可以做',
-              title: '改成旅行路线抽签器',
+              title: '也能改成旅行路线抽签器',
               tech: 3,
               novice: 3.5,
               goal:
@@ -1543,21 +1862,21 @@
       const starterWorks = [
         {
           title: '我的中文小站第一页',
-          project: '中文个人小站模板',
+          project: '个人主页起点',
           url: './static-sites/yuzhu-upon/index.html',
           note: '参考雨竹upon的小站结构：先放自我介绍、代表作、项目和联系方式。',
           tag: '第一步'
         },
         {
           title: 'AI 个人主页样例',
-          project: 'AI 个人主页模板',
+          project: '个人品牌起点',
           url: 'https://xiestar.github.io/',
           note: '参考流星玩AI的结构：先介绍定位，再展示作品、服务和联系方式。',
           tag: '第一步'
         },
         {
           title: '周末吃什么选择器',
-          project: '随机选择小工具',
+          project: '选择工具起点',
           url: '',
           note: '把候选项换成本地餐厅，结果页会解释为什么推荐。',
           tag: '第二步'
@@ -1711,12 +2030,22 @@
                     </div>
                     <div class="pack-actions">
                       <a class="edit-button" href="./remix-editor.html?project=${project.id}&pack=${state.packIndex}">
-                        打开编辑页面
+                        进入改造台
                       </a>
                       <a class="demo-button" href="${sampleHref}"${sampleTarget}>
                         ${sampleLabel}
                       </a>
                     </div>
+                  </div>
+                  <div class="mini-info-card">
+                    <h4>主要改这些</h4>
+                    <div class="change-tags">
+                      ${pack.files.map((item) => `<span>${item}</span>`).join('')}
+                    </div>
+                  </div>
+                  <div class="mini-info-card">
+                    <h4>第一版先别碰</h4>
+                    <p>${pack.stayAway.join('、')}</p>
                   </div>
                 </div>
               </div>
@@ -1799,6 +2128,15 @@
       });
 
       document.addEventListener('click', (event) => {
+        const ideaButton = event.target.closest('[data-idea-project]');
+        if (ideaButton) {
+          state.projectId = ideaButton.dataset.ideaProject;
+          state.packIndex = Number(ideaButton.dataset.ideaPack || 0);
+          renderAll();
+          activateTab('library', { scroll: true });
+          return;
+        }
+
         const tabButton = event.target.closest('[data-tab], [data-open-tab]');
         if (!tabButton) return;
         const tabId = tabButton.dataset.tab || tabButton.dataset.openTab;
@@ -1824,7 +2162,7 @@
       });
 
       renderAll();
-      const initialTab = window.location.hash.replace('#', '') || 'library';
+      const initialTab = window.location.hash.replace('#', '') || 'hot';
       activateTab(initialTab);
     </script>
   </body>
