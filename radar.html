@@ -5,24 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="每天帮你找好项目，自动筛出 AI 前沿趋势、实用产品灵感和热门开源项目。"
+      content="每天帮你找好项目，自动筛出 AI 前沿趋势、实用产品灵感和热门开源项目，并整理成小白也能看懂的中文判断。"
     />
-    <title>github好项目雷达（自己爬）· 静态版</title>
+    <title>GitHub 好项目雷达</title>
     <style>
       :root {
-        color-scheme: light;
-        --bg: #f3f9f5;
+        color-scheme: light dark;
+        --bg: #f6f8f2;
         --panel: #ffffff;
-        --panel-2: #f1f7f3;
+        --panel-2: #f0f5ed;
         --ink: #1f2d28;
         --muted: #6c7d76;
         --line: rgba(24, 60, 44, 0.10);
-        --blue: #2b9fd6;
-        --green: #21b573;
-        --amber: #d6912a;
-        --red: #e05a4f;
-        --shadow: 0 12px 32px rgba(31, 70, 50, 0.08);
-        --radius: 14px;
+        --blue: #2f7f96;
+        --green: #18825f;
+        --amber: #bc7a22;
+        --red: #c84f45;
+        --control: rgba(255, 255, 255, 0.82);
+        --shadow: 0 12px 30px rgba(31, 70, 50, 0.07);
+        --radius: 12px;
         font-family:
           Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
           "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
@@ -40,8 +41,14 @@
         min-width: 320px;
         margin: 0;
         background:
-          radial-gradient(1100px 520px at 12% -8%, rgba(33, 181, 115, 0.12), transparent 60%),
-          radial-gradient(900px 480px at 92% -6%, rgba(43, 159, 214, 0.12), transparent 60%),
+          linear-gradient(180deg, rgba(246, 248, 242, 0.98), rgba(234, 241, 231, 0.98) 52%, rgba(248, 247, 241, 0.98)),
+          repeating-linear-gradient(
+            90deg,
+            rgba(31, 45, 40, 0.035) 0,
+            rgba(31, 45, 40, 0.035) 1px,
+            transparent 1px,
+            transparent 88px
+          ),
           var(--bg);
         color: var(--ink);
         -webkit-font-smoothing: antialiased;
@@ -57,23 +64,23 @@
         color: inherit;
       }
 
+      [hidden] {
+        display: none !important;
+      }
+
       .shell {
-        width: min(1440px, calc(100% - 32px));
+        width: min(1360px, calc(100% - 32px));
         margin: 0 auto;
-        padding: 24px 0 42px;
+        padding: 18px 0 42px;
       }
 
       .topbar {
-        position: sticky;
-        z-index: 10;
-        top: 0;
-        display: grid;
-        grid-template-columns: minmax(220px, 1fr);
+        display: flex;
+        justify-content: space-between;
         gap: 16px;
         align-items: center;
-        padding: 14px 0 18px;
-        background: linear-gradient(180deg, rgba(243, 249, 245, 0.96), rgba(243, 249, 245, 0.72));
-        backdrop-filter: blur(14px);
+        min-height: 68px;
+        padding: 6px 0 10px;
       }
 
       .brand {
@@ -91,8 +98,30 @@
         place-items: center;
         border-radius: 8px;
         background: linear-gradient(135deg, var(--blue), var(--green));
-        color: #0f1415;
+        color: #ffffff;
         font-weight: 900;
+      }
+
+      .topbar-note {
+        max-width: 380px;
+        color: var(--muted);
+        text-align: right;
+        line-height: 1.5;
+      }
+
+      .topbar-note strong,
+      .topbar-note span {
+        display: block;
+      }
+
+      .topbar-note strong {
+        color: var(--ink);
+        font-size: 0.92rem;
+      }
+
+      .topbar-note span {
+        margin-top: 2px;
+        font-size: 0.82rem;
       }
 
       h1 {
@@ -110,18 +139,18 @@
 
       .summary-grid {
         display: grid;
-        grid-template-columns: repeat(6, minmax(0, 1fr));
-        gap: 12px;
-        margin-top: 14px;
+        grid-template-columns: repeat(8, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 6px;
       }
 
       .metric {
-        min-height: 96px;
-        padding: 16px;
+        min-height: 76px;
+        padding: 12px;
         border: 1px solid var(--line);
         border-radius: var(--radius);
-        background: linear-gradient(180deg, #ffffff, #f3faf6);
-        box-shadow: var(--shadow);
+        background: rgba(255, 255, 255, 0.72);
+        box-shadow: 0 8px 20px rgba(31, 70, 50, 0.045);
         transition: transform 0.18s ease, box-shadow 0.18s ease;
       }
 
@@ -138,24 +167,35 @@
 
       .metric strong {
         display: block;
-        margin-top: 7px;
+        margin-top: 5px;
         color: var(--ink);
-        font-size: clamp(1.3rem, 2.5vw, 2rem);
+        font-size: clamp(1.12rem, 1.8vw, 1.55rem);
         line-height: 1;
+        overflow-wrap: anywhere;
       }
 
       .metric small {
         display: block;
-        margin-top: 7px;
+        margin-top: 6px;
         color: var(--muted);
+        font-size: 0.78rem;
       }
 
       .controls {
+        position: sticky;
+        z-index: 20;
+        top: 0;
         display: grid;
-        grid-template-columns: 1fr auto auto;
+        grid-template-columns: minmax(280px, 1fr) 174px auto;
         gap: 10px;
         align-items: center;
-        margin: 18px 0;
+        margin: 14px 0 16px;
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--control);
+        box-shadow: 0 12px 30px rgba(31, 70, 50, 0.08);
+        backdrop-filter: blur(16px);
       }
 
       .search {
@@ -182,7 +222,7 @@
       }
 
       .search input {
-        padding: 0 14px 0 42px;
+        padding: 0 42px;
       }
 
       .search span {
@@ -191,6 +231,27 @@
         top: 50%;
         color: var(--muted);
         transform: translateY(-50%);
+      }
+
+      .clear-search {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        width: 28px;
+        height: 28px;
+        display: grid;
+        place-items: center;
+        border: 0;
+        border-radius: 8px;
+        background: rgba(24, 60, 44, 0.07);
+        color: var(--muted);
+        cursor: pointer;
+        transform: translateY(-50%);
+      }
+
+      .clear-search:hover {
+        background: rgba(24, 60, 44, 0.12);
+        color: var(--ink);
       }
 
       select {
@@ -266,6 +327,17 @@
         line-height: 1.2;
       }
 
+      .list-heading {
+        min-width: 0;
+      }
+
+      .list-hint {
+        margin: 5px 0 0;
+        color: var(--muted);
+        font-size: 0.84rem;
+        line-height: 1.45;
+      }
+
       .count {
         color: var(--muted);
         font-size: 0.86rem;
@@ -277,9 +349,9 @@
 
       .repo-row {
         display: grid;
-        grid-template-columns: 54px minmax(0, 1fr) auto;
+        grid-template-columns: 48px minmax(0, 1fr) 136px;
         gap: 14px;
-        padding: 16px;
+        padding: 17px 16px;
         border-bottom: 1px solid var(--line);
         transition: background 0.16s ease;
       }
@@ -316,6 +388,23 @@
         font-size: 1rem;
       }
 
+      .repo-kicker {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin: 0 0 7px;
+        color: var(--muted);
+        font-size: 0.78rem;
+        line-height: 1.4;
+      }
+
+      .repo-kicker span {
+        padding: 2px 7px;
+        border: 1px solid rgba(24, 60, 44, 0.09);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.6);
+      }
+
       .repo-title a {
         color: var(--ink);
         text-decoration: none;
@@ -348,6 +437,7 @@
         margin: 8px 0 0;
         color: #41524b;
         line-height: 1.56;
+        max-width: 82ch;
       }
 
       .reason {
@@ -386,6 +476,49 @@
         color: #44544c;
         line-height: 1.55;
         font-size: 0.86rem;
+      }
+
+      .repo-more-details {
+        margin-top: 10px;
+        border: 1px solid rgba(43, 159, 214, 0.18);
+        border-radius: 11px;
+        background: rgba(43, 159, 214, 0.035);
+        overflow: hidden;
+      }
+
+      .repo-more-summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 12px;
+        color: #1d6f97;
+        list-style: none;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 850;
+      }
+
+      .repo-more-summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .repo-more-summary::after {
+        content: "⌄";
+        color: #1d6f97;
+        transition: transform 0.18s ease;
+      }
+
+      .repo-more-details[open] .repo-more-summary {
+        border-bottom: 1px solid rgba(43, 159, 214, 0.16);
+      }
+
+      .repo-more-details[open] .repo-more-summary::after {
+        transform: rotate(180deg);
+      }
+
+      .repo-more-body {
+        padding: 0 10px 10px;
       }
 
       .expert-signals {
@@ -656,6 +789,57 @@
         overflow: hidden;
       }
 
+      .example-details {
+        margin-top: 12px;
+        border: 1px solid rgba(33, 181, 115, 0.18);
+        border-radius: 11px;
+        background: rgba(33, 181, 115, 0.035);
+        overflow: hidden;
+      }
+
+      .example-details summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 12px;
+        color: #176f4b;
+        list-style: none;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 850;
+      }
+
+      .example-details summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .example-details summary::after {
+        content: "⌄";
+        color: #176f4b;
+        transition: transform 0.18s ease;
+      }
+
+      .example-details[open] summary {
+        border-bottom: 1px solid rgba(33, 181, 115, 0.16);
+      }
+
+      .example-details[open] summary::after {
+        transform: rotate(180deg);
+      }
+
+      .example-details:not([open]) > :not(summary),
+      .repo-more-details:not([open]) > :not(summary),
+      .beginner-difficulty:not([open]) > :not(summary),
+      .usage-details:not([open]) > :not(summary) {
+        display: none;
+      }
+
+      .example-details .example-list {
+        margin: 0;
+        padding: 0 10px 10px;
+      }
+
       .example-list {
         display: grid;
         gap: 8px;
@@ -914,6 +1098,10 @@
         min-width: 96px;
       }
 
+      .repo-score-mobile {
+        display: none;
+      }
+
       .score {
         text-align: right;
       }
@@ -934,18 +1122,40 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
+        width: 100%;
         padding: 0 12px;
         border: 1px solid rgba(33, 181, 115, 0.4);
-        border-radius: 999px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.72);
         color: #157a4d;
         text-decoration: none;
         font-size: 0.82rem;
         font-weight: 800;
-        transition: background 0.18s ease;
+        cursor: pointer;
+        transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
       }
 
       .small-link:hover {
         background: rgba(33, 181, 115, 0.12);
+      }
+
+      .small-link.primary {
+        border-color: #163f31;
+        background: #163f31;
+        color: #ffffff;
+      }
+
+      .small-link.primary:hover {
+        background: #0f3025;
+      }
+
+      .small-link.secondary {
+        border-color: rgba(47, 127, 150, 0.28);
+        color: #1c6578;
+      }
+
+      button.small-link {
+        font: inherit;
       }
 
       .side-panel {
@@ -1014,9 +1224,91 @@
         color: #b23a2f;
       }
 
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #111714;
+          --panel: #17211d;
+          --panel-2: #1d2924;
+          --ink: #eef5ef;
+          --muted: #a7b8ae;
+          --line: rgba(214, 232, 219, 0.12);
+          --blue: #5da9be;
+          --green: #48b88c;
+          --amber: #d49a45;
+          --red: #e06f64;
+          --control: rgba(23, 33, 29, 0.88);
+          --shadow: 0 16px 34px rgba(0, 0, 0, 0.22);
+        }
+
+        body {
+          background:
+            linear-gradient(180deg, rgba(17, 23, 20, 0.99), rgba(21, 31, 27, 0.99) 58%, rgba(14, 18, 16, 0.99)),
+            repeating-linear-gradient(
+              90deg,
+              rgba(214, 232, 219, 0.035) 0,
+              rgba(214, 232, 219, 0.035) 1px,
+              transparent 1px,
+              transparent 88px
+            ),
+            var(--bg);
+        }
+
+        .metric,
+        .search input,
+        select,
+        .tabs,
+        .repo-kicker span,
+        .expert-signal-list a,
+        .expert-signal-list span,
+        .difficulty-item,
+        .generated-panel,
+        .example-media figure,
+        .small-link {
+          background: rgba(255, 255, 255, 0.055);
+        }
+
+        .description,
+        .detail-item p,
+        .expert-signals p,
+        .difficulty-item p,
+        .playbook-block ul,
+        .playbook-block ol,
+        .example p,
+        .generated-panel span,
+        .draft pre {
+          color: #c5d3cb;
+        }
+
+        .reason,
+        .expert-signals,
+        .usage-details,
+        .example-details,
+        .generated-example {
+          background: rgba(72, 184, 140, 0.08);
+        }
+
+        .detail-item,
+        .playbook-block,
+        .draft,
+        .example {
+          background: rgba(255, 255, 255, 0.045);
+        }
+
+        .brand-mark,
+        .tabs button[aria-selected="true"] {
+          color: #10211a;
+        }
+
+        .small-link.primary {
+          border-color: var(--green);
+          background: var(--green);
+          color: #10211a;
+        }
+      }
+
       @media (max-width: 1080px) {
         .summary-grid {
-          grid-template-columns: repeat(3, minmax(0, 1fr));
+          grid-template-columns: repeat(4, minmax(0, 1fr));
         }
 
         .content-layout {
@@ -1036,31 +1328,85 @@
 
         .topbar {
           position: static;
-          grid-template-columns: 1fr;
+          flex-direction: column;
+          align-items: flex-start;
         }
 
-        .summary-grid,
+        .topbar-note {
+          max-width: none;
+          text-align: left;
+        }
+
+        .summary-grid {
+          display: flex;
+          gap: 8px;
+          margin: 8px 0 10px;
+          overflow-x: auto;
+          padding-bottom: 2px;
+          scroll-snap-type: x proximity;
+        }
+
+        .metric {
+          flex: 0 0 132px;
+          min-height: 76px;
+          padding: 10px;
+          scroll-snap-align: start;
+        }
+
         .controls {
+          position: static;
           grid-template-columns: 1fr;
+          gap: 8px;
+          margin: 10px 0 12px;
+          padding: 8px;
+        }
+
+        .search {
+          grid-column: 1 / -1;
+        }
+
+        select {
+          min-width: 0;
         }
 
         .tabs {
+          width: 100%;
           grid-auto-flow: row;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 5px;
+          padding: 4px;
         }
 
         .tabs button {
-          min-width: 100%;
+          min-width: 0;
+          width: 100%;
         }
 
         .repo-row {
           grid-template-columns: 44px minmax(0, 1fr);
         }
 
-        .repo-score {
-          grid-column: 2;
-          justify-items: start;
+        .description {
+          display: -webkit-box;
+          overflow: hidden;
+          -webkit-line-clamp: 4;
+          -webkit-box-orient: vertical;
+        }
+
+        .repo-score-desktop {
+          display: none;
+        }
+
+        .repo-score-mobile {
+          display: grid;
           grid-template-columns: repeat(2, minmax(0, 1fr));
+          justify-items: start;
           width: 100%;
+          margin-top: 10px;
+        }
+
+        .repo-score-mobile .primary {
+          grid-column: 1 / -1;
         }
 
         .playbook {
@@ -1099,6 +1445,10 @@
             <p class="subtitle" id="subtitle">正在读取日报数据...</p>
           </div>
         </div>
+        <div class="topbar-note">
+          <strong>先判断值不值得点开</strong>
+          <span>把 README、热度、更新和上手难度压成中文卡片。</span>
+        </div>
       </header>
 
       <section class="summary-grid" id="summary" aria-label="今日概览"></section>
@@ -1107,6 +1457,7 @@
         <label class="search">
           <span>⌕</span>
           <input id="searchInput" type="search" placeholder="搜索用途、适合人群、关键词" autocomplete="off" />
+          <button id="clearSearch" class="clear-search" type="button" aria-label="清除搜索" hidden>×</button>
         </label>
         <select id="sortSelect" aria-label="排序">
           <option value="rank">按榜单排序</option>
@@ -1126,7 +1477,10 @@
       <section class="content-layout">
         <section class="list" aria-live="polite">
           <div class="list-header">
-            <h2 id="listTitle">大佬在看榜</h2>
+            <div class="list-heading">
+              <h2 id="listTitle">大佬在看榜</h2>
+              <p class="list-hint" id="listHint">先看早期信号，再点开项目确认能不能试。</p>
+            </div>
             <span class="count" id="resultCount">0 个项目</span>
           </div>
           <div class="repo-list" id="repoList"></div>
@@ -1157,8 +1511,11 @@
       const resultCount = $('#resultCount');
       const draftCount = $('#draftCount');
       const listTitle = $('#listTitle');
+      const listHint = $('#listHint');
       const subtitle = $('#subtitle');
       const summary = $('#summary');
+      const searchInput = $('#searchInput');
+      const clearSearch = $('#clearSearch');
 
       const featureText = {
         'AI Coding / Agent': 'AI 帮你写代码',
@@ -1974,6 +2331,12 @@
       };
 
       const shortDate = (value) => (value ? String(value).slice(0, 10) : '未知');
+      const shortCnDate = (value) => {
+        const date = shortDate(value);
+        const match = date.match(/^\d{4}-(\d{2})-(\d{2})$/);
+        if (!match) return date;
+        return `${Number(match[1])}月${Number(match[2])}日`;
+      };
 
       const stripEmoji = (value) =>
         String(value ?? '')
@@ -2484,6 +2847,43 @@
         });
       }
 
+      function repoKey(repo) {
+        return repo.full_name || repo.html_url || repo.name || '';
+      }
+
+      function homepageUrl(repo) {
+        const url = String(repo.homepage || '').trim();
+        if (!url || !/^https?:\/\//i.test(url)) return '';
+        return url;
+      }
+
+      function draftForRepo(repo) {
+        const key = repoKey(repo);
+        return collectDrafts(state.data || {}).find((draft) => repoKey(draft.repo) === key);
+      }
+
+      function updateSearchUi() {
+        clearSearch.hidden = !state.query;
+      }
+
+      async function copyText(text) {
+        try {
+          await navigator.clipboard.writeText(text);
+          return true;
+        } catch (error) {
+          const textarea = document.createElement('textarea');
+          textarea.value = text;
+          textarea.setAttribute('readonly', '');
+          textarea.style.position = 'fixed';
+          textarea.style.opacity = '0';
+          document.body.appendChild(textarea);
+          textarea.select();
+          const ok = document.execCommand('copy');
+          textarea.remove();
+          return ok;
+        }
+      }
+
       function rankingReason(repo, tabName = state.activeTab) {
         const features = repo.features?.length ? repo.features.map(toChineseFeature) : ['开发者效率'];
         if (tabName === 'frontier') {
@@ -2574,7 +2974,7 @@
           .at(-1);
 
         summary.innerHTML = [
-          ['日报日期', data.date || '未知', '今天的数据'],
+          ['日报日期', shortCnDate(data.date), '今天的数据'],
           ['候选项目', allRepos.length, '从 GitHub 找到的'],
           ['大佬在看', frontier.length, 'AI 圈早期信号'],
           ['产品灵感', productIdeas.length, '能拿来用或改造'],
@@ -2682,6 +3082,16 @@
         return filtered.sort((a, b) => a._rank - b._rank);
       }
 
+      function renderRepoActions(repo, demoUrl, draft, extraClass = '') {
+        return `
+          <div class="repo-score ${extraClass}">
+            <a class="small-link primary" href="${escapeHtml(repo.html_url)}" target="_blank" rel="noreferrer">打开 GitHub</a>
+            ${demoUrl ? `<a class="small-link secondary" href="${escapeHtml(demoUrl)}" target="_blank" rel="noreferrer">看演示/官网</a>` : ''}
+            ${draft ? `<button class="small-link" type="button" data-copy-repo="${escapeHtml(repoKey(repo))}">复制草稿</button>` : ''}
+          </div>
+        `;
+      }
+
       function renderRepos() {
         const repos = sortedRepos(getReposForTab());
         const titleMap = {
@@ -2691,11 +3101,19 @@
           all_time: '经典项目榜',
           drafts: '发帖草稿关联项目',
         };
+        const hintMap = {
+          frontier: '先看 AI 圈和技术圈的早期信号，适合找趋势和选题。',
+          product_ideas: '优先看能试、能改、能做内容的产品点子。',
+          rising: '按近期热度变化看正在被更多人发现的项目。',
+          all_time: '适合补课和找经典案例，热度高但不一定最新。',
+          drafts: '这些项目已经被整理成小红书草稿，可以直接复制再改。',
+        };
         listTitle.textContent = titleMap[state.activeTab];
+        listHint.textContent = `${hintMap[state.activeTab]}${state.query ? ` 当前搜索：${state.query}` : ''}`;
         resultCount.textContent = `${repos.length} 个项目`;
 
         if (!repos.length) {
-          repoList.innerHTML = '<div class="empty">没有匹配的项目。</div>';
+          repoList.innerHTML = '<div class="empty">没有匹配的项目。可以换一个关键词，或点右侧清除搜索。</div>';
           return;
         }
 
@@ -2706,53 +3124,33 @@
             const details = projectDetails(repo);
             const edge = projectEdgeText[repo.full_name];
             const friendlyName = displayProjectName(repo);
+            const examples = renderExampleBlocks(repo);
+            const demoUrl = homepageUrl(repo);
+            const draft = draftForRepo(repo);
             return `
               <article class="repo-row">
                 <div class="rank">${String(repo._rank).padStart(2, '0')}</div>
                 <div class="repo-main">
+                  <p class="repo-kicker">
+                    <span>${escapeHtml(repo.full_name || repo.name || 'GitHub 项目')}</span>
+                    ${repo.language ? `<span>${escapeHtml(repo.language)}</span>` : ''}
+                    <span>${compact(repo.stars)} 人收藏</span>
+                    <span>${escapeHtml(freshnessText(repo))}</span>
+                  </p>
                   <h3 class="repo-title">
                     <span class="repo-name">${escapeHtml(friendlyName || `项目 ${repo._rank}`)}</span>
                     <span class="badge">${escapeHtml(heatBadge(repo))}</span>
                   </h3>
                   <p class="description">${escapeHtml(toChineseIntro(repo))}</p>
-                  ${renderExampleBlocks(repo)}
-                  <div class="detail-grid">
-                    <section class="detail-item">
-                      <strong>这是什么</strong>
-                      <p>${escapeHtml(details.what)}</p>
-                    </section>
-                    <section class="detail-item">
-                      <strong>能帮你做什么</strong>
-                      <p>${escapeHtml(details.canDo)}</p>
-                    </section>
-                    <section class="detail-item">
-                      <strong>适合谁</strong>
-                      <p>${escapeHtml(details.who)}</p>
-                    </section>
-                  </div>
-                  ${renderExpertSignals(repo)}
-                  ${renderDifficultyBlock(repo)}
-                  <details class="usage-details">
-                    <summary class="usage-summary">点开看具体怎么用</summary>
-                    <div class="playbook">
-                      <section class="playbook-block">
-                        <h4>可以怎么用</h4>
-                        <ul>
-                          ${playbook.scenarios.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
-                        </ul>
-                      </section>
-                      <section class="playbook-block">
-                        <h4>上手步骤</h4>
-                        <ol>
-                          ${playbook.steps.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
-                        </ol>
-                      </section>
-                    </div>
-                  </details>
-                  ${edge ? `<section class="edge">
-                    <h4>它强在哪？为什么 Codex、Claude Code 替不了</h4>
-                    <ul>${edge.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
-                  </section>` : ''}
+                  ${renderRepoActions(repo, demoUrl, draft, 'repo-score-mobile')}
+                  ${
+                    examples
+                      ? `<details class="example-details">
+                          <summary>看截图和 README 示例</summary>
+                          ${examples}
+                        </details>`
+                      : ''
+                  }
                   <div class="features">
                     ${features.map((feature) => `<span>${escapeHtml(feature)}</span>`).join('')}
                   </div>
@@ -2760,10 +3158,50 @@
                     <span>${compact(repo.stars)} 人收藏</span>
                     <span>${escapeHtml(freshnessText(repo))}</span>
                   </div>
+                  <details class="repo-more-details">
+                    <summary class="repo-more-summary">看判断详情、难度和用法</summary>
+                    <div class="repo-more-body">
+                      <div class="detail-grid">
+                        <section class="detail-item">
+                          <strong>这是什么</strong>
+                          <p>${escapeHtml(details.what)}</p>
+                        </section>
+                        <section class="detail-item">
+                          <strong>能帮你做什么</strong>
+                          <p>${escapeHtml(details.canDo)}</p>
+                        </section>
+                        <section class="detail-item">
+                          <strong>适合谁</strong>
+                          <p>${escapeHtml(details.who)}</p>
+                        </section>
+                      </div>
+                      ${renderExpertSignals(repo)}
+                      ${renderDifficultyBlock(repo)}
+                      <details class="usage-details">
+                        <summary class="usage-summary">点开看具体怎么用</summary>
+                        <div class="playbook">
+                          <section class="playbook-block">
+                            <h4>可以怎么用</h4>
+                            <ul>
+                              ${playbook.scenarios.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
+                            </ul>
+                          </section>
+                          <section class="playbook-block">
+                            <h4>上手步骤</h4>
+                            <ol>
+                              ${playbook.steps.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
+                            </ol>
+                          </section>
+                        </div>
+                      </details>
+                      ${edge ? `<section class="edge">
+                        <h4>它强在哪？为什么 Codex、Claude Code 替不了</h4>
+                        <ul>${edge.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
+                      </section>` : ''}
+                    </div>
+                  </details>
                 </div>
-                <div class="repo-score">
-                  <a class="small-link" href="${escapeHtml(repo.html_url)}" target="_blank" rel="noreferrer">去看看 ↗</a>
-                </div>
+                ${renderRepoActions(repo, demoUrl, draft, 'repo-score-desktop')}
               </article>
             `;
           })
@@ -2824,8 +3262,25 @@
         });
       });
 
-      $('#searchInput').addEventListener('input', (event) => {
+      searchInput.addEventListener('input', (event) => {
         state.query = event.target.value.trim().toLowerCase();
+        updateSearchUi();
+        renderRepos();
+      });
+
+      searchInput.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape' || !state.query) return;
+        state.query = '';
+        searchInput.value = '';
+        updateSearchUi();
+        renderRepos();
+      });
+
+      clearSearch.addEventListener('click', () => {
+        state.query = '';
+        searchInput.value = '';
+        updateSearchUi();
+        searchInput.focus();
         renderRepos();
       });
 
@@ -2834,13 +3289,27 @@
         renderRepos();
       });
 
+      repoList.addEventListener('click', async (event) => {
+        const button = event.target.closest('button[data-copy-repo]');
+        if (!button) return;
+        const drafts = collectDrafts(state.data || {});
+        const draft = drafts.find((item) => repoKey(item.repo) === button.dataset.copyRepo);
+        if (!draft) return;
+        const oldText = button.textContent;
+        const copied = await copyText(draft.text);
+        button.textContent = copied ? '已复制' : '复制失败';
+        setTimeout(() => {
+          button.textContent = oldText;
+        }, 1400);
+      });
+
       draftList.addEventListener('click', async (event) => {
         const button = event.target.closest('button[data-copy]');
         if (!button) return;
         const drafts = collectDrafts(state.data || {});
         const draft = drafts.find((item) => String(item.index) === button.dataset.copy);
         if (!draft) return;
-        await navigator.clipboard.writeText(draft.text);
+        await copyText(draft.text);
         const oldText = button.querySelector('span').textContent;
         button.querySelector('span').textContent = '已复制';
         setTimeout(() => {
@@ -2848,6 +3317,7 @@
         }, 1200);
       });
 
+      updateSearchUi();
       loadData();
     </script>
   </body>
