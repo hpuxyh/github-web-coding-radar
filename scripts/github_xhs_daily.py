@@ -7,12 +7,14 @@ import argparse
 import base64
 import datetime as dt
 import html
+import http.client
 import json
 import math
 import os
 import re
 import shutil
 import socket
+import subprocess
 import sys
 import time
 import urllib.error
@@ -265,20 +267,54 @@ class GitHubClient:
 
         headers = {
             "Accept": accept,
+            "Accept-Encoding": "identity",
+            "Connection": "close",
             "User-Agent": USER_AGENT,
             "X-GitHub-Api-Version": "2022-11-28",
         }
         if self.token:
             headers["Authorization"] = f"Bearer {self.token}"
 
-        req = urllib.request.Request(url, headers=headers)
         last_error: Exception | None = None
         for attempt in range(self.retries + 1):
             try:
-                with urllib.request.urlopen(req, timeout=self.timeout_seconds) as resp:
-                    self._last_request_at = time.monotonic()
-                    payload = resp.read().decode("utf-8")
-                    return json.loads(payload)
+                cmd = [
+                    "curl",
+                    "--http1.1",
+                    "-L",
+                    "-sS",
+                    "--retry",
+                    str(self.retries),
+                    "--retry-all-errors",
+                    "--connect-timeout",
+                    str(min(20.0, self.timeout_seconds)),
+                    "--max-time",
+                    str(self.timeout_seconds),
+                    "-w",
+                    "\n%{http_code}",
+                ]
+                for key, value in headers.items():
+                    cmd.extend(["-H", f"{key}: {value}"])
+                cmd.append(url)
+                completed = subprocess.run(cmd, capture_output=True, text=True, check=False)
+                self._last_request_at = time.monotonic()
+                if completed.returncode != 0:
+                    raise urllib.error.URLError(completed.stderr.strip() or f"curl exit {completed.returncode}")
+                body, status_text = completed.stdout.rsplit("\n", 1)
+                status = int(status_text)
+                if status >= 400:
+                    reset_text = ""
+                    message = f"GitHub API error {status} for {url}: {body[:500]}{reset_text}"
+                    if status not in {429, 500, 502, 503, 504} or attempt >= self.retries:
+                        raise GithubApiError(message)
+                    last_error = GithubApiError(message)
+                else:
+                    try:
+                        return json.loads(body)
+                    except json.JSONDecodeError as exc:
+                        last_error = exc
+                        if attempt >= self.retries:
+                            raise GithubApiError(f"Invalid JSON response for {url}: {exc}") from exc
             except urllib.error.HTTPError as exc:
                 self._last_request_at = time.monotonic()
                 body = exc.read().decode("utf-8", errors="replace")
@@ -291,7 +327,7 @@ class GitHubClient:
                 if exc.code not in {429, 500, 502, 503, 504} or attempt >= self.retries:
                     raise GithubApiError(message) from exc
                 last_error = GithubApiError(message)
-            except (urllib.error.URLError, TimeoutError, socket.timeout) as exc:
+            except (urllib.error.URLError, TimeoutError, socket.timeout, http.client.IncompleteRead) as exc:
                 self._last_request_at = time.monotonic()
                 last_error = exc
                 if attempt >= self.retries:
@@ -1478,7 +1514,11 @@ def collect_repositories(
     ]:
         for template in queries:
             query = render_query(template, run_date)
-            items = client.search_repositories(query, per_page=per_page, pages=pages)
+            try:
+                items = client.search_repositories(query, per_page=per_page, pages=pages)
+            except GithubApiError as exc:
+                print(f"Search skipped for {section}: {query} ({exc})", file=sys.stderr)
+                continue
             for item in items:
                 repo = normalize_repo(item, section, query)
                 if not repo.get("full_name"):
