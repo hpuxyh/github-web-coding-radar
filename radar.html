@@ -1676,6 +1676,8 @@
           '网站规格说明：覆盖 HTML、可访问性、安全、搜索优化和智能体就绪度，平台无关、有来源，采用 MIT 协议。',
         'withkynam/vibecode-pro-max-kit':
           '给会遗忘的人工智能准备的记忆系统。面向氛围编程者、产品负责人、CEO 和实际构建者的规格驱动编码工作台，包含自改进上下文记忆、12 个智能体和 32 个技能，用来减少上下文腐化并交付功能。支持 Claude Code 与 Codex，适配任意技术栈。',
+        'DietrichGebert/ponytail':
+          '一个给 Claude Code、Cursor 等 AI 编程助手用的技能/规则包。它让 AI 像“懒但有经验的资深工程师”一样少写没必要的代码，优先用更简单的原生方案解决问题，从而减少代码量、模型消耗、成本和耗时，同时保留安全检查。',
         'alibaba/open-code-review':
           '阿里巴巴规模验证过的代码评审工具：混合架构把确定性流水线与大语言模型智能体结合，支持精确到行的评论，内置微调规则集（空指针、线程安全、跨站脚本、SQL 注入），兼容 OpenAI 与 Anthropic。',
         'AgriciDaniel/claude-obsidian':
@@ -2153,6 +2155,11 @@
           canDo: '可以看到一次改代码、写测试、生成页面分别花了多少模型额度和多少钱。',
           who: '适合经常用 AI 写代码、担心成本失控的人或团队。',
         },
+        'DietrichGebert/ponytail': {
+          what: '一个让 AI 编程助手少写冗余代码、少过度设计的技能包。',
+          canDo: '可以给 Claude Code、Cursor 等工具加一套“先用最简单可行方案”的规则，让 AI 改代码时更少引入没必要的依赖、组件和复杂封装。',
+          who: '适合重度用 AI 写代码的人，尤其是想减少代码膨胀、token 消耗和后续维护成本的开发者。',
+        },
         'rtk-ai/rtk': {
           what: '一个帮你减少 AI 使用费用的命令行工具。',
           canDo: '它会优化一些开发命令，让同样的 AI 编程任务少消耗模型额度。',
@@ -2338,7 +2345,44 @@
         if (repoIntroText[repo.full_name]) return repoIntroText[repo.full_name];
         const fallback = repo.description || repo.readme_excerpt || '';
         if (/[\u4e00-\u9fff]/.test(fallback)) return fallback;
+        const generated = generatedChineseIntro(repo);
+        if (generated) return generated;
         return '这个项目还没有整理成小白版说明，可以先点开仓库看原始介绍。';
+      }
+
+      function generatedChineseIntro(repo) {
+        const source = stripEmoji(repo.description || repo.readme_excerpt || '')
+          .replace(/\s+/g, ' ')
+          .trim();
+        if (!source) return '';
+
+        const text = repoSignalText(repo);
+        if (/ponytail|laziest senior dev|code you never wrote|yagni/.test(text)) {
+          return '一个给 AI 编程助手用的“少写冗余代码”技能包。它让 AI 优先选择简单、原生、必要的实现，目标是少写代码、少花 token、少花时间，同时不牺牲安全检查。';
+        }
+
+        if (friendlyProjectNameText[repo.full_name]) {
+          const safeName = safeProjectKind(repo);
+          return `${safeName}。GitHub 上已有原始介绍和 README 信息，页面先按项目标题、截图、功能标签和最近更新帮你判断是否值得点开。`;
+        }
+
+        const featureLabels = (repo.features || []).map((feature) => toChineseFeature(feature)).filter(Boolean);
+        const safeName = safeProjectKind(repo);
+        const focus = featureLabels.length ? featureLabels.slice(0, 2).join('、') : safeName;
+
+        if (/\b(awesome|curated|directory|list|roadmap|resources)\b/.test(text)) {
+          return `一个围绕「${focus}」整理的资源合集，适合先当资料库查找同类工具、教程和可复用方案。`;
+        }
+        if (/\b(agent|agentic|coding agent|claude code|cursor|codex|plugin|skill|prompt|rule)\b/.test(text)) {
+          return `一个围绕「${focus}」的开发者工具，主要帮助 AI 更稳定地读代码、改代码或执行开发任务。`;
+        }
+        if (/\b(workflow|automation|no-code|low-code|visual canvas)\b/.test(text)) {
+          return `一个围绕「${focus}」的工作流工具，适合把重复任务、AI 能力和外部工具串起来做自动化。`;
+        }
+        if (/\b(prototype|design|ui|html|wireframe|deck|slide)\b/.test(text)) {
+          return `一个围绕「${focus}」的原型/设计工具，适合先看 README 截图和演示，判断能不能改造成页面、封面或产品原型。`;
+        }
+        return `${safeName}。GitHub 描述显示它主要和「${focus}」有关，适合先结合 README 截图、原始介绍和最近提交判断是否值得试。`;
       }
 
       function projectDetails(repo) {
@@ -2746,6 +2790,14 @@
           .replace(/\s+/g, ' ')
           .trim();
         return raw || '开源项目';
+      }
+
+      function safeProjectKind(repo) {
+        if (friendlyProjectNameText[repo.full_name]) return friendlyProjectNameText[repo.full_name];
+        const featureName = featureBasedName(repo);
+        if (featureName !== '值得看看的一款工具') return featureName;
+        const name = humanizedRepoName(repo);
+        return /[\u4e00-\u9fff]/.test(name) ? name : `${name} 项目`;
       }
 
       function keywordBasedName(repo) {
