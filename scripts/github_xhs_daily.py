@@ -1539,6 +1539,55 @@ def collect_repositories(
     return list(merged.values())
 
 
+def load_previous_readme_assets(path: Path) -> dict[str, dict[str, Any]]:
+    if not path.exists():
+        return {}
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+    assets: dict[str, dict[str, Any]] = {}
+    for section in ["all_repos", "frontier", "product_ideas", "all_time", "rising", "xhs_repos"]:
+        for repo in payload.get(section) or []:
+            full_name = repo.get("full_name")
+            if not full_name:
+                continue
+            current = assets.setdefault(full_name, {})
+            if repo.get("readme_excerpt") and not current.get("readme_excerpt"):
+                current["readme_excerpt"] = repo["readme_excerpt"]
+            examples = repo.get("examples")
+            if isinstance(examples, list) and examples and not current.get("examples"):
+                current["examples"] = examples
+    return assets
+
+
+def restore_previous_readme_assets(
+    repos: list[dict[str, Any]],
+    previous_assets: dict[str, dict[str, Any]],
+    history: dict[str, Any],
+    run_date: dt.date,
+) -> int:
+    restored = 0
+    for repo in repos:
+        previous = previous_assets.get(repo["full_name"])
+        if not previous:
+            continue
+
+        changed = False
+        if not repo.get("readme_excerpt") and previous.get("readme_excerpt"):
+            repo["readme_excerpt"] = previous["readme_excerpt"]
+            changed = True
+        if not repo.get("examples") and previous.get("examples"):
+            repo["examples"] = previous["examples"]
+            changed = True
+        if changed:
+            repo["features"] = infer_features(repo)
+            score_repo(repo, history, run_date)
+            restored += 1
+    return restored
+
+
 def enrich_repositories(
     client: GitHubClient,
     repos: list[dict[str, Any]],
@@ -1687,6 +1736,12 @@ def run(args: argparse.Namespace) -> int:
     history = load_history(paths.data_path)
     repos = collect_repositories(client, config, run_date)
     enrich_repositories(client, repos, config, history, run_date)
+    restored_readme_assets = restore_previous_readme_assets(
+        repos,
+        load_previous_readme_assets(paths.output_dir / "latest.json"),
+        history,
+        run_date,
+    )
     frontier, product_ideas, all_time, rising, xhs_repos = select_rankings(repos, config)
     update_history(paths.data_path, history, repos, run_date)
     markdown_path, json_path = write_outputs(
@@ -1701,6 +1756,8 @@ def run(args: argparse.Namespace) -> int:
     print(f"All-time ranking: {len(all_time)}")
     print(f"Rising ranking: {len(rising)}")
     print(f"XHS drafts: {len(xhs_repos)}")
+    if restored_readme_assets:
+        print(f"Restored README assets from previous run: {restored_readme_assets}")
     expert_summary = summarize_expert_sources(repos, config)
     if expert_summary["enabled"]:
         print(

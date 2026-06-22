@@ -1,5 +1,7 @@
 import datetime as dt
+import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -256,6 +258,61 @@ MIT
         self.assertGreater(repo["scores"]["rising"], 0)
         self.assertGreater(repo["scores"]["frontier"], 0)
         self.assertGreater(repo["scores"]["product"], 0)
+
+    def test_restore_previous_readme_assets_preserves_images(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            latest_path = Path(tmpdir) / "latest.json"
+            latest_path.write_text(
+                json.dumps(
+                    {
+                        "all_repos": [
+                            {
+                                "full_name": "demo/project",
+                                "readme_excerpt": "AI coding agent creates videos from HTML.",
+                                "examples": [
+                                    {
+                                        "title": "Quick start",
+                                        "body": "",
+                                        "code": "",
+                                        "images": [
+                                            {
+                                                "url": "https://raw.githubusercontent.com/demo/project/main/hero.png",
+                                                "alt": "Hero screenshot",
+                                            }
+                                        ],
+                                        "source": "README",
+                                    }
+                                ],
+                            }
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            repo = {
+                "full_name": "demo/project",
+                "description": "",
+                "readme_excerpt": "",
+                "examples": [],
+                "topics": [],
+                "features": [],
+                "stars": 100,
+                "forks": 10,
+                "open_issues": 1,
+                "created_at": "2026-05-01T00:00:00Z",
+                "pushed_at": "2026-06-04T00:00:00Z",
+                "expert_signals": [],
+            }
+
+            assets = daily.load_previous_readme_assets(latest_path)
+            restored = daily.restore_previous_readme_assets([repo], assets, {"repos": {}}, dt.date(2026, 6, 5))
+
+        self.assertEqual(restored, 1)
+        self.assertEqual(repo["readme_excerpt"], "AI coding agent creates videos from HTML.")
+        self.assertEqual(repo["examples"][0]["images"][0]["alt"], "Hero screenshot")
+        self.assertIn("AI Coding / Agent", repo["features"])
+        self.assertGreater(repo["scores"]["frontier"], 0)
 
     def test_build_markdown_contains_required_sections(self):
         run_date = dt.date(2026, 6, 5)
