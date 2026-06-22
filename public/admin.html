@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>访问统计后台</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f5f7f2;
+        --panel: #ffffff;
+        --ink: #1f2d28;
+        --muted: #6c7d76;
+        --line: rgba(24, 60, 44, 0.12);
+        --green: #107c5b;
+        --blue: #2f7f96;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+      }
+
+      main {
+        width: min(1120px, calc(100vw - 32px));
+        margin: 0 auto;
+        padding: 28px 0 48px;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: flex-end;
+        margin-bottom: 18px;
+      }
+
+      h1 {
+        margin: 0 0 6px;
+        font-size: 28px;
+      }
+
+      p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      button,
+      input,
+      select {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+        color: var(--ink);
+        font: inherit;
+        min-height: 38px;
+      }
+
+      button {
+        padding: 0 14px;
+        cursor: pointer;
+        font-weight: 700;
+      }
+
+      input,
+      select {
+        padding: 0 10px;
+      }
+
+      .login,
+      .panel,
+      .metric {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        box-shadow: 0 10px 24px rgba(31, 70, 50, 0.06);
+      }
+
+      .login {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        padding: 16px;
+        margin-bottom: 18px;
+      }
+
+      .login input {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .metric {
+        padding: 16px;
+      }
+
+      .metric span {
+        display: block;
+        color: var(--muted);
+        font-size: 13px;
+        margin-bottom: 8px;
+      }
+
+      .metric strong {
+        font-size: 30px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+
+      .panel {
+        overflow: hidden;
+      }
+
+      .panel h2 {
+        margin: 0;
+        padding: 14px 16px;
+        font-size: 17px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 11px 16px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      td.num {
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+
+      .toolbar {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .error {
+        margin-bottom: 14px;
+        color: #b34036;
+        font-weight: 700;
+      }
+
+      .wide {
+        grid-column: 1 / -1;
+      }
+
+      @media (max-width: 760px) {
+        main {
+          width: min(100vw - 20px, 1120px);
+          padding-top: 18px;
+        }
+
+        header,
+        .login,
+        .toolbar {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .metrics,
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        table {
+          display: block;
+          overflow-x: auto;
+          white-space: nowrap;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <h1>访问统计后台</h1>
+          <p id="status">统计从接入后开始记录，访客人数按浏览器随机 ID 粗略去重。</p>
+        </div>
+        <div class="toolbar">
+          <select id="days">
+            <option value="7">近 7 天</option>
+            <option value="30" selected>近 30 天</option>
+            <option value="90">近 90 天</option>
+          </select>
+          <button id="refresh" type="button">刷新</button>
+        </div>
+      </header>
+
+      <section class="login" id="login">
+        <input id="key" type="password" placeholder="输入后台访问密钥" autocomplete="current-password" />
+        <button id="saveKey" type="button">进入后台</button>
+      </section>
+
+      <div class="error" id="error" hidden></div>
+
+      <section class="metrics">
+        <article class="metric"><span>总访问次数 PV</span><strong id="totalPv">-</strong></article>
+        <article class="metric"><span>总访客数 UV</span><strong id="totalUv">-</strong></article>
+        <article class="metric"><span>今日访问次数</span><strong id="todayPv">-</strong></article>
+        <article class="metric"><span>今日访客数</span><strong id="todayUv">-</strong></article>
+      </section>
+
+      <section class="grid">
+        <article class="panel">
+          <h2>按天统计</h2>
+          <table>
+            <thead><tr><th>日期</th><th>PV</th><th>UV</th></tr></thead>
+            <tbody id="daily"></tbody>
+          </table>
+        </article>
+        <article class="panel">
+          <h2>按页面统计</h2>
+          <table>
+            <thead><tr><th>页面</th><th>PV</th><th>UV</th></tr></thead>
+            <tbody id="paths"></tbody>
+          </table>
+        </article>
+        <article class="panel">
+          <h2>按地区统计</h2>
+          <table>
+            <thead><tr><th>地区</th><th>PV</th><th>UV</th></tr></thead>
+            <tbody id="countries"></tbody>
+          </table>
+        </article>
+        <article class="panel wide">
+          <h2>最近访问</h2>
+          <table>
+            <thead><tr><th>时间</th><th>页面</th><th>地区</th><th>来源</th></tr></thead>
+            <tbody id="recent"></tbody>
+          </table>
+        </article>
+      </section>
+    </main>
+
+    <script>
+      const storageKey = 'radar_admin_key';
+      const keyInput = document.getElementById('key');
+      const errorBox = document.getElementById('error');
+      const login = document.getElementById('login');
+      const daysSelect = document.getElementById('days');
+      const params = new URLSearchParams(location.search);
+      const keyFromUrl = params.get('key');
+      if (keyFromUrl) {
+        localStorage.setItem(storageKey, keyFromUrl);
+        history.replaceState(null, '', location.pathname);
+      }
+      keyInput.value = localStorage.getItem(storageKey) || '';
+
+      function text(value) {
+        return value === undefined || value === null || value === '' ? '-' : String(value);
+      }
+
+      function escapeHtml(value) {
+        return text(value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function num(value) {
+        return Number(value || 0).toLocaleString('zh-CN');
+      }
+
+      function renderRows(id, rows, columns) {
+        const body = document.getElementById(id);
+        body.innerHTML = rows.length
+          ? rows
+              .map(
+                (row) =>
+                  `<tr>${columns
+                    .map((column) => `<td class="${column.num ? 'num' : ''}">${column.num ? num(row[column.key]) : escapeHtml(row[column.key])}</td>`)
+                    .join('')}</tr>`,
+              )
+              .join('')
+          : '<tr><td colspan="4">暂无数据</td></tr>';
+      }
+
+      function formatTime(ts) {
+        return new Date(Number(ts || 0)).toLocaleString('zh-CN', { hour12: false });
+      }
+
+      async function loadStats() {
+        const key = localStorage.getItem(storageKey) || keyInput.value.trim();
+        if (!key) return;
+        errorBox.hidden = true;
+        const response = await fetch(`/api/stats?days=${encodeURIComponent(daysSelect.value)}`, {
+          headers: { authorization: `Bearer ${key}` },
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data.ok) {
+          errorBox.textContent = response.status === 401 ? '密钥不对，重新输入一下。' : `读取失败：${data.error || response.status}`;
+          errorBox.hidden = false;
+          return;
+        }
+        login.hidden = true;
+        document.getElementById('status').textContent = `最近更新：${new Date(data.generatedAt).toLocaleString('zh-CN', { hour12: false })}，时区：${data.timezone}`;
+        document.getElementById('totalPv').textContent = num(data.total.pageviews);
+        document.getElementById('totalUv').textContent = num(data.total.visitors);
+        document.getElementById('todayPv').textContent = num(data.today.pageviews);
+        document.getElementById('todayUv').textContent = num(data.today.visitors);
+        renderRows('daily', data.daily, [
+          { key: 'day' },
+          { key: 'pageviews', num: true },
+          { key: 'visitors', num: true },
+        ]);
+        renderRows('paths', data.paths, [
+          { key: 'path' },
+          { key: 'pageviews', num: true },
+          { key: 'visitors', num: true },
+        ]);
+        renderRows('countries', data.countries, [
+          { key: 'country' },
+          { key: 'pageviews', num: true },
+          { key: 'visitors', num: true },
+        ]);
+        renderRows(
+          'recent',
+          data.recent.map((row) => ({ ...row, time: formatTime(row.ts), referrer: row.referrer || '-' })),
+          [{ key: 'time' }, { key: 'path' }, { key: 'country' }, { key: 'referrer' }],
+        );
+      }
+
+      document.getElementById('saveKey').addEventListener('click', () => {
+        const key = keyInput.value.trim();
+        if (key) localStorage.setItem(storageKey, key);
+        loadStats();
+      });
+      document.getElementById('refresh').addEventListener('click', loadStats);
+      daysSelect.addEventListener('change', loadStats);
+      loadStats();
+    </script>
+  </body>
+</html>
