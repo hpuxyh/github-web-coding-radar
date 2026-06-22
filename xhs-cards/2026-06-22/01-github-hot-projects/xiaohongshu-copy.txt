@@ -1,0 +1,100 @@
+GitHub 爆火项目榜：15 个项目一句话看懂
+
+最近刷 GitHub，整理了一期比较值得看的开源项目。
+
+不是单纯按 Star 排名，我更关心的是：
+最近有没有人在看、解决的问题是不是清楚、普通人能不能一句话理解它的价值。
+
+这一期集中在 AI 编程、Agent、设计工具、API 工具和开发效率。
+
+收藏 = GitHub Star
+热度 = 近 17 天新增 Star
+链接放在每个项目后面，想看的可以复制打开。
+
+01｜open-design
+一句话看懂：不会设计、不会前端，也能让 Agent 帮你做网页、原型、PPT 和海报。
+收藏：68,493 Star｜热度：+9,560
+链接：https://github.com/nexu-io/open-design
+
+02｜ECC
+一句话看懂：给 Claude Code / Codex 加一套工作习惯，让它更懂规则、记得流程。
+收藏：219,168 Star｜热度：+11,756
+链接：https://github.com/affaan-m/ECC
+
+03｜DeepSeek-Reasonix
+一句话看懂：让 DeepSeek 在终端里长时间帮你改代码，主打低成本长会话。
+收藏：23,522 Star｜热度：+5,398
+链接：https://github.com/esengine/DeepSeek-Reasonix
+
+04｜rtk
+一句话看懂：把命令输出、测试日志压缩后再给 AI 看，省 Token，也省上下文。
+收藏：64,481 Star｜热度：+5,557
+链接：https://github.com/rtk-ai/rtk
+
+05｜html-anything
+一句话看懂：把草稿直接变成 HTML 页面、小红书图文、报告和原型。
+收藏：7,067 Star｜热度：+987
+链接：https://github.com/nexu-io/html-anything
+
+06｜awesome-claude-skills
+一句话看懂：想研究 Claude Skills 和 Agent 插件生态，可以从这个资源库开始。
+收藏：65,417 Star｜热度：+2,136
+链接：https://github.com/ComposioHQ/awesome-claude-skills
+
+07｜AutoGPT
+一句话看懂：老牌自主 Agent 项目，适合补课“AI 怎么自己拆任务、跑流程”。
+收藏：185,057 Star｜热度：+289
+链接：https://github.com/Significant-Gravitas/AutoGPT
+
+08｜OpenHands
+一句话看懂：开源版 AI 软件工程师，能读项目、改代码、跑命令。
+收藏：77,906 Star｜热度：+2,041
+链接：https://github.com/OpenHands/OpenHands
+
+09｜hoppscotch
+一句话看懂：开源 API 工作台，可以理解成 Postman / Insomnia 的开放替代。
+收藏：79,598 Star｜热度：+174
+链接：https://github.com/hoppscotch/hoppscotch
+
+10｜puppeteer
+一句话看懂：用 JavaScript 控制浏览器，适合自动化、测试、截图和网页任务。
+收藏：95,181 Star｜热度：+754
+链接：https://github.com/puppeteer/puppeteer
+
+11｜bruno
+一句话看懂：本地优先的 API IDE，可以把接口调试集合放进 Git 管理。
+收藏：45,051 Star｜热度：+361
+链接：https://github.com/usebruno/bruno
+
+12｜semble
+一句话看懂：给 AI Agent 用的代码搜索，让它少读无关代码，少浪费上下文。
+收藏：5,337 Star｜热度：+505
+链接：https://github.com/MinishLab/semble
+
+13｜vibecode-pro-max-kit
+一句话看懂：解决 AI 编程里“上下文老是忘”的问题，适合长期做项目。
+收藏：957 Star｜热度：+177
+链接：https://github.com/withkynam/vibecode-pro-max-kit
+
+14｜streamlit
+一句话看懂：把 Python 脚本快速变成可以分享的数据 App。
+收藏：45,022 Star｜热度：+194
+链接：https://github.com/streamlit/streamlit
+
+15｜awesome-agentic-ai-zh
+一句话看懂：中文 Agentic AI 学习路线图，从 LLM 基础一路学到多 Agent。
+收藏：3,117 Star｜热度：+1,229
+链接：https://github.com/WenyuChiou/awesome-agentic-ai-zh
+
+我自己的感觉是：
+AI 编程现在已经不只是“帮你写代码”了。
+
+这批项目更像是在往几个方向扩散：
+做设计、记流程、省 Token、管接口、自动操作浏览器、整理学习路线。
+
+如果只挑 3 个先看，我会先看：
+open-design、rtk、OpenHands。
+
+一个偏结果展示，一个偏成本效率，一个偏 AI 软件工程师。
+
+#GitHub #开源项目 #AI工具 #AI编程 #ClaudeCode #Codex #Agent #程序员工具 #效率工具 #技术趋势

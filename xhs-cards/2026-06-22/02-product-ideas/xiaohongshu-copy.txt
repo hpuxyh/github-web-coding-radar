@@ -1,0 +1,98 @@
+GitHub 产品灵感榜：15 个能拆成产品点子的开源项目
+
+最近整理 GitHub 的时候，我把这一组单独拎出来了。
+
+它们不一定都是最老牌的项目，但有一个共同点：
+看完之后，很容易联想到一个产品方向、内容选题，或者自己能不能也做一个小工具。
+
+收藏 = GitHub Star
+热度 = 近 17 天新增 Star
+链接可以复制到浏览器打开。
+
+01｜html-video
+一句话看懂：不用剪辑软件，也能让 Agent 批量做讲解视频和数据视频。
+收藏：3,392 Star｜热度：+2,674
+链接：https://github.com/nexu-io/html-video
+
+02｜guizang-ppt-skill
+一句话看懂：不用从空白 PPT 开始，先让 AI 出一版能看的高级排版。
+收藏：18,295 Star｜热度：+3,240
+链接：https://github.com/op7418/guizang-ppt-skill
+
+03｜open-codesign
+一句话看懂：不用依赖单一平台，也能本地做 AI 设计和原型输出。
+收藏：6,905 Star｜热度：+245
+链接：https://github.com/OpenCoworkAI/open-codesign
+
+04｜Files
+一句话看懂：默认文件管理器不好用时，换一个更现代的文件工作台。
+收藏：43,988 Star｜热度：+209
+链接：https://github.com/files-community/Files
+
+05｜career-ops
+一句话看懂：把投简历、改简历、生成 PDF、追踪岗位这些碎活交给 AI 系统。
+收藏：55,028 Star｜热度：+6,300
+链接：https://github.com/santifer/career-ops
+
+06｜guizang-social-card-skill
+一句话看懂：不会排版，也能快速做一组小红书图文和公众号封面。
+收藏：3,840 Star｜热度：暂无新增数据
+链接：https://github.com/op7418/guizang-social-card-skill
+
+07｜designer-skills
+一句话看懂：AI 设计结果太随机时，用 Skill 约束它的步骤和审美方向。
+收藏：355 Star｜热度：+137
+链接：https://github.com/julianoczkowski/designer-skills
+
+08｜Observal
+一句话看懂：AI 开发组件太散时，用一个平台统一展示、分析和共享。
+收藏：2,104 Star｜热度：暂无新增数据
+链接：https://github.com/BlazeUp-AI/Observal
+
+09｜omnigent
+一句话看懂：不同 Agent 工具各自为政时，用它统一策略、沙盒和协作。
+收藏：4,280 Star｜热度：暂无新增数据
+链接：https://github.com/omnigent-ai/omnigent
+
+10｜baoyu-design
+一句话看懂：不用打开 claude.ai/design，也能在本地生成高质量 UI mockup。
+收藏：1,705 Star｜热度：暂无新增数据
+链接：https://github.com/JimLiu/baoyu-design
+
+11｜dify
+一句话看懂：做 Agent 应用时，不用把编排、发布、知识库和工作流全都自己搭。
+收藏：146,045 Star｜热度：暂无新增数据
+链接：https://github.com/langgenius/dify
+
+12｜browser-harness
+一句话看懂：AI 操作网页容易失败时，用自修复 harness 提高任务完成率。
+收藏：15,180 Star｜热度：暂无新增数据
+链接：https://github.com/browser-use/browser-harness
+
+13｜daytona
+一句话看懂：让 AI 跑代码时，有一个更安全、隔离、弹性的运行环境。
+收藏：72,366 Star｜热度：暂无新增数据
+链接：https://github.com/daytonaio/daytona
+
+14｜fanbox
+一句话看懂：Vibe Coding 时看不清 AI 改了什么，可以用它做项目驾驶舱。
+收藏：752 Star｜热度：暂无新增数据
+链接：https://github.com/alchaincyf/fanbox
+
+15｜claude-directory
+一句话看懂：想看 AI 生成 UI 能做到什么程度，可以从这个画廊找参考。
+收藏：275 Star｜热度：暂无新增数据
+链接：https://github.com/pulkitxm/claude-directory
+
+我自己的感觉是：
+这一组最适合做产品灵感。
+
+它们不是在炫技术，而是在解决很具体的事：
+做视频、做 PPT、做封面、做求职系统、做 AI 应用、做浏览器任务、做代码运行环境。
+
+如果只挑 3 个先看，我会看：
+html-video、career-ops、guizang-social-card-skill。
+
+一个偏视频生产，一个偏求职效率，一个偏内容图文生产。
+
+#GitHub #开源项目 #AI工具 #产品灵感 #AI编程 #ClaudeCode #Codex #Agent #效率工具 #小红书运营

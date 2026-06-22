@@ -1,0 +1,97 @@
+GitHub 正在变火榜：15 个最近升温的 AI / Agent 项目
+
+这组我更关注“最近有没有人在重新讨论”。
+
+有些项目 Star 很高，有些项目还没那么大，但它们都指向一个趋势：
+AI 工具正在从单点工具，往 Harness、记忆、数据上下文、桌面助手和自动化工作流扩散。
+
+收藏 = GitHub Star
+热度 = 近 17 天新增 Star
+链接可以复制到浏览器打开。
+
+01｜claude-code-book
+一句话看懂：想系统理解 Claude Code，不再只看零散教程。
+收藏：3,709 Star｜热度：+158
+链接：https://github.com/lintsinghua/claude-code-book
+
+02｜opensquilla
+一句话看懂：Agent 花很多 Token 却不够聪明时，用它提高信息密度。
+收藏：4,502 Star｜热度：+1,482
+链接：https://github.com/opensquilla/opensquilla
+
+03｜ktx
+一句话看懂：数据 Agent 不懂业务上下文时，容易查错、答偏，它专门补这个上下文层。
+收藏：1,329 Star｜热度：+451
+链接：https://github.com/Kaelio/ktx
+
+04｜deepcode-cli
+一句话看懂：想用 DeepSeek 做代码任务，但缺一个顺手的终端工具。
+收藏：1,270 Star｜热度：+147
+链接：https://github.com/lessweb/deepcode-cli
+
+05｜ponytail
+一句话看懂：AI 总想多写代码时，用它提醒 Agent 少写、少改、少制造复杂度。
+收藏：45,203 Star｜热度：暂无新增数据
+链接：https://github.com/DietrichGebert/ponytail
+
+06｜Vibe-Trading
+一句话看懂：交易信息太多时，用 Agent 辅助整理、分析和决策。
+收藏：12,884 Star｜热度：暂无新增数据
+链接：https://github.com/HKUDS/Vibe-Trading
+
+07｜open-multi-agent
+一句话看懂：多 Agent 协作时，拆任务和排顺序太费人，它可以自动生成任务 DAG。
+收藏：6,412 Star｜热度：暂无新增数据
+链接：https://github.com/open-multi-agent/open-multi-agent
+
+08｜mempalace
+一句话看懂：AI 每次都像第一次见你时，需要一个长期记忆层。
+收藏：56,092 Star｜热度：暂无新增数据
+链接：https://github.com/MemPalace/mempalace
+
+09｜hermes-desktop
+一句话看懂：Agent 只在命令行或网页里不够顺手时，把它放进桌面工作流。
+收藏：12,520 Star｜热度：暂无新增数据
+链接：https://github.com/fathah/hermes-desktop
+
+10｜hermes-studio
+一句话看懂：Agent 会话和任务太多时，用一个可视化后台统一管理。
+收藏：8,190 Star｜热度：暂无新增数据
+链接：https://github.com/EKKOLearnAI/hermes-studio
+
+11｜ian-xiaohei-illustrations
+一句话看懂：写中文内容缺配图时，用 Skill 生成统一风格的正文插画。
+收藏：5,516 Star｜热度：暂无新增数据
+链接：https://github.com/helloianneo/ian-xiaohei-illustrations
+
+12｜openclaude
+一句话看懂：想让 Claude 能在更多环境里运行、接更多工具。
+收藏：29,234 Star｜热度：暂无新增数据
+链接：https://github.com/Gitlawb/openclaude
+
+13｜TencentDB-Agent-Memory
+一句话看懂：企业场景不想依赖外部 API，也想给 Agent 做长期记忆。
+收藏：5,954 Star｜热度：暂无新增数据
+链接：https://github.com/TencentCloud/TencentDB-Agent-Memory
+
+14｜learn-harness-engineering
+一句话看懂：只会用 Agent 还不够，想从 0 到 1 学会搭 Agent Harness。
+收藏：8,975 Star｜热度：暂无新增数据
+链接：https://github.com/walkinglabs/learn-harness-engineering
+
+15｜palmier-pro
+一句话看懂：AI 生成内容越来越多后，需要更轻量的视频编辑工作台。
+收藏：4,556 Star｜热度：暂无新增数据
+链接：https://github.com/palmier-io/palmier-pro
+
+我自己的感觉是：
+这一组的关键词不是“再来一个聊天机器人”，而是 Agent 的基础设施。
+
+记忆、上下文、Harness、任务编排、桌面化、可视化后台，这些东西正在变重要。
+
+如果只挑 3 个先看，我会看：
+claude-code-book、opensquilla、mempalace。
+
+一个补架构，一个省 Token，一个解决长期记忆。
+
+#GitHub #开源项目 #AI工具 #Agent #ClaudeCode #Codex #AI编程 #开发者工具 #效率工具 #技术趋势
