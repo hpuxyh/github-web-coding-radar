@@ -2343,10 +2343,13 @@
 
       function projectDetails(repo) {
         if (projectDetailText[repo.full_name]) return projectDetailText[repo.full_name];
+        const title = keywordBasedName(repo);
+        const intro = toChineseIntro(repo);
+        const hasUsefulIntro = intro && !intro.includes('还没有整理成小白版说明');
         return {
-          what: '这个项目暂时还没有整理出可靠的具体用途，不能只按分类硬猜。',
-          canDo: '建议先点开仓库，看它的演示图、说明文档和最近提交，再决定要不要写。',
-          who: '适合先放进候选池，等补完项目详情后再做成小红书选题。',
+          what: hasUsefulIntro ? `${title}。${intro}` : title,
+          canDo: `可以先把它当作「${title}」来判断，重点看 README 截图、演示入口和最近提交。`,
+          who: '适合先放进候选池，确认真实演示和使用门槛后，再做成项目推荐或同类产品对比。',
         };
       }
 
@@ -2687,6 +2690,28 @@
         'jnMetaCode/superpowers-zh': '中文 AI 编程技能包',
         'affaan-m/ECC': 'AI 编程流程优化包',
         'Significant-Gravitas/AutoGPT': '自动任务 AI 助手',
+        'OpenHands/OpenHands': 'AI 编程助手',
+        'hoppscotch/hoppscotch': 'API 调试工具',
+        'MinishLab/semble': '代码搜索工具',
+        'streamlit/streamlit': '数据应用搭建工具',
+        'files-community/Files': '文件管理器',
+        'santifer/career-ops': '求职管理工具',
+        'julianoczkowski/designer-skills': '设计师 AI 技能包',
+        'BlazeUp-AI/Observal': 'AI 观测工具',
+        'omnigent-ai/omnigent': 'AI 智能体开发框架',
+        'JimLiu/baoyu-design': 'Claude Design 本地技能',
+        'browser-use/browser-harness': '浏览器测试运行环境',
+        'alchaincyf/fanbox': 'AI 编程驾驶舱',
+        'pulkitxm/claude-directory': 'Claude 资源目录',
+        'opensquilla/opensquilla': '省模型额度 AI 助手',
+        'Kaelio/ktx': '终端开发工具',
+        'lessweb/deepcode-cli': '命令行 AI 编程助手',
+        'DietrichGebert/ponytail': 'AI 编程辅助工具',
+        'fathah/hermes-desktop': '桌面 AI 助手',
+        'EKKOLearnAI/hermes-studio': 'AI 助手工作台',
+        'helloianneo/ian-xiaohei-illustrations': '插画素材库',
+        'TencentCloud/TencentDB-Agent-Memory': '数据库智能体记忆工具',
+        'palmier-io/palmier-pro': 'AI 编程工作流工具',
         'NousResearch/hermes-agent': '会成长的 AI 助手',
         'huggingface/transformers': '大模型工具箱',
         'ollama/ollama': '本地跑大模型工具',
@@ -2695,6 +2720,7 @@
         'langchain-ai/langchain': 'AI 应用开发平台',
         'open-webui/open-webui': '本地 AI 聊天界面',
         'firecrawl/firecrawl': '网页抓取工具',
+        'GitHubDaily/GitHubDaily': 'GitHub 热门项目日报',
         'rasbt/LLMs-from-scratch': '从零学大模型教程',
         'browser-use/browser-use': 'AI 操作网页工具',
         'puppeteer/puppeteer': '浏览器自动化工具',
@@ -2714,6 +2740,42 @@
         return '值得看看的一款工具';
       }
 
+      function humanizedRepoName(repo) {
+        const raw = stripEmoji(repo.name || String(repo.full_name || '').split('/').pop() || '')
+          .replace(/[-_]+/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+        return raw || '开源项目';
+      }
+
+      function keywordBasedName(repo) {
+        const text = repoSignalText(repo);
+        const name = humanizedRepoName(repo);
+        if (/\b(awesome|curated|directory|list|roadmap|resources)\b/.test(text)) {
+          if (/\b(skill|skills)\b/.test(text)) return 'AI 技能资料库';
+          if (/\b(agent|agents|agentic)\b/.test(text)) return 'AI Agent 资料库';
+          return '开源资料库';
+        }
+        if (/\b(book|guide|learn|course|tutorial|from scratch)\b/.test(text) || /教程|学习/.test(text)) return 'AI 学习教程';
+        if (/\b(file manager|explorer|filesystem|files app)\b/.test(text)) return '文件管理工具';
+        if (/\b(career|resume|job|interview)\b/.test(text)) return '求职管理工具';
+        if (/\b(video|movie|ffmpeg|record|render)\b/.test(text)) return '视频生成工具';
+        if (/\b(ppt|slide|deck|presentation)\b/.test(text)) return 'PPT 生成工具';
+        if (/\b(design|prototype|wireframe|ui generator|mockup)\b/.test(text)) return '设计原型工具';
+        if (/\b(browser|puppeteer|playwright|web automation)\b/.test(text)) return '浏览器自动化工具';
+        if (/\b(api|postman|rest|graphql|http client)\b/.test(text)) return 'API 调试工具';
+        if (/\b(trading|finance|stock|market)\b/.test(text)) return 'AI 交易工具';
+        if (/\b(memory|knowledge|second brain|wiki)\b/.test(text)) return 'AI 记忆工具';
+        if (/\b(observability|eval|monitor|trace)\b/.test(text)) return 'AI 观测工具';
+        if (/\b(search|retrieval|grep|embedding)\b/.test(text)) return '代码搜索工具';
+        if (/\b(workflow|automation|agent pack)\b/.test(text)) return 'AI 工作流工具';
+        if (/\b(chat|webui|assistant)\b/.test(text)) return 'AI 聊天助手';
+        if (/\b(sandbox|container|runtime)\b/.test(text)) return '代码沙盒工具';
+        const featureName = featureBasedName(repo);
+        if (featureName !== '值得看看的一款工具') return featureName;
+        return /[\u4e00-\u9fff]/.test(name) ? name : `${name} 工具`;
+      }
+
       function cleanFriendlyName(value) {
         return String(value || '')
           .replace(/^这是?一个/, '')
@@ -2731,10 +2793,11 @@
         if (friendlyProjectNameText[repo.full_name]) return friendlyProjectNameText[repo.full_name];
         const details = projectDetails(repo);
         const fromDetails = cleanFriendlyName(details.what);
-        if (fromDetails && /[\u4e00-\u9fff]/.test(fromDetails)) {
+        const isGeneric = /暂时还没有整理|不能只按分类硬猜|建议先点开仓库|适合先放进候选池/.test(fromDetails);
+        if (fromDetails && !isGeneric && /[\u4e00-\u9fff]/.test(fromDetails)) {
           return fromDetails.length > 18 ? `${fromDetails.slice(0, 18)}…` : fromDetails;
         }
-        return featureBasedName(repo);
+        return keywordBasedName(repo);
       }
 
       function normalizeExampleEntry(entry) {
