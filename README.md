@@ -71,7 +71,9 @@ npm run build
 - Cloudflare Pages：`https://github-web-coding-radar.pages.dev/radar.html`
 - GitHub Pages：`https://hpuxyh.github.io/github-web-coding-radar/radar.html`
 
-仓库里的 GitHub Actions 会在每周一 09:00（Asia/Shanghai）自动刷新雷达数据、重新构建并发布 GitHub Pages。Cloudflare Pages 项目当前没有绑定 GitHub Provider，因此自动发布到 Cloudflare 需要在仓库 Secrets 里配置：
+当前每周刷新由 Codex automation 执行：每周一 09:00（Asia/Shanghai）重新抓取、嵌入静态页面、构建并部署到 Cloudflare Pages。
+
+如果要改成完全由 GitHub Actions 执行，需要先用带 `workflow` scope 的 GitHub 凭据更新 `.github/workflows/deploy-pages.yml`，并在仓库 Secrets 里配置：
 
 - `CLOUDFLARE_API_TOKEN`：可部署 Pages 的 Cloudflare API token。
 - `CLOUDFLARE_ACCOUNT_ID`：Cloudflare account id，可用 `npx wrangler whoami` 查询。
