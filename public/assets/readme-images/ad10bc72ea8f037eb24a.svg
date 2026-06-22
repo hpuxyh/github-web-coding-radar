@@ -1,0 +1,27 @@
+<svg viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ktx">
+  <!-- mascot -->
+  <g fill="none" stroke="#1B3139" stroke-width="16" stroke-linecap="round">
+    <path d="M 62 110 Q 32 130 44 152" />
+    <path d="M 88 116 Q 80 152 70 174" />
+    <path d="M 112 116 Q 120 152 130 174" />
+  </g>
+
+  <path
+    d="M 134 108 C 162 116, 172 96, 162 78 C 154 64, 168 56, 178 60"
+    fill="none" stroke="#FF8A4C" stroke-width="16" stroke-linecap="round"
+  />
+
+  <path
+    d="M 48 102 C 48 56, 78 30, 100 30 C 122 30, 152 56, 152 102 C 152 116, 132 120, 100 120 C 68 120, 48 116, 48 102 Z"
+    fill="#1B3139"
+  />
+
+  <path d="M 80 84 Q 86 77 92 84" fill="none" stroke="#F5F1EA" stroke-width="3.5" stroke-linecap="round" />
+  <path d="M 108 84 Q 114 77 120 84" fill="none" stroke="#F5F1EA" stroke-width="3.5" stroke-linecap="round" />
+
+  <!-- wordmark: "ktx" outlined from Outfit SemiBold (the docs-site display font)
+       so it renders identically everywhere, independent of installed fonts -->
+  <g transform="translate(242 145)" fill="#1B3139">
+    <path d="M51.17 0 25.06 -34.79 51.03 -67.62H72.17L41.65 -30.7L42.35 -39.55L73.57 0ZM8.05 0V-101.22H26.46V0ZM88.41 0V-95.69H106.82V0ZM72.66 -51.52V-67.62H122.57V-51.52ZM171.75 0 153.93 -27.41 150.22 -30.17 123.83 -67.62H145.64L161.91 -42.77L165.48 -40.18L193.38 0ZM122.54 0 150.05 -38.61 160.62 -26.22 143.19 0ZM166.11 -30.38 155.44 -42.67 171.54 -67.62H192.08Z" />
+  </g>
+</svg>

@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import base64
 import datetime as dt
+import hashlib
 import html
 import http.client
 import json
@@ -33,6 +34,28 @@ DEFAULT_CONFIG_PATH = PROJECT_ROOT / "config" / "github_xhs_config.json"
 EMBEDDED_RADAR_DATA_RE = re.compile(
     r'(<script id="embedded-radar-data" type="application/json">)(.*?)(</script>)',
     re.S,
+)
+LOCAL_README_IMAGE_DIR = PROJECT_ROOT / "public" / "assets" / "readme-images"
+LOCAL_README_IMAGE_BASE = "assets/readme-images"
+IMAGE_CONTENT_TYPE_EXTENSIONS = {
+    "image/jpeg": ".jpg",
+    "image/jpg": ".jpg",
+    "image/png": ".png",
+    "image/webp": ".webp",
+    "image/gif": ".gif",
+    "image/svg+xml": ".svg",
+}
+IMAGE_EXTENSION_FALLBACK_CONTENT_TYPES = {
+    "application/octet-stream",
+    "binary/octet-stream",
+}
+IMAGE_FILE_EXTENSIONS = set(IMAGE_CONTENT_TYPE_EXTENSIONS.values()) | {".jpeg"}
+OPTIMIZED_README_IMAGE_MAX_WIDTH = 1400
+OPTIMIZED_README_IMAGE_QUALITY = 82
+OPTIMIZABLE_README_IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
+GITHUB_README_IMAGE_MODE_SUFFIXES = (
+    "%23gh-light-mode-only",
+    "%23gh-dark-mode-only",
 )
 
 
@@ -1371,6 +1394,195 @@ def collect_readme_assets_from_payload(payload: dict[str, Any]) -> dict[str, dic
     return assets
 
 
+def iter_payload_images(payload: dict[str, Any]) -> list[dict[str, Any]]:
+    images: list[dict[str, Any]] = []
+    seen_repos: set[str] = set()
+    for section in ["frontier", "product_ideas", "all_time", "rising", "xhs_repos", "all_repos"]:
+        for repo in payload.get(section) or []:
+            full_name = repo.get("full_name")
+            if not full_name:
+                continue
+            if section == "all_repos" and full_name in seen_repos:
+                continue
+            seen_repos.add(full_name)
+            for example in repo.get("examples") or []:
+                if not isinstance(example, dict):
+                    continue
+                for image in example.get("images") or []:
+                    if isinstance(image, dict) and image.get("url"):
+                        images.append(image)
+    return images
+
+
+def is_local_readme_image_url(url: str) -> bool:
+    clean_url = url.lstrip("/")
+    return clean_url.startswith(f"{LOCAL_README_IMAGE_BASE}/")
+
+
+def normalize_readme_image_url(url: str) -> str:
+    clean_url = url.strip()
+    lower_url = clean_url.lower()
+    for suffix in GITHUB_README_IMAGE_MODE_SUFFIXES:
+        if lower_url.endswith(suffix):
+            return clean_url[: -len(suffix)]
+    return clean_url
+
+
+def image_extension_from_url(url: str) -> str:
+    normalized_url = normalize_readme_image_url(url)
+    suffix = Path(urllib.parse.urlparse(normalized_url).path).suffix.lower()
+    return suffix if suffix in IMAGE_FILE_EXTENSIONS else ""
+
+
+def image_content_type_from_headers(path: Path) -> str:
+    try:
+        headers = path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return ""
+    content_types = re.findall(r"(?im)^content-type:\s*([^;\r\n]+)", headers)
+    if not content_types:
+        return ""
+    return content_types[-1].strip().lower()
+
+
+def image_extension_from_headers(path: Path) -> str:
+    content_type = image_content_type_from_headers(path)
+    return IMAGE_CONTENT_TYPE_EXTENSIONS.get(content_type, "")
+
+
+def cached_readme_image_path(url: str, asset_dir: Path = LOCAL_README_IMAGE_DIR) -> Path | None:
+    digest = hashlib.sha256(url.encode("utf-8")).hexdigest()[:20]
+    matches = sorted(asset_dir.glob(f"{digest}.*"))
+    return matches[0] if matches else None
+
+
+def optimize_readme_image(path: Path, extension: str) -> Path:
+    if extension not in OPTIMIZABLE_README_IMAGE_EXTENSIONS:
+        return path
+    try:
+        from PIL import Image, ImageOps
+    except ImportError:
+        return path
+
+    optimized_path = path.with_suffix(".webp")
+    try:
+        with Image.open(path) as image:
+            if getattr(image, "is_animated", False):
+                return path
+            image = ImageOps.exif_transpose(image)
+            if image.width > OPTIMIZED_README_IMAGE_MAX_WIDTH:
+                height = max(1, round(image.height * OPTIMIZED_README_IMAGE_MAX_WIDTH / image.width))
+                image = image.resize((OPTIMIZED_README_IMAGE_MAX_WIDTH, height), Image.Resampling.LANCZOS)
+            if image.mode not in {"RGB", "RGBA"}:
+                image = image.convert("RGBA" if "A" in image.getbands() else "RGB")
+            image.save(optimized_path, "WEBP", quality=OPTIMIZED_README_IMAGE_QUALITY, method=6)
+    except Exception as exc:
+        print(f"Image optimize skipped: {path.name} ({exc})", file=sys.stderr)
+        try:
+            if optimized_path.exists():
+                optimized_path.unlink()
+        except OSError:
+            pass
+        return path
+
+    try:
+        if optimized_path.stat().st_size < path.stat().st_size:
+            path.unlink()
+            return optimized_path
+        optimized_path.unlink()
+    except OSError:
+        return path
+    return path
+
+
+def download_readme_image(url: str, asset_dir: Path = LOCAL_README_IMAGE_DIR) -> str | None:
+    url = normalize_readme_image_url(url)
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme not in {"http", "https"}:
+        return None
+
+    cached = cached_readme_image_path(url, asset_dir)
+    if cached:
+        return f"{LOCAL_README_IMAGE_BASE}/{cached.name}"
+
+    asset_dir.mkdir(parents=True, exist_ok=True)
+    digest = hashlib.sha256(url.encode("utf-8")).hexdigest()[:20]
+    temp_path = asset_dir / f"{digest}.download"
+    headers_path = asset_dir / f"{digest}.headers"
+    cmd = [
+        "curl",
+        "-L",
+        "-sS",
+        "--retry",
+        "2",
+        "--retry-all-errors",
+        "--connect-timeout",
+        "15",
+        "--max-time",
+        "45",
+        "-A",
+        USER_AGENT,
+        "-D",
+        str(headers_path),
+        "-o",
+        str(temp_path),
+        url,
+    ]
+    try:
+        completed = subprocess.run(cmd, capture_output=True, text=True, check=False)
+        if completed.returncode != 0 or not temp_path.exists() or temp_path.stat().st_size == 0:
+            print(f"Image cache skipped: {url} ({completed.stderr.strip() or completed.returncode})", file=sys.stderr)
+            return None
+        content_type = image_content_type_from_headers(headers_path)
+        header_extension = IMAGE_CONTENT_TYPE_EXTENSIONS.get(content_type, "")
+        if content_type and not header_extension and content_type not in IMAGE_EXTENSION_FALLBACK_CONTENT_TYPES:
+            print(f"Image cache skipped: {url} (non-image content type: {content_type})", file=sys.stderr)
+            return None
+        extension = header_extension or image_extension_from_url(url)
+        if not extension:
+            print(f"Image cache skipped: {url} (unknown image type)", file=sys.stderr)
+            return None
+        final_path = asset_dir / f"{digest}{extension}"
+        temp_path.replace(final_path)
+        final_path = optimize_readme_image(final_path, extension)
+        return f"{LOCAL_README_IMAGE_BASE}/{final_path.name}"
+    finally:
+        for path in [temp_path, headers_path]:
+            try:
+                if path.exists():
+                    path.unlink()
+            except OSError:
+                pass
+
+
+def localize_payload_images(payload: dict[str, Any], asset_dir: Path = LOCAL_README_IMAGE_DIR) -> int:
+    localized = 0
+    for section in ["frontier", "product_ideas", "all_time", "rising", "xhs_repos", "all_repos"]:
+        for repo in payload.get(section) or []:
+            for example in repo.get("examples") or []:
+                if not isinstance(example, dict):
+                    continue
+                kept_images = []
+                for image in example.get("images") or []:
+                    if not isinstance(image, dict):
+                        continue
+                    url = str(image.get("url") or "").strip()
+                    if not url:
+                        continue
+                    if is_local_readme_image_url(url):
+                        kept_images.append(image)
+                        continue
+                    local_url = download_readme_image(url, asset_dir)
+                    if not local_url:
+                        continue
+                    image.setdefault("source_url", url)
+                    image["url"] = local_url
+                    kept_images.append(image)
+                    localized += 1
+                example["images"] = kept_images
+    return localized
+
+
 def safe_int(value: Any) -> int:
     try:
         return int(value)
@@ -1456,6 +1668,9 @@ def embed_latest_json(args: argparse.Namespace) -> int:
     payload = json.loads(data_path.read_text(encoding="utf-8"))
     if not isinstance(payload, dict):
         raise ValueError(f"{data_path} must contain a JSON object")
+    localized = localize_payload_images(payload)
+    if localized:
+        print(f"Localized README images: {localized}")
 
     files = [Path(file).resolve() for file in args.files]
     for html_path in files:

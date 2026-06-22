@@ -336,6 +336,79 @@ MIT
         extracted = daily.extract_embedded_radar_payload_from_text(updated)
         self.assertEqual(extracted, payload)
 
+    def test_readme_image_url_helpers(self):
+        self.assertTrue(daily.is_local_readme_image_url("assets/readme-images/demo.png"))
+        self.assertTrue(daily.is_local_readme_image_url("/assets/readme-images/demo.png"))
+        self.assertFalse(daily.is_local_readme_image_url("https://raw.githubusercontent.com/demo/repo/main/demo.png"))
+        self.assertEqual(
+            daily.image_extension_from_url("https://raw.githubusercontent.com/demo/repo/main/demo.PNG?raw=1"),
+            ".png",
+        )
+        self.assertEqual(
+            daily.image_extension_from_url("https://raw.githubusercontent.com/demo/repo/main/demo.jpeg"),
+            ".jpeg",
+        )
+        self.assertEqual(
+            daily.normalize_readme_image_url(
+                "https://raw.githubusercontent.com/demo/repo/main/demo.png%23gh-light-mode-only"
+            ),
+            "https://raw.githubusercontent.com/demo/repo/main/demo.png",
+        )
+        self.assertEqual(
+            daily.image_extension_from_url(
+                "https://raw.githubusercontent.com/demo/repo/main/demo.png%23gh-light-mode-only"
+            ),
+            ".png",
+        )
+        self.assertEqual(daily.image_extension_from_url("https://github.com/user-attachments/assets/demo"), "")
+
+    def test_readme_image_content_type_helpers(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            headers_path = Path(tmpdir) / "headers"
+            headers_path.write_text("HTTP/2 200\ncontent-type: text/html; charset=utf-8\n", encoding="utf-8")
+            self.assertEqual(daily.image_content_type_from_headers(headers_path), "text/html")
+            self.assertEqual(daily.image_extension_from_headers(headers_path), "")
+
+            headers_path.write_text("HTTP/2 200\ncontent-type: image/webp\n", encoding="utf-8")
+            self.assertEqual(daily.image_content_type_from_headers(headers_path), "image/webp")
+            self.assertEqual(daily.image_extension_from_headers(headers_path), ".webp")
+
+    def test_localize_payload_images_removes_failed_external_images(self):
+        payload = {
+            "frontier": [
+                {
+                    "full_name": "demo/project",
+                    "examples": [
+                        {
+                            "images": [
+                                {"url": "https://example.com/good.png", "alt": "good"},
+                                {"url": "https://example.com/bad.png", "alt": "bad"},
+                                {"url": "assets/readme-images/existing.webp", "alt": "existing"},
+                            ]
+                        }
+                    ],
+                }
+            ]
+        }
+        original_download = daily.download_readme_image
+
+        def fake_download(url, asset_dir=daily.LOCAL_README_IMAGE_DIR):
+            return "assets/readme-images/good.webp" if "good" in url else None
+
+        daily.download_readme_image = fake_download
+        try:
+            localized = daily.localize_payload_images(payload)
+        finally:
+            daily.download_readme_image = original_download
+
+        images = payload["frontier"][0]["examples"][0]["images"]
+        self.assertEqual(localized, 1)
+        self.assertEqual(
+            [image["url"] for image in images],
+            ["assets/readme-images/good.webp", "assets/readme-images/existing.webp"],
+        )
+        self.assertEqual(images[0]["source_url"], "https://example.com/good.png")
+
     def test_bootstrap_history_from_embedded_payload(self):
         history = {"repos": {}}
         payload = {
