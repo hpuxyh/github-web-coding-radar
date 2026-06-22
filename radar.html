@@ -186,9 +186,10 @@
         z-index: 20;
         top: 0;
         display: grid;
-        grid-template-columns: minmax(280px, 1fr) 174px auto;
+        grid-template-columns: 174px auto;
         gap: 10px;
         align-items: center;
+        justify-content: flex-start;
         margin: 14px 0 16px;
         padding: 10px;
         border: 1px solid var(--line);
@@ -198,11 +199,6 @@
         backdrop-filter: blur(16px);
       }
 
-      .search {
-        position: relative;
-      }
-
-      .search input,
       select {
         width: 100%;
         height: 44px;
@@ -215,43 +211,9 @@
         transition: border-color 0.18s ease, box-shadow 0.18s ease;
       }
 
-      .search input:focus,
       select:focus {
         border-color: rgba(33, 181, 115, 0.6);
         box-shadow: 0 0 0 3px rgba(33, 181, 115, 0.14);
-      }
-
-      .search input {
-        padding: 0 42px;
-      }
-
-      .search span {
-        position: absolute;
-        left: 14px;
-        top: 50%;
-        color: var(--muted);
-        transform: translateY(-50%);
-      }
-
-      .clear-search {
-        position: absolute;
-        right: 8px;
-        top: 50%;
-        width: 28px;
-        height: 28px;
-        display: grid;
-        place-items: center;
-        border: 0;
-        border-radius: 8px;
-        background: rgba(24, 60, 44, 0.07);
-        color: var(--muted);
-        cursor: pointer;
-        transform: translateY(-50%);
-      }
-
-      .clear-search:hover {
-        background: rgba(24, 60, 44, 0.12);
-        color: var(--ink);
       }
 
       select {
@@ -1317,7 +1279,6 @@
         }
 
         .metric,
-        .search input,
         select,
         .tabs,
         .repo-kicker span,
@@ -1424,10 +1385,6 @@
           gap: 8px;
           margin: 10px 0 12px;
           padding: 8px;
-        }
-
-        .search {
-          grid-column: 1 / -1;
         }
 
         select {
@@ -1559,11 +1516,6 @@
       </section>
 
       <section class="controls" aria-label="筛选控制">
-        <label class="search">
-          <span>⌕</span>
-          <input id="searchInput" type="search" placeholder="搜索用途、适合人群、关键词" autocomplete="off" />
-          <button id="clearSearch" class="clear-search" type="button" aria-label="清除搜索" hidden>×</button>
-        </label>
         <select id="sortSelect" aria-label="排序">
           <option value="rank">按榜单排序</option>
           <option value="stars">按收藏数排序</option>
@@ -1606,7 +1558,6 @@
       const state = {
         data: null,
         activeTab: 'frontier',
-        query: '',
         sort: 'rank',
       };
 
@@ -1619,8 +1570,6 @@
       const listHint = $('#listHint');
       const subtitle = $('#subtitle');
       const summary = $('#summary');
-      const searchInput = $('#searchInput');
-      const clearSearch = $('#clearSearch');
 
       const featureText = {
         'AI Coding / Agent': 'AI 帮你写代码',
@@ -3082,10 +3031,6 @@
         return collectDrafts(state.data || {}).find((draft) => repoKey(draft.repo) === key);
       }
 
-      function updateSearchUi() {
-        clearSearch.hidden = !state.query;
-      }
-
       async function copyText(text) {
         try {
           await navigator.clipboard.writeText(text);
@@ -3246,60 +3191,18 @@
         return rankings.rising;
       }
 
-      function repoSearchText(repo) {
-        const details = projectDetails(repo);
-        const difficulty = beginnerDifficulty(repo);
-        return [
-          displayProjectName(repo),
-          repo.full_name,
-          toChineseIntro(repo),
-          details.what,
-          details.canDo,
-          details.who,
-          ...repoExamples(repo).flatMap((example) => [
-            example.title,
-            example.body,
-            example.code,
-            ...(example.images || []).map((image) => image.alt),
-          ]),
-          repo.language,
-          repo.license,
-          rankingReason(repo),
-          difficulty.install.label,
-          difficulty.install.summary,
-          ...difficulty.install.reasons,
-          difficulty.use.label,
-          difficulty.use.summary,
-          ...difficulty.use.reasons,
-          expertSignalSummaryText(repo),
-          ...expertSignals(repo).flatMap((signal) => [
-            signal.expert_name,
-            signal.expert_id,
-            signal.category_label,
-            signal.source_label,
-            signal.note,
-          ]),
-          ...(repo.features || []).map(toChineseFeature),
-          ...(repo.features || []),
-          ...(repo.topics || []),
-        ]
-          .join(' ')
-          .toLowerCase();
-      }
-
       function sortedRepos(repos) {
         const withRank = repos.map((repo, index) => ({ ...repo, _rank: index + 1 }));
-        const filtered = withRank.filter((repo) => repoSearchText(repo).includes(state.query));
         if (state.sort === 'stars') {
-          return filtered.sort((a, b) => Number(b.stars || 0) - Number(a.stars || 0));
+          return withRank.sort((a, b) => Number(b.stars || 0) - Number(a.stars || 0));
         }
         if (state.sort === 'velocity') {
-          return filtered.sort((a, b) => Number(b.star_velocity || 0) - Number(a.star_velocity || 0));
+          return withRank.sort((a, b) => Number(b.star_velocity || 0) - Number(a.star_velocity || 0));
         }
         if (state.sort === 'recent') {
-          return filtered.sort((a, b) => String(b.pushed_at || '').localeCompare(String(a.pushed_at || '')));
+          return withRank.sort((a, b) => String(b.pushed_at || '').localeCompare(String(a.pushed_at || '')));
         }
-        return filtered.sort((a, b) => a._rank - b._rank);
+        return withRank.sort((a, b) => a._rank - b._rank);
       }
 
       function renderRepoActions(repo, demoUrl, draft, extraClass = '') {
@@ -3329,11 +3232,11 @@
           drafts: '这些项目已经被整理成小红书草稿，可以直接复制再改。',
         };
         listTitle.textContent = titleMap[state.activeTab];
-        listHint.textContent = `${hintMap[state.activeTab]}${state.query ? ` 当前搜索：${state.query}` : ''}`;
+        listHint.textContent = hintMap[state.activeTab];
         resultCount.textContent = `${repos.length} 个项目`;
 
         if (!repos.length) {
-          repoList.innerHTML = '<div class="empty">没有匹配的项目。可以换一个关键词，或点右侧清除搜索。</div>';
+          repoList.innerHTML = '<div class="empty">这个榜单暂时没有项目。</div>';
           return;
         }
 
@@ -3482,28 +3385,6 @@
         });
       });
 
-      searchInput.addEventListener('input', (event) => {
-        state.query = event.target.value.trim().toLowerCase();
-        updateSearchUi();
-        renderRepos();
-      });
-
-      searchInput.addEventListener('keydown', (event) => {
-        if (event.key !== 'Escape' || !state.query) return;
-        state.query = '';
-        searchInput.value = '';
-        updateSearchUi();
-        renderRepos();
-      });
-
-      clearSearch.addEventListener('click', () => {
-        state.query = '';
-        searchInput.value = '';
-        updateSearchUi();
-        searchInput.focus();
-        renderRepos();
-      });
-
       $('#sortSelect').addEventListener('change', (event) => {
         state.sort = event.target.value;
         renderRepos();
@@ -3537,7 +3418,6 @@
         }, 1200);
       });
 
-      updateSearchUi();
       loadData();
     </script>
   </body>
