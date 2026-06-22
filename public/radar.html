@@ -1217,6 +1217,69 @@
         line-height: 1.7;
       }
 
+      .methodology {
+        margin: 18px 0 26px;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.62);
+        box-shadow: var(--shadow);
+      }
+
+      .methodology-header {
+        display: grid;
+        gap: 6px;
+        max-width: 880px;
+      }
+
+      .methodology-kicker {
+        margin: 0;
+        color: #157a4d;
+        font-size: 0.78rem;
+        font-weight: 850;
+      }
+
+      .methodology h2 {
+        margin: 0;
+        color: var(--ink);
+        font-size: 1.08rem;
+        line-height: 1.3;
+      }
+
+      .methodology p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.9rem;
+        line-height: 1.7;
+      }
+
+      .methodology-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .methodology-item {
+        padding: 13px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.66);
+      }
+
+      .methodology-item strong {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--ink);
+        font-size: 0.94rem;
+      }
+
+      .methodology-note {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--line);
+      }
+
       .error {
         border: 1px solid rgba(224, 90, 79, 0.34);
         border-radius: 11px;
@@ -1283,14 +1346,16 @@
         .expert-signals,
         .usage-details,
         .example-details,
-        .generated-example {
+        .generated-example,
+        .methodology {
           background: rgba(72, 184, 140, 0.08);
         }
 
         .detail-item,
         .playbook-block,
         .draft,
-        .example {
+        .example,
+        .methodology-item {
           background: rgba(255, 255, 255, 0.045);
         }
 
@@ -1429,6 +1494,15 @@
           grid-template-columns: 1fr;
         }
 
+        .methodology {
+          margin-top: 14px;
+          padding: 14px;
+        }
+
+        .methodology-grid {
+          grid-template-columns: 1fr;
+        }
+
         .score {
           text-align: left;
         }
@@ -1493,6 +1567,37 @@
           </div>
           <div class="draft-list" id="draftList"></div>
         </aside>
+      </section>
+
+      <section class="methodology" aria-labelledby="methodologyTitle">
+        <div class="methodology-header">
+          <p class="methodology-kicker">榜单取数逻辑</p>
+          <h2 id="methodologyTitle">这几个标签按什么标准选项目</h2>
+          <p>
+            先从公开 GitHub 搜索、仓库主题、README、更新记录和可配置的人物观察源里收集候选项目，再按每个榜单的用途分别打分。同一个项目只放进一个榜单，优先顺序是：大佬在看、产品灵感、正在变火、经典项目。
+          </p>
+        </div>
+        <div class="methodology-grid">
+          <article class="methodology-item">
+            <strong>大佬在看</strong>
+            <p>优先收 AI 编程、Agent、MCP、Claude Code、开发者工具等前沿信号；如果配置了公开人物观察源，也会把他们 star 或引用过的项目加权。</p>
+          </article>
+          <article class="methodology-item">
+            <strong>产品灵感</strong>
+            <p>优先收能拿来试、能改造成内容或工具的项目，比如 app-builder、低代码、网页编辑器、原型工具、在线预览和 AI coding 产品。</p>
+          </article>
+          <article class="methodology-item">
+            <strong>正在变火</strong>
+            <p>优先看近期创建或近期涨得快的项目，综合星标密度、历史快照里的涨星速度、最近更新时间和功能匹配度。</p>
+          </article>
+          <article class="methodology-item">
+            <strong>经典项目</strong>
+            <p>优先看高星、长期被验证的 LLM、开发者工具、代码编辑器和 AI Agent 项目；它们不一定最新，但适合补课和找标杆。</p>
+          </article>
+        </div>
+        <p class="methodology-note">
+          排序时会综合 stars、forks、创建时间、最近提交时间、README 关键词、topics、功能标签、涨星速度和人物信号；页面上的排序下拉框只是在当前榜单内重新排列，不改变项目属于哪个榜。
+        </p>
       </section>
     </main>
 
