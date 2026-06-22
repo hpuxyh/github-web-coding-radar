@@ -66,6 +66,17 @@ npm run build
 - 构建命令：`npm run build`
 - 输出目录：`dist`
 
+当前公网地址：
+
+- Cloudflare Pages：`https://github-web-coding-radar.pages.dev/radar.html`
+- GitHub Pages：`https://hpuxyh.github.io/github-web-coding-radar/radar.html`
+
+仓库里的 GitHub Actions 会在每周一 09:00（Asia/Shanghai）自动刷新雷达数据、重新构建并发布 GitHub Pages。Cloudflare Pages 项目当前没有绑定 GitHub Provider，因此自动发布到 Cloudflare 需要在仓库 Secrets 里配置：
+
+- `CLOUDFLARE_API_TOKEN`：可部署 Pages 的 Cloudflare API token。
+- `CLOUDFLARE_ACCOUNT_ID`：Cloudflare account id，可用 `npx wrangler whoami` 查询。
+- `RADAR_GITHUB_TOKEN`：可选，用来提高 GitHub 抓取额度；不配时会使用 GitHub Actions 自带 token。
+
 ## 项目雷达
 
 如果你只是想看当前榜单，不想安装爬虫、配置 token 或运行脚本，可以打开仓库里的 `radar.html`。这是完整静态版，已经内置一份榜单数据。
@@ -74,6 +85,18 @@ npm run build
 
 ```bash
 python3 scripts/github_xhs_daily.py run
+```
+
+把生成结果写回静态页面：
+
+```bash
+python3 scripts/github_xhs_daily.py embed
+```
+
+本地一键刷新并嵌入：
+
+```bash
+make refresh
 ```
 
 生成结果在：
@@ -118,11 +141,11 @@ src/data/projects.js
 
 ## 雷达榜单取数逻辑
 
-项目雷达先从公开 GitHub 搜索、仓库主题、README、更新记录和可配置的人物观察源里收集候选项目，再按不同榜单的用途分别打分。同一个项目只进一个榜单，认领顺序是：大佬在看、产品灵感、正在变火、经典项目。
+候选项目来自公开 GitHub 搜索、仓库主题、README、更新记录和可配置的人物观察源。系统先算四类分数，再把同一个项目放进最匹配的一个榜单；冲突时按大佬在看、产品灵感、正在变火、经典项目的顺序归类。
 
-- 大佬在看：优先收 AI 编程、Agent、MCP、Claude Code、开发者工具等前沿信号；如果配置了公开人物观察源，也会把他们 star 或引用过的项目加权。
-- 产品灵感：优先收能拿来试、能改造成内容或工具的项目，比如 app-builder、低代码、网页编辑器、原型工具、在线预览和 AI coding 产品。
-- 正在变火：优先看近期创建或近期涨得快的项目，综合星标密度、历史快照里的涨星速度、最近更新时间和功能匹配度。
-- 经典项目：优先看高星、长期被验证的 LLM、开发者工具、代码编辑器和 AI Agent 项目；它们不一定最新，但适合补课和找标杆。
+- 大佬在看：前沿信号，包括 AI 编程、Agent、MCP、Claude Code、开发者工具，以及公开观察源里被 star 或引用的项目。
+- 产品灵感：产品可用性，包括可直接试用、可改造成内容或工具的项目，例如 app-builder、低代码、网页编辑器、原型工具、在线预览和 AI coding 产品。
+- 正在变火：热度变化，包括近期创建、涨星快、星标密度高，并且最近更新和功能方向匹配。
+- 经典项目：长期标杆，包括高星、持续维护、被反复验证的 LLM、开发者工具、代码编辑器和 AI Agent 项目。
 
-排序时会综合 stars、forks、创建时间、最近提交时间、README 关键词、topics、功能标签、涨星速度和人物信号；页面上的排序下拉框只是在当前榜单内重新排列，不改变项目属于哪个榜。
+榜内排序综合 stars、forks、创建时间、最近提交时间、README 关键词、topics、功能标签、涨星速度和人物信号；页面上的排序下拉框只调整当前榜单顺序，不重新分榜。

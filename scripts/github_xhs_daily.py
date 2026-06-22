@@ -30,6 +30,10 @@ USER_AGENT = "github-xhs-daily/0.1"
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONFIG_PATH = PROJECT_ROOT / "config" / "github_xhs_config.json"
+EMBEDDED_RADAR_DATA_RE = re.compile(
+    r'(<script id="embedded-radar-data" type="application/json">)(.*?)(</script>)',
+    re.S,
+)
 
 
 FEATURE_RULES = [
@@ -1339,6 +1343,128 @@ def write_outputs(
     return markdown_path, json_path
 
 
+def iter_payload_repos(payload: dict[str, Any]) -> list[dict[str, Any]]:
+    repos: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for section in ["all_repos", "frontier", "product_ideas", "all_time", "rising", "xhs_repos"]:
+        for repo in payload.get(section) or []:
+            full_name = repo.get("full_name")
+            if not full_name or full_name in seen:
+                continue
+            seen.add(full_name)
+            repos.append(repo)
+    return repos
+
+
+def collect_readme_assets_from_payload(payload: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    assets: dict[str, dict[str, Any]] = {}
+    for repo in iter_payload_repos(payload):
+        full_name = repo.get("full_name")
+        if not full_name:
+            continue
+        current = assets.setdefault(full_name, {})
+        if repo.get("readme_excerpt") and not current.get("readme_excerpt"):
+            current["readme_excerpt"] = repo["readme_excerpt"]
+        examples = repo.get("examples")
+        if isinstance(examples, list) and examples and not current.get("examples"):
+            current["examples"] = examples
+    return assets
+
+
+def safe_int(value: Any) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return 0
+
+
+def bootstrap_history_from_payload(history: dict[str, Any], payload: dict[str, Any]) -> int:
+    date_text = str(payload.get("date") or "").strip()
+    if not date_text:
+        return 0
+    try:
+        dt.date.fromisoformat(date_text)
+    except ValueError:
+        return 0
+
+    repos_history = history.setdefault("repos", {})
+    added = 0
+    for repo in iter_payload_repos(payload):
+        full_name = repo.get("full_name")
+        if not full_name:
+            continue
+        snapshots = repos_history.setdefault(full_name, [])
+        if any(snapshot.get("date") == date_text for snapshot in snapshots):
+            continue
+        snapshots.append(
+            {
+                "date": date_text,
+                "stars": safe_int(repo.get("stars")),
+                "forks": safe_int(repo.get("forks")),
+                "open_issues": safe_int(repo.get("open_issues")),
+            }
+        )
+        added += 1
+    return added
+
+
+def extract_embedded_radar_payload_from_text(html_text: str) -> dict[str, Any] | None:
+    match = EMBEDDED_RADAR_DATA_RE.search(html_text)
+    if not match:
+        return None
+    try:
+        payload = json.loads(match.group(2))
+    except json.JSONDecodeError:
+        return None
+    return payload if isinstance(payload, dict) else None
+
+
+def load_embedded_radar_payload(path: Path) -> dict[str, Any] | None:
+    if not path.exists():
+        return None
+    try:
+        return extract_embedded_radar_payload_from_text(path.read_text(encoding="utf-8"))
+    except OSError:
+        return None
+
+
+def json_for_embedded_script(payload: dict[str, Any]) -> str:
+    text = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+    return (
+        text.replace("&", "\\u0026")
+        .replace("<", "\\u003c")
+        .replace(">", "\\u003e")
+        .replace("\u2028", "\\u2028")
+        .replace("\u2029", "\\u2029")
+    )
+
+
+def embed_radar_payload(html_text: str, payload: dict[str, Any]) -> str:
+    embedded = json_for_embedded_script(payload)
+    updated, count = EMBEDDED_RADAR_DATA_RE.subn(
+        lambda match: f"{match.group(1)}{embedded}{match.group(3)}",
+        html_text,
+        count=1,
+    )
+    if count != 1:
+        raise ValueError("embedded radar data script tag not found")
+    return updated
+
+
+def embed_latest_json(args: argparse.Namespace) -> int:
+    data_path = Path(args.data).resolve()
+    payload = json.loads(data_path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise ValueError(f"{data_path} must contain a JSON object")
+
+    files = [Path(file).resolve() for file in args.files]
+    for html_path in files:
+        html_text = html_path.read_text(encoding="utf-8")
+        html_path.write_text(embed_radar_payload(html_text, payload), encoding="utf-8")
+        print(f"Embedded radar data: {html_path}")
+    return 0
+
+
 def iter_enabled_experts(config: dict[str, Any]) -> list[dict[str, Any]]:
     expert_config = config.get("expert_sources") or {}
     if not expert_config.get("enabled", False):
@@ -1734,11 +1860,20 @@ def run(args: argparse.Namespace) -> int:
     )
 
     history = load_history(paths.data_path)
+    embedded_payload = load_embedded_radar_payload(PROJECT_ROOT / "radar.html")
+    if embedded_payload and not history.get("repos"):
+        bootstrapped = bootstrap_history_from_payload(history, embedded_payload)
+        if bootstrapped:
+            print(f"Bootstrapped history from embedded radar data: {bootstrapped} repos")
+
     repos = collect_repositories(client, config, run_date)
     enrich_repositories(client, repos, config, history, run_date)
+    previous_readme_assets = load_previous_readme_assets(paths.output_dir / "latest.json")
+    if not previous_readme_assets and embedded_payload:
+        previous_readme_assets = collect_readme_assets_from_payload(embedded_payload)
     restored_readme_assets = restore_previous_readme_assets(
         repos,
-        load_previous_readme_assets(paths.output_dir / "latest.json"),
+        previous_readme_assets,
         history,
         run_date,
     )
@@ -1806,6 +1941,15 @@ def build_parser() -> argparse.ArgumentParser:
     queries_parser.add_argument("--config", default=str(DEFAULT_CONFIG_PATH))
     queries_parser.add_argument("--date", help="run date, YYYY-MM-DD")
     queries_parser.set_defaults(func=print_queries)
+
+    embed_parser = subparsers.add_parser("embed", help="embed generated latest JSON into static radar pages")
+    embed_parser.add_argument("--data", default=str(PROJECT_ROOT / "output" / "latest.json"))
+    embed_parser.add_argument(
+        "files",
+        nargs="*",
+        default=[str(PROJECT_ROOT / "radar.html"), str(PROJECT_ROOT / "public" / "radar.html")],
+    )
+    embed_parser.set_defaults(func=embed_latest_json)
 
     return parser
 

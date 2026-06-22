@@ -1,7 +1,12 @@
-.PHONY: run queries test view install-schedule
+.PHONY: run embed refresh queries test view install-schedule
 
 run:
 	python3 scripts/github_xhs_daily.py run
+
+embed:
+	python3 scripts/github_xhs_daily.py embed
+
+refresh: run embed
 
 queries:
 	python3 scripts/github_xhs_daily.py queries

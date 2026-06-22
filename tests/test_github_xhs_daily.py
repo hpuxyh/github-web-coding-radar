@@ -314,6 +314,48 @@ MIT
         self.assertIn("AI Coding / Agent", repo["features"])
         self.assertGreater(repo["scores"]["frontier"], 0)
 
+    def test_embed_radar_payload_escapes_script_end(self):
+        html = (
+            '<html><script id="embedded-radar-data" type="application/json">'
+            '{"date":"old"}'
+            '</script></html>'
+        )
+        payload = {
+            "date": "2026-06-22",
+            "all_repos": [
+                {
+                    "full_name": "demo/project",
+                    "description": "safe </script><div>& text",
+                }
+            ],
+        }
+        updated = daily.embed_radar_payload(html, payload)
+
+        self.assertIn("\\u003c/script\\u003e", updated)
+        self.assertNotIn("safe </script><div>& text", updated)
+        extracted = daily.extract_embedded_radar_payload_from_text(updated)
+        self.assertEqual(extracted, payload)
+
+    def test_bootstrap_history_from_embedded_payload(self):
+        history = {"repos": {}}
+        payload = {
+            "date": "2026-06-21",
+            "all_repos": [
+                {
+                    "full_name": "demo/project",
+                    "stars": "123",
+                    "forks": 4,
+                    "open_issues": None,
+                }
+            ],
+        }
+
+        added = daily.bootstrap_history_from_payload(history, payload)
+        self.assertEqual(added, 1)
+        self.assertEqual(history["repos"]["demo/project"][0]["date"], "2026-06-21")
+        self.assertEqual(history["repos"]["demo/project"][0]["stars"], 123)
+        self.assertEqual(history["repos"]["demo/project"][0]["open_issues"], 0)
+
     def test_build_markdown_contains_required_sections(self):
         run_date = dt.date(2026, 6, 5)
         repo = {
