@@ -8,6 +8,7 @@
       content="每天帮你找好项目，自动筛出 AI 前沿趋势、实用产品灵感和热门开源项目，并整理成小白也能看懂的中文判断。"
     />
     <title>GitHub 好项目雷达</title>
+    <link rel="icon" href="data:," />
     <style>
       :root {
         color-scheme: light dark;
@@ -1616,7 +1617,7 @@
         </div>
         <div class="topbar-note">
           <strong>先判断值不值得点开</strong>
-          <span>把 README、热度、更新和上手难度压成中文卡片。</span>
+          <span>把项目说明、热度、更新和上手难度压成中文卡片。</span>
         </div>
       </header>
 
@@ -1627,7 +1628,7 @@
           <p class="methodology-kicker">榜单取数逻辑</p>
           <h2 id="methodologyTitle">这几个标签按什么标准选项目</h2>
           <p>
-            候选项目来自公开 GitHub 搜索、仓库主题、README、更新记录和可配置的人物观察源。系统先算四类分数，再把同一个项目放进最匹配的一个榜单；冲突时按大佬在看、产品灵感、正在变火、经典项目的顺序归类。
+            候选项目来自公开 GitHub 搜索、仓库主题、项目说明、更新记录和可配置的人物观察源。系统先算四类分数，再把同一个项目放进最匹配的一个榜单；冲突时按大佬在看、产品灵感、正在变火、经典项目的顺序归类。
           </p>
         </div>
         <div class="methodology-grid">
@@ -1649,7 +1650,7 @@
           </article>
         </div>
         <p class="methodology-note">
-          榜内排序综合 stars、forks、创建时间、最近提交时间、README 关键词、topics、功能标签、涨星速度和人物信号；页面上的排序下拉框只调整当前榜单顺序，不重新分榜。
+          榜内排序综合收藏数、分叉数、创建时间、最近提交时间、项目说明关键词、仓库主题、功能标签、涨星速度和人物信号；页面上的排序下拉框只调整当前榜单顺序，不重新分榜。
         </p>
       </section>
 
@@ -2168,7 +2169,7 @@
         'freeCodeCamp/freeCodeCamp':
           '免费学编程的大型开源课程平台。适合入门编程和计算机基础。',
         'public-apis/public-apis':
-          '免费 API 大合集。想做小产品但缺数据源，可以先来这里找接口。',
+          '免费接口大合集。想做小产品但缺数据源，可以先来这里找接口。',
         'openclaw/openclaw':
           '一个个人 AI 助手项目，目标是让你在不同系统和平台上都有自己的 AI 助理。',
         'EbookFoundation/free-programming-books':
@@ -2427,49 +2428,137 @@
 
       const toChineseFeature = (feature) => featureText[feature] || feature;
 
+      const hasChineseText = (value) => /[\u4e00-\u9fff]/.test(String(value || ''));
+      const hasLongEnglishText = (value) => /[A-Za-z]{4,}/.test(String(value || ''));
+
+      function projectReadableText(repo) {
+        const examples = Array.isArray(repo.examples)
+          ? repo.examples.flatMap((example) => [
+              example?.title,
+              example?.body,
+              example?.text,
+              example?.description,
+              ...(Array.isArray(example?.images) ? example.images.map((image) => image?.alt) : []),
+            ])
+          : [];
+        return stripEmoji(
+          [
+            repo.full_name,
+            repo.name,
+            repo.description,
+            repo.readme_excerpt,
+            repo.homepage,
+            repo.language,
+            ...(repo.features || []),
+            ...(repo.topics || []),
+            ...examples,
+          ]
+            .filter(Boolean)
+            .join(' ')
+            .toLowerCase(),
+        );
+      }
+
+      function chineseIntroFromSignals(repo, text, safeName, focus) {
+        const starsText = Number(repo.stars || 0) >= 1000 ? `目前有 ${compact(repo.stars)} 个收藏，` : '';
+        if (/\b(api client|postman|rest|graphql|http client|exploring and testing apis|api testing)\b/.test(text)) {
+          return `一个接口调试工具。它用来管理接口请求、测试返回结果和整理接口用例，适合替代或补充 Postman 这类工具。`;
+        }
+        if (/\b(browser automation|puppeteer|playwright|web automation|browser harness)\b/.test(text)) {
+          return `一个浏览器自动化工具。它可以打开网页、点击按钮、抓取内容或跑端到端测试，适合做网页测试、自动化操作和数据采集。`;
+        }
+        if (/\b(data app|dashboard|streamlit|visualization|analytics|chart)\b/.test(text)) {
+          return `一个数据应用搭建工具。它适合把 Python 脚本、表格或模型结果做成可交互页面，让别人不用看代码也能操作和查看结果。`;
+        }
+        if (/\b(file manager|file explorer|files app|filesystem)\b/.test(text)) {
+          return `一个文件管理工具。它主要改善本地文件浏览、搜索和整理体验，适合拿来观察现代桌面工具怎么做界面和交互。`;
+        }
+        if (/\b(game engine|2d game|lua|live reload|cross-platform export)\b/.test(text)) {
+          return `一个 2D 游戏开发工具。它主打快速做原型、实时预览和跨平台导出，适合用来学习小游戏或交互原型怎么搭起来。`;
+        }
+        if (/\b(cryptographic|untrusted server|encrypted|collaborative applications)\b/.test(text)) {
+          return `一个偏研究型的加密协作框架。它关注多人协作时的数据安全问题，适合技术团队研究“服务器不可信时如何协作”。`;
+        }
+        if (/\b(copilot studio|microsoft 365|declarative agents|m365)\b/.test(text)) {
+          return `一个 Microsoft 365 Copilot 智能体模板合集。它提供可直接复制的业务智能体配置，适合企业办公场景里快速试 Agent。`;
+        }
+        if (/\b(markdown vault|obsidian|logseq|wiki|second brain|knowledge wiki)\b/.test(text)) {
+          return `一个个人知识库增强工具。它把 Markdown、Obsidian 或 Logseq 里的笔记整理成可持续增长的知识系统，适合长期沉淀资料和让 AI 复用上下文。`;
+        }
+        if (/\b(vibe coding|talking to ai|prompt engineering|building software by talking)\b/.test(text)) {
+          return `一个围绕“和 AI 对话做软件”的工具/资料合集。它适合查 Vibe Coding 相关工具、提示词、平台和实践案例。`;
+        }
+        if (/\b(search|retrieval|embedding|grep|query|code snippets)\b/.test(text)) {
+          return `一个代码搜索和检索工具。它让 AI 或开发者用更自然的方式找到相关代码片段，减少在大项目里手动翻文件。`;
+        }
+        if (/\b(awesome|curated|directory|list|roadmap|resources|collection)\b/.test(text)) {
+          if (/\b(copilot|agent|agents|agentic)\b/.test(text)) {
+            return `一个围绕「${focus}」整理的资料库。它把智能体、工具、教程或模板集中放在一起，适合先用来补课、找同类项目和做选题池。`;
+          }
+          if (/\b(skill|skills|plugin|plugins)\b/.test(text)) {
+            return `一个 AI 技能和插件合集。它适合给 Claude Code、Codex、Cursor 这类工具找可复用规则，让 AI 在写代码、写文档或跑任务时更有章法。`;
+          }
+          return `一个围绕「${focus}」整理的资源合集。它不是单一应用，更像索引目录，适合查工具、教程、模板和可复用方案。`;
+        }
+        if (/\b(token|cost|compression|savings|reduce llm token|cost reduction)\b/.test(text)) {
+          return `一个帮 AI 编程降成本的工具。它重点减少命令输出和上下文里的无效内容，让同样的开发任务少消耗模型额度。`;
+        }
+        if (/\b(deepseek|terminal|cli|coding agent|code agent|agentic coding)\b/.test(text)) {
+          return `一个面向开发者的 AI 编程助手。它通常在终端或编辑器里工作，可以读代码、改代码、跑命令，适合用小项目先验证稳定性。`;
+        }
+        if (/\b(skill|skills|rule|rules|plugin|claude code|cursor|codex)\b/.test(text)) {
+          return `一个给 AI 编程工具使用的技能/规则包。它的价值不在界面，而在把提示词、流程和约束整理好，让 AI 更稳定地完成开发任务。`;
+        }
+        if (/\b(mcp|tool calling|connect apps|real actions|send emails|slack|github issues)\b/.test(text)) {
+          return `一个让 AI 调用外部工具的项目。它把邮件、表格、GitHub、Slack 等应用接进 AI 流程里，让 AI 不只是回答问题，也能执行具体动作。`;
+        }
+        if (/\b(workflow|automation|visual canvas|rag|human-in-the-loop|n8n alternative)\b/.test(text)) {
+          return `一个 AI 工作流搭建工具。它适合把提示词、知识库、人工确认、外部工具和自动化流程串起来，做成可以反复运行的业务流程。`;
+        }
+        if (/\b(design|prototype|wireframe|mockup|ui generator|html artifacts|slides|deck|poster)\b/.test(text)) {
+          return `一个设计或原型生成工具。它适合把想法快速变成界面、海报、幻灯片或网页原型，先看截图就能判断产出风格。`;
+        }
+        if (/\b(html editor|html page|web page|landing page|surface|hyperframe)\b/.test(text)) {
+          return `一个生成 HTML 页面或内容物料的工具。它适合把文字想法变成可预览网页、报告、海报或社交媒体配图。`;
+        }
+        if (/\b(trading|finance|stock|market)\b/.test(text)) {
+          return `一个金融或交易相关的 AI 项目。它适合观察智能体如何读取市场信息、生成策略或做模拟分析，不建议直接当投资建议使用。`;
+        }
+        if (/\b(framework|sdk|library|package|server|runtime)\b/.test(text)) {
+          return `一个面向开发者的框架/工具包。${starsText}它更适合有技术背景的人接入，用来搭建「${focus}」相关能力。`;
+        }
+        return '';
+      }
+
       function toChineseIntro(repo) {
         if (simpleIntroText[repo.full_name]) return simpleIntroText[repo.full_name];
         if (repoIntroText[repo.full_name]) return repoIntroText[repo.full_name];
         const fallback = repo.description || repo.readme_excerpt || '';
-        if (/[\u4e00-\u9fff]/.test(fallback)) return fallback;
+        if (hasChineseText(fallback) && !hasLongEnglishText(fallback)) return fallback;
         const generated = generatedChineseIntro(repo);
         if (generated) return generated;
-        return '这个项目还没有整理成小白版说明，可以先点开仓库看原始介绍。';
+        return `${safeProjectKind(repo)}。这个项目需要结合项目说明和示例截图判断用途，建议先看它解决什么问题、有没有演示入口，再决定是否投入时间试用。`;
       }
 
       function generatedChineseIntro(repo) {
-        const source = stripEmoji(repo.description || repo.readme_excerpt || '')
+        const source = projectReadableText(repo)
           .replace(/\s+/g, ' ')
           .trim();
         if (!source) return '';
 
-        const text = repoSignalText(repo);
+        const text = source;
         if (/ponytail|laziest senior dev|code you never wrote|yagni/.test(text)) {
           return '一个给 AI 编程助手用的“少写冗余代码”技能包。它让 AI 优先选择简单、原生、必要的实现，目标是少写代码、少花 token、少花时间，同时不牺牲安全检查。';
-        }
-
-        if (friendlyProjectNameText[repo.full_name]) {
-          const safeName = safeProjectKind(repo);
-          return `${safeName}。GitHub 上已有原始介绍和 README 信息，页面先按项目标题、截图、功能标签和最近更新帮你判断是否值得点开。`;
         }
 
         const featureLabels = (repo.features || []).map((feature) => toChineseFeature(feature)).filter(Boolean);
         const safeName = safeProjectKind(repo);
         const focus = featureLabels.length ? featureLabels.slice(0, 2).join('、') : safeName;
 
-        if (/\b(awesome|curated|directory|list|roadmap|resources)\b/.test(text)) {
-          return `一个围绕「${focus}」整理的资源合集，适合先当资料库查找同类工具、教程和可复用方案。`;
-        }
-        if (/\b(agent|agentic|coding agent|claude code|cursor|codex|plugin|skill|prompt|rule)\b/.test(text)) {
-          return `一个围绕「${focus}」的开发者工具，主要帮助 AI 更稳定地读代码、改代码或执行开发任务。`;
-        }
-        if (/\b(workflow|automation|no-code|low-code|visual canvas)\b/.test(text)) {
-          return `一个围绕「${focus}」的工作流工具，适合把重复任务、AI 能力和外部工具串起来做自动化。`;
-        }
-        if (/\b(prototype|design|ui|html|wireframe|deck|slide)\b/.test(text)) {
-          return `一个围绕「${focus}」的原型/设计工具，适合先看 README 截图和演示，判断能不能改造成页面、封面或产品原型。`;
-        }
-        return `${safeName}。GitHub 描述显示它主要和「${focus}」有关，适合先结合 README 截图、原始介绍和最近提交判断是否值得试。`;
+        return (
+          chineseIntroFromSignals(repo, text, safeName, focus) ||
+          `${safeName}。从仓库描述和项目说明关键词看，它主要围绕「${focus}」解决问题；适合先看演示入口和项目截图，再判断能不能用到自己的工作里。`
+        );
       }
 
       function projectDetails(repo) {
@@ -2479,7 +2568,7 @@
         const hasUsefulIntro = intro && !intro.includes('还没有整理成小白版说明');
         return {
           what: hasUsefulIntro ? `${title}。${intro}` : title,
-          canDo: `可以先把它当作「${title}」来判断，重点看 README 截图、演示入口和最近提交。`,
+          canDo: `可以先把它当作「${title}」来判断，重点看项目截图、演示入口和最近提交。`,
           who: '适合先放进候选池，确认真实演示和使用门槛后，再做成项目推荐或同类产品对比。',
         };
       }
@@ -2646,7 +2735,7 @@
           return ['更偏可视化或直接输入需求，学习成本相对低。', '先照项目示例做一遍，就能判断有没有用。'];
         }
         if (score === 3 && type === 'install') {
-          return ['大概率要跟着 README 安装依赖或准备账号。', '遇到报错时可能需要搜索或请技术同学帮忙。'];
+          return ['大概率要跟着项目说明安装依赖或准备账号。', '遇到报错时可能需要搜索或请技术同学帮忙。'];
         }
         if (score === 3) {
           return ['要先理解它解决的具体场景，再照示例操作。', '适合从一个很小的任务开始试，不要直接上复杂项目。'];
@@ -2822,7 +2911,7 @@
         'affaan-m/ECC': 'AI 编程流程优化包',
         'Significant-Gravitas/AutoGPT': '自动任务 AI 助手',
         'OpenHands/OpenHands': 'AI 编程助手',
-        'hoppscotch/hoppscotch': 'API 调试工具',
+        'hoppscotch/hoppscotch': '接口调试工具',
         'MinishLab/semble': '代码搜索工具',
         'streamlit/streamlit': '数据应用搭建工具',
         'files-community/Files': '文件管理器',
@@ -2902,7 +2991,7 @@
         if (/\b(ppt|slide|deck|presentation)\b/.test(text)) return 'PPT 生成工具';
         if (/\b(design|prototype|wireframe|ui generator|mockup)\b/.test(text)) return '设计原型工具';
         if (/\b(browser|puppeteer|playwright|web automation)\b/.test(text)) return '浏览器自动化工具';
-        if (/\b(api|postman|rest|graphql|http client)\b/.test(text)) return 'API 调试工具';
+        if (/\b(api|postman|rest|graphql|http client)\b/.test(text)) return '接口调试工具';
         if (/\b(trading|finance|stock|market)\b/.test(text)) return 'AI 交易工具';
         if (/\b(memory|knowledge|second brain|wiki)\b/.test(text)) return 'AI 记忆工具';
         if (/\b(observability|eval|monitor|trace)\b/.test(text)) return 'AI 观测工具';
@@ -2928,6 +3017,114 @@
           .trim();
       }
 
+      function toChineseExampleTitle(title, repo) {
+        const raw = stripEmoji(title || '').trim();
+        const text = raw.toLowerCase();
+        if (hasChineseText(raw) && !hasLongEnglishText(raw)) return raw;
+        if (/quick\s*start|get started|getting started|install|setup|run setup|start here/.test(text)) return '快速上手';
+        if (/demo|screenshot|showcase|preview|gallery|image|figure|banner|hero/.test(text)) return '项目截图 / 演示图';
+        if (/api|request|client|testing apis/.test(text)) return '接口调用示例';
+        if (/test runner|pytest|jest|vitest|unit test|e2e test/.test(text)) return '测试运行示例';
+        if (/example agents|agent examples|agents/.test(text)) return '智能体示例';
+        if (/hook|runtime|control|flag/.test(text)) return '运行控制示例';
+        if (/usage|example|sample/.test(text)) return '使用示例';
+        if (/roadmap|resources|list|directory/.test(text)) return '资料目录';
+        if (/feature|capabilit|what.*do/.test(text)) return '核心能力';
+        if (repo) return `${displayProjectName(repo)}示例`;
+        return '项目示例';
+      }
+
+      function toChineseImageAlt(alt, title) {
+        const raw = stripEmoji(alt || title || '').trim();
+        const text = raw.toLowerCase();
+        if (hasChineseText(raw) && !hasLongEnglishText(raw)) return raw;
+        if (/logo|icon/.test(text)) return '项目标志';
+        if (/mobile|phone|onboarding/.test(text)) return '手机端截图';
+        if (/dashboard|studio|console|workspace|entry view|home|ui|interface|screen|screenshot|window/.test(text)) return '项目界面截图';
+        if (/chart|metric|graph|analytics|report/.test(text)) return '数据图表示例';
+        if (/banner|hero|cover/.test(text)) return '项目横幅图';
+        if (/demo|preview|showcase/.test(text)) return '项目演示图';
+        return '项目示例图';
+      }
+
+      function toChineseExampleBody(repo, body, title, code, images) {
+        const raw = stripEmoji(body || '').replace(/\s+/g, ' ').trim();
+        if (hasChineseText(raw) && !hasLongEnglishText(raw)) return raw;
+        const localText = `${title || ''} ${raw} ${code || ''}`.toLowerCase();
+        const text = `${localText} ${projectReadableText(repo)}`.toLowerCase();
+        const name = displayProjectName(repo);
+        if (/quick\s*start|get started|getting started|install|setup|run setup/.test(localText)) {
+          return `${name} 的项目说明主要给了快速上手流程：先按文档准备环境或账号，再运行示例命令开始试用。`;
+        }
+        if (/test runner|pytest|jest|vitest|cargo test|go test|playwright test/.test(localText)) {
+          return `项目说明展示了如何把它接到测试命令里，用来压缩输出、查看失败原因或让 AI 更容易理解测试结果。`;
+        }
+        if (/browser|puppeteer|playwright|page\.goto|web automation/.test(localText)) {
+          return `${name} 的示例主要展示如何打开网页、控制浏览器并执行自动化步骤，适合做网页测试、采集或重复操作。`;
+        }
+        if (/api|request|graphql|http|client|postman|testing apis/.test(localText)) {
+          return `${name} 的示例主要展示接口请求、调试和测试流程，适合用来管理接口用例或替代传统接口调试工具。`;
+        }
+        if (/demo|screenshot|showcase|preview|gallery|image|figure|banner|hero/.test(localText) || images?.length) {
+          return `项目说明里提供了项目截图或演示图，先看图能快速判断它的界面形态、输出效果和是否适合你的场景。`;
+        }
+        if (/agent|coding agent|claude code|cursor|codex|tool calling|mcp/.test(text)) {
+          return `${name} 的示例主要围绕 AI 如何读代码、调用工具或执行开发任务，适合先用一个小项目验证它是否稳定。`;
+        }
+        if (/workflow|automation|canvas|node|rag/.test(text)) {
+          return `${name} 的示例主要展示如何把多个步骤串成流程，适合做自动化、知识库问答或业务工具。`;
+        }
+        if (code) {
+          return `项目说明给了可复制的命令或代码示例，说明它更适合按步骤接入、在本地运行后再判断效果。`;
+        }
+        return toChineseIntro(repo);
+      }
+
+      function translateCodeComment(comment) {
+        const raw = stripEmoji(comment || '').trim();
+        const lower = raw.toLowerCase();
+        const rules = [
+          [/jest compact.*failures only/, 'Jest 精简输出（只显示失败）'],
+          [/vitest compact.*failures only/, 'Vitest 精简输出（只显示失败）'],
+          [/e2e results.*failures only/, '端到端测试结果（只显示失败）'],
+          [/cargo tests.*-90%/, 'Cargo 测试（约少 90% 输出）'],
+          [/python tests.*-90%/, 'Python 测试（约少 90% 输出）'],
+          [/\bgo tests.*-90%/, 'Go 测试（约少 90% 输出）'],
+          [/config wizard.*reasonix/, '配置向导，生成 ./reasonix.toml'],
+          [/credential store/, '也可以让安装向导保存到凭据存储'],
+          [/generate agents\.md|project memory/, '然后运行 /init 生成项目记忆文件 AGENTS.md'],
+          [/launch the browser.*blank page/, '启动浏览器并打开一个空白页面'],
+          [/navigate.*url/, '让页面打开指定网址'],
+          [/set screen size|viewport/, '设置浏览器窗口尺寸'],
+          [/type.*search/, '在搜索框输入关键词'],
+          [/wait.*click.*first result/, '等待结果并点击第一条'],
+          [/extract.*title/, '读取页面标题'],
+          [/recommended default/, '推荐默认安装方式'],
+          [/manual installer/, '手动安装方式'],
+        ];
+        for (const [pattern, zh] of rules) {
+          if (pattern.test(lower)) return zh;
+        }
+        if (hasLongEnglishText(raw) && !hasChineseText(raw)) return '按项目说明执行这一步';
+        return raw;
+      }
+
+      function toChineseExampleCode(code) {
+        return String(code || '')
+          .split('\n')
+          .map((line) => {
+            const hashMatch = line.match(/^(.*?#\s*)(.+)$/);
+            if (hashMatch) return `${hashMatch[1]}${translateCodeComment(hashMatch[2])}`;
+            const slashOnlyMatch = line.match(/^(\s*\/\/\s*)(.+)$/);
+            if (slashOnlyMatch) return `${slashOnlyMatch[1]}${translateCodeComment(slashOnlyMatch[2])}`;
+            const slashInlineMatch = line.match(/^(.*\s\/\/\s+)(.+)$/);
+            if (slashInlineMatch) return `${slashInlineMatch[1]}${translateCodeComment(slashInlineMatch[2])}`;
+            return line;
+          })
+          .join('\n')
+          .trim();
+      }
+
       function displayProjectName(repo) {
         if (friendlyProjectNameText[repo.full_name]) return friendlyProjectNameText[repo.full_name];
         const details = projectDetails(repo);
@@ -2939,33 +3136,35 @@
         return keywordBasedName(repo);
       }
 
-      function normalizeExampleEntry(entry) {
+      function normalizeExampleEntry(entry, repo) {
         if (!entry) return null;
         if (typeof entry === 'string') {
           return { title: '举个例子', body: entry, code: '', images: [], source: '简化示例' };
         }
-        const title = String(entry.title || entry.name || '项目里的示例').trim();
-        const body = String(entry.body || entry.text || entry.description || '').trim();
-        const code = String(entry.code || '').trim();
+        const rawTitle = String(entry.title || entry.name || '项目里的示例').trim();
+        const title = toChineseExampleTitle(rawTitle, repo);
+        const rawBody = String(entry.body || entry.text || entry.description || '').trim();
+        const code = toChineseExampleCode(String(entry.code || '').trim());
         const images = Array.isArray(entry.images)
           ? entry.images
               .map((image) => ({
                 url: String(image?.url || '').trim(),
-                alt: String(image?.alt || '项目示例图').trim(),
+                alt: toChineseImageAlt(image?.alt, rawTitle),
               }))
               .filter((image) => image.url)
               .slice(0, 2)
           : [];
-        const source = String(entry.source || 'README').trim();
+        const body = toChineseExampleBody(repo, rawBody, rawTitle, code, images);
+        const source = String(entry.source || '项目说明').trim();
         if (!body && !code && !images.length) return null;
         return { title, body, code, images, source };
       }
 
       function repoExamples(repo) {
         const extracted = Array.isArray(repo.examples)
-          ? repo.examples.map(normalizeExampleEntry).filter(Boolean)
+          ? repo.examples.map((entry) => normalizeExampleEntry(entry, repo)).filter(Boolean)
           : [];
-        const manual = normalizeExampleEntry(projectExampleText[repo.full_name]);
+        const manual = normalizeExampleEntry(projectExampleText[repo.full_name], repo);
         const combined = [];
         if (manual) {
           if (!manual.images.length && extracted[0]?.images?.length) {
@@ -3407,7 +3606,7 @@
                   ${
                     examples
                       ? `<details class="example-details" open>
-                          <summary>看截图和 README 示例</summary>
+                          <summary>看截图和项目说明示例</summary>
                           ${examples}
                         </details>`
                       : ''
