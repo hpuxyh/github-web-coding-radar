@@ -226,6 +226,31 @@ FEATURE_LABEL_ZH = {
     "Testing / Quality": "测试 / 质量",
 }
 
+README_LANGUAGE_WORDS = {
+    "english",
+    "español",
+    "français",
+    "português",
+    "한국어",
+    "日本語",
+    "简体中文",
+    "繁體中文",
+    "русский",
+    "polski",
+    "العربية",
+    "deutsch",
+    "tiếng việt",
+    "ไทย",
+}
+
+README_SUMMARY_OVERRIDES = {
+    "santifer/career-ops": (
+        "Career-Ops 是一个 AI 求职指挥中心，运行在 Claude Code、Codex、Gemini 等支持 Agent Skill 标准的命令行工具里。"
+        "README 说明它会把岗位评估、个性化简历/CV 和求职信生成、PDF 输出、申请记录、批量处理和职位扫描串成一套流程，"
+        "帮助候选人系统化管理从筛选职位到准备投递材料的全过程。"
+    )
+}
+
 EXPERT_CATEGORY_LABEL_ZH = {
     "ai_engineer": "AI 工程师",
     "open_source_author": "开源作者",
@@ -418,21 +443,62 @@ class GitHubClient:
             starred.extend(data)
         return starred
 
-    def get_readme_text(self, full_name: str) -> str | None:
+    def get_raw_text(self, url: str) -> str | None:
+        headers = {
+            "Accept-Encoding": "identity",
+            "Connection": "close",
+            "User-Agent": USER_AGENT,
+        }
+        cmd = [
+            "curl",
+            "--http1.1",
+            "-L",
+            "-sS",
+            "--connect-timeout",
+            str(min(20.0, self.timeout_seconds)),
+            "--max-time",
+            str(self.timeout_seconds),
+            "-w",
+            "\n%{http_code}",
+        ]
+        for key, value in headers.items():
+            cmd.extend(["-H", f"{key}: {value}"])
+        cmd.append(url)
+        try:
+            completed = subprocess.run(cmd, capture_output=True, text=True, check=False)
+            if completed.returncode != 0:
+                return None
+            body, status_text = completed.stdout.rsplit("\n", 1)
+            return body if int(status_text) < 400 else None
+        except (ValueError, OSError):
+            return None
+
+    def get_readme_text(self, full_name: str, default_branch: str = "main") -> str | None:
         encoded_name = urllib.parse.quote(full_name, safe="/")
         try:
             data = self.request_json(f"/repos/{encoded_name}/readme")
         except GithubApiError:
-            return None
+            data = None
 
-        content = data.get("content")
-        encoding = data.get("encoding")
+        if isinstance(data, dict):
+            content = data.get("content")
+            encoding = data.get("encoding")
+        else:
+            content = None
+            encoding = None
         if content and encoding == "base64":
             try:
                 raw = base64.b64decode(content).decode("utf-8", errors="replace")
                 return raw
             except (ValueError, UnicodeError):
-                return None
+                pass
+
+        branch = urllib.parse.quote(default_branch or "main", safe="")
+        for filename in ["README.md", "readme.md", "README.MD", "README"]:
+            path = urllib.parse.quote(filename, safe="/")
+            raw = self.get_raw_text(f"https://raw.githubusercontent.com/{full_name}/{branch}/{path}")
+            if raw:
+                return raw
         return None
 
 
@@ -625,25 +691,254 @@ def clean_markdown(text: str) -> str:
     return text.strip()
 
 
-def first_readme_excerpt(text: str | None, max_chars: int) -> str:
+def has_chinese_text(value: str | None) -> bool:
+    return bool(re.search(r"[\u4e00-\u9fff]", value or ""))
+
+
+def has_long_english_text(value: str | None) -> bool:
+    return bool(re.search(r"[A-Za-z]{4,}", value or ""))
+
+
+def looks_like_readme_noise(line: str) -> bool:
+    clean = line.strip()
+    if not clean:
+        return True
+
+    lower = clean.lower()
+    if re.fullmatch(r"[\s|:.\-–—_·•]+", clean):
+        return True
+    if re.search(r"shields\.io|badge|stargazers|network/members|graphs/contributors", lower):
+        return True
+    if lower.startswith(("license", "sponsor", "stars ", "forks ", "discord ", "website ")):
+        return True
+    if clean.count("|") >= 3 and any(word in lower for word in README_LANGUAGE_WORDS):
+        return True
+    if any(word in lower for word in README_LANGUAGE_WORDS) and re.search(r"\s[|·]\s|&nbsp;| / ", lower):
+        return True
+    if re.fullmatch(r"(?:\[[^\]]*\]\([^)]*\)\s*){2,}", clean):
+        return True
+    if len(re.sub(r"[^A-Za-z0-9\u4e00-\u9fff]+", "", clean)) < 3:
+        return True
+    return False
+
+
+def readme_plain_lines(text: str | None) -> list[str]:
     if not text:
-        return ""
+        return []
+
     lines: list[str] = []
+    in_code_block = False
     for raw_line in text.splitlines():
         line = raw_line.strip()
-        if not line:
+        if line.startswith("```"):
+            in_code_block = not in_code_block
+            continue
+        if in_code_block or looks_like_readme_noise(line):
             continue
         if line.startswith(("#", "-", "*", ">")):
             line = line.lstrip("#-* >").strip()
-        if line.lower().startswith(("badge", "license", "sponsor")):
+        if looks_like_readme_noise(line):
             continue
         line = clean_markdown(line)
-        if line:
+        if not looks_like_readme_noise(line):
             lines.append(line)
+    return lines
+
+
+def first_readme_excerpt(text: str | None, max_chars: int) -> str:
+    lines: list[str] = []
+    for line in readme_plain_lines(text):
+        lines.append(line)
         if sum(len(item) for item in lines) >= max_chars:
             break
     excerpt = " ".join(lines)
     return excerpt[:max_chars].strip()
+
+
+def compact_sentence(value: str, max_chars: int = 180) -> str:
+    value = clean_markdown(value)
+    value = re.sub(r"\s+", " ", value).strip(" .;:|")
+    if len(value) <= max_chars:
+        return value
+    shortened = value[:max_chars].rsplit(" ", 1)[0].strip(" .;:|")
+    return shortened or value[:max_chars].strip(" .;:|")
+
+
+def readable_repo_title(repo: dict[str, Any]) -> str:
+    name = str(repo.get("name") or repo.get("full_name") or "这个项目").strip()
+    return name.replace("-", " ").replace("_", " ").strip() or "这个项目"
+
+
+def doc_text_for_summary(repo: dict[str, Any]) -> str:
+    examples = []
+    for example in repo.get("examples") or []:
+        if not isinstance(example, dict):
+            continue
+        examples.extend([example.get("title"), example.get("body"), example.get("code")])
+    return " ".join(
+        str(item)
+        for item in [
+            repo.get("full_name"),
+            repo.get("name"),
+            repo.get("description"),
+            repo.get("readme_excerpt"),
+            *(repo.get("topics") or []),
+            *examples,
+        ]
+        if item
+    ).lower()
+
+
+def summary_kind_from_docs(repo: dict[str, Any], text: str) -> tuple[str, str]:
+    if re.search(
+        r"\b(job search|career|resume|cv|cover letter|interview prep|job applications?|application tracker|application tracking)\b",
+        text,
+    ):
+        return (
+            "AI 求职管理系统",
+            "重点覆盖岗位评估、简历/CV、求职信、申请记录和批量处理这些求职流程。",
+        )
+    if re.search(
+        r"\b(token consumption|token optimization|cost reduction|token savings|compresses?|compression|reduce[sd]? llm token|token killer)\b",
+        text,
+    ):
+        return (
+            "AI 编程成本优化工具",
+            "重点压缩命令输出、减少上下文浪费或统计模型消耗，让同样的开发任务少花 token 和费用。",
+        )
+    if re.search(r"\b(deepseek|terminal|cli|coding agent|code agent|agentic coding)\b", text):
+        return (
+            "终端里的 AI 编程助手",
+            "重点在命令行或编辑器里读代码、改代码、跑命令，适合先用小项目验证稳定性。",
+        )
+    if re.search(r"\b(agent harness|skills?, instincts?|agent shield|rules?)\b", text):
+        return (
+            "AI 编程技能/规则包",
+            "重点把提示词、流程、记忆、安全检查或开发习惯整理成可复用规则，让 Claude Code、Codex、Cursor 等工具更稳定地工作。",
+        )
+    if re.search(r"\b(awesome|curated list|resources|roadmap|collection of)\b", text):
+        return (
+            "资料合集",
+            "重点收集同类工具、教程、模板或资源，适合用来补课、找参考项目和做选题池。",
+        )
+    if re.search(r"\b(api client|postman|rest|graphql|http client|api testing)\b", text):
+        return (
+            "接口调试工具",
+            "重点管理接口请求、测试返回结果和整理接口用例，适合替代或补充 Postman 这类工作流。",
+        )
+    if re.search(r"\b(browser automation|puppeteer|playwright|web automation|browser harness)\b", text):
+        return (
+            "浏览器自动化工具",
+            "重点自动打开网页、点击、抓取内容或跑端到端测试，适合网页测试和自动化操作。",
+        )
+    if re.search(r"\b(game engine|2d game|lua|live reload|cross-platform export)\b", text):
+        return (
+            "2D 游戏开发工具",
+            "重点快速做原型、实时预览和跨平台导出，适合学习小游戏或交互原型的搭建方式。",
+        )
+    if re.search(r"\b(cryptographic|untrusted server|encrypted|collaborative applications)\b", text):
+        return (
+            "加密协作框架",
+            "重点研究多人协作场景里的数据安全，尤其是服务器不可信时如何保护协作数据。",
+        )
+    if re.search(r"\b(copilot studio|microsoft 365|declarative agents|m365)\b", text):
+        return (
+            "Microsoft 365 Copilot 智能体模板",
+            "重点提供可复制的业务智能体配置，帮助企业办公场景快速试用 Copilot Agent。",
+        )
+    if re.search(r"\b(markdown vault|obsidian|logseq|wiki|second brain|knowledge wiki)\b", text):
+        return (
+            "个人知识库增强工具",
+            "重点把 Markdown、Obsidian 或 Logseq 笔记整理成可持续增长的知识系统，让 AI 能复用长期上下文。",
+        )
+    if re.search(r"\b(workflow|automation|visual canvas|rag|human-in-the-loop|n8n alternative)\b", text):
+        return (
+            "AI 工作流自动化工具",
+            "重点把提示词、知识库、人工确认、外部工具和自动化流程串起来，做成可反复运行的业务流程。",
+        )
+    if re.search(r"\b(design|wireframe|mockup|ui generator|html artifacts|slides|deck|poster)\b", text):
+        return (
+            "设计/原型生成工具",
+            "重点把想法快速变成界面、海报、幻灯片、网页原型或可预览的视觉物料。",
+        )
+    if re.search(r"\b(html editor|html page|web page|landing page|surface|hyperframe)\b", text):
+        return (
+            "HTML 页面生成工具",
+            "重点把文字草稿或需求变成可预览、可发布的网页、报告、海报或社交媒体内容。",
+        )
+    if re.search(r"\b(data app|dashboard|streamlit|visualization|analytics|chart)\b", text):
+        return (
+            "数据应用搭建工具",
+            "重点把脚本、表格或模型结果做成可交互页面，让别人不用看代码也能操作和查看结果。",
+        )
+    if re.search(r"\b(mcp|tool calling|connect apps|real actions|send emails|slack|github issues)\b", text):
+        return (
+            "AI 工具连接项目",
+            "重点把邮件、表格、GitHub、Slack 等外部应用接进 AI 流程，让 AI 能执行真实动作。",
+        )
+    if re.search(r"\b(framework|sdk|library|package|server|runtime)\b", text):
+        return (
+            "开发者框架/工具包",
+            "重点给技术团队接入底层能力或搭建上层产品，适合有开发经验的人深入试用。",
+        )
+    return (
+        "开发者工具项目",
+        "重点需要结合 README 的项目说明、示例截图和最近提交来判断它具体解决的问题。",
+    )
+
+
+def doc_detail_hints(text: str) -> list[str]:
+    hints: list[str] = []
+    checks = [
+        (r"\b(pdf|ats-optimized|ats optimized)\b", "PDF 输出"),
+        (r"\b(batch|bulk)\b", "批量处理"),
+        (r"\b(scan|scanner)\b", "自动扫描"),
+        (r"\b(dashboard|kanban|tracker)\b", "看板/记录追踪"),
+        (r"\b(agent skill standard|skill-standard)\b", "Agent Skill 标准 CLI"),
+        (r"\b(local-first|local first)\b", "本地优先"),
+        (r"\b(sandbox|preview)\b", "沙盒预览"),
+        (r"\b(one[- ]click|1-click)\b", "一键操作"),
+        (r"\b(open source|open-source)\b", "开源"),
+        (r"\b(multi[- ]agent|parallel agents?)\b", "多智能体协作"),
+    ]
+    for pattern, label in checks:
+        if re.search(pattern, text) and label not in hints:
+            hints.append(label)
+    return hints
+
+
+def summarize_repo_docs_zh(repo: dict[str, Any]) -> str:
+    full_name = str(repo.get("full_name") or "")
+    if full_name in README_SUMMARY_OVERRIDES:
+        return README_SUMMARY_OVERRIDES[full_name]
+
+    description = compact_sentence(str(repo.get("description") or ""), 220)
+    excerpt = compact_sentence(str(repo.get("readme_excerpt") or ""), 360)
+    source = description or excerpt
+    if source and has_chinese_text(source) and not has_long_english_text(source):
+        return source
+
+    text = doc_text_for_summary(repo)
+    kind, detail = summary_kind_from_docs(repo, text)
+    title = readable_repo_title(repo)
+    hints = doc_detail_hints(text)
+    examples = [
+        str(example.get("title") or "").strip()
+        for example in repo.get("examples") or []
+        if isinstance(example, dict) and str(example.get("title") or "").strip()
+    ]
+
+    article = "一个 " if re.match(r"^[A-Za-z0-9]", kind) else "一个"
+    pieces = [f"{title} 是{article}{kind}。", detail]
+    if hints:
+        pieces.append(f"README 和仓库信息里能看到的关键能力包括：{'、'.join(hints[:4])}。")
+    if examples:
+        pieces.append(f"README 还给了 {'、'.join(examples[:2])} 这类上手/使用部分，可以直接看示例判断是否值得试。")
+    return "".join(pieces)
+
+
+def attach_repo_doc_summary(repo: dict[str, Any]) -> None:
+    repo["readme_summary_zh"] = summarize_repo_docs_zh(repo)
 
 
 EXAMPLE_HEADING_KEYWORDS = [
@@ -1431,6 +1726,24 @@ def iter_payload_repos(payload: dict[str, Any]) -> list[dict[str, Any]]:
     return repos
 
 
+def attach_payload_doc_summaries(payload: dict[str, Any]) -> int:
+    updated = 0
+    seen: set[int] = set()
+    for section in PAYLOAD_REPO_SECTIONS:
+        for repo in payload.get(section) or []:
+            if not isinstance(repo, dict):
+                continue
+            marker = id(repo)
+            if marker in seen:
+                continue
+            seen.add(marker)
+            summary = summarize_repo_docs_zh(repo)
+            if repo.get("readme_summary_zh") != summary:
+                repo["readme_summary_zh"] = summary
+                updated += 1
+    return updated
+
+
 def collect_readme_assets_from_payload(payload: dict[str, Any]) -> dict[str, dict[str, Any]]:
     assets: dict[str, dict[str, Any]] = {}
     for repo in iter_payload_repos(payload):
@@ -1720,6 +2033,9 @@ def embed_latest_json(args: argparse.Namespace) -> int:
     payload = json.loads(data_path.read_text(encoding="utf-8"))
     if not isinstance(payload, dict):
         raise ValueError(f"{data_path} must contain a JSON object")
+    summary_count = attach_payload_doc_summaries(payload)
+    if summary_count:
+        print(f"Refreshed Chinese README summaries: {summary_count}")
     localized = localize_payload_images(payload)
     if localized:
         print(f"Localized README images: {localized}")
@@ -1976,6 +2292,7 @@ def restore_previous_readme_assets(
             changed = True
         if changed:
             repo["features"] = infer_features(repo)
+            attach_repo_doc_summary(repo)
             score_repo(repo, history, run_date)
             restored += 1
     return restored
@@ -1999,11 +2316,14 @@ def enrich_repositories(
         ),
         reverse=True,
     )
-    readme_targets = {repo["full_name"] for repo in likely_interesting[:max_readmes]}
+    if max_readmes <= 0:
+        readme_targets = {repo["full_name"] for repo in likely_interesting}
+    else:
+        readme_targets = {repo["full_name"] for repo in likely_interesting[:max_readmes]}
 
     for repo in repos:
         if repo["full_name"] in readme_targets:
-            readme_text = client.get_readme_text(repo["full_name"])
+            readme_text = client.get_readme_text(repo["full_name"], repo.get("default_branch") or "main")
             repo["readme_excerpt"] = first_readme_excerpt(readme_text, readme_chars)
             repo["examples"] = extract_readme_examples(
                 readme_text,
@@ -2011,6 +2331,7 @@ def enrich_repositories(
                 default_branch=repo.get("default_branch") or "main",
             )
         repo["features"] = infer_features(repo)
+        attach_repo_doc_summary(repo)
         score_repo(repo, history, run_date)
 
 

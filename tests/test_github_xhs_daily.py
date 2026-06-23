@@ -55,6 +55,45 @@ class GithubXhsDailyTests(unittest.TestCase):
         self.assertIn("Web IDE / Browser Editor", features)
         self.assertIn("Sandbox / Preview", features)
 
+    def test_first_readme_excerpt_skips_language_nav_noise(self):
+        readme = """
+# Career-Ops
+
+English | Español | Français | Português (Brasil) | 한국어 | 日本語 | 简体中文
+
+[![stars](https://img.shields.io/github/stars/demo/project)](https://github.com/demo/project)
+
+## What Is This
+
+Career-Ops turns any AI coding CLI into a full job search command center.
+Instead of manually tracking applications in a spreadsheet, you get an AI-powered pipeline.
+"""
+        excerpt = daily.first_readme_excerpt(readme, 260)
+
+        self.assertNotIn("English | Español", excerpt)
+        self.assertNotIn("shields.io", excerpt)
+        self.assertIn("Career-Ops turns any AI coding CLI", excerpt)
+
+    def test_career_ops_summary_uses_readme_meaning(self):
+        repo = {
+            "full_name": "santifer/career-ops",
+            "name": "career-ops",
+            "description": "AI-powered job search system built on Claude Code. 14 skill modes, Go dashboard, PDF generation, batch processing.",
+            "readme_excerpt": (
+                "Career-Ops turns any AI coding CLI into a full job search command center. "
+                "Instead of manually tracking applications in a spreadsheet, you get an AI-powered pipeline."
+            ),
+            "topics": ["job-search", "resume", "career"],
+            "examples": [{"title": "Usage", "body": "/career-ops pdf", "code": ""}],
+        }
+
+        summary = daily.summarize_repo_docs_zh(repo)
+
+        self.assertIn("AI 求职指挥中心", summary)
+        self.assertIn("岗位评估", summary)
+        self.assertIn("简历/CV", summary)
+        self.assertNotIn("数据应用", summary)
+
     def test_select_rankings_keeps_tabs_exclusive(self):
         shared = self.ranked_repo(
             "demo/shared",
