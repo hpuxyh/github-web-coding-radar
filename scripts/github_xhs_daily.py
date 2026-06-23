@@ -252,6 +252,35 @@ README_SUMMARY_OVERRIDES = {
         "README 给出的使用信号是已经评估 740+ 个职位、生成 100+ 份个性化 CV，并帮助拿到 1 个目标岗位。"
     )
 }
+README_SUMMARY_OVERRIDES_PATH = PROJECT_ROOT / "config" / "readme_summary_overrides_zh.json"
+_README_SUMMARY_OVERRIDES_CACHE: dict[str, str] | None = None
+
+
+def readme_summary_overrides() -> dict[str, str]:
+    global _README_SUMMARY_OVERRIDES_CACHE
+    if _README_SUMMARY_OVERRIDES_CACHE is not None:
+        return _README_SUMMARY_OVERRIDES_CACHE
+
+    overrides: dict[str, str] = {
+        str(name): str(summary).strip()
+        for name, summary in README_SUMMARY_OVERRIDES.items()
+        if str(summary).strip()
+    }
+    if README_SUMMARY_OVERRIDES_PATH.exists():
+        try:
+            loaded = json.loads(README_SUMMARY_OVERRIDES_PATH.read_text(encoding="utf-8"))
+        except Exception as exc:
+            print(f"[warn] 读取 README 摘要覆盖表失败: {exc}", file=sys.stderr)
+        else:
+            if isinstance(loaded, dict):
+                for name, summary in loaded.items():
+                    clean = str(summary or "").strip()
+                    if clean:
+                        overrides[str(name)] = clean
+            else:
+                print(f"[warn] README 摘要覆盖表不是 JSON object: {README_SUMMARY_OVERRIDES_PATH}", file=sys.stderr)
+    _README_SUMMARY_OVERRIDES_CACHE = overrides
+    return overrides
 
 EXPERT_CATEGORY_LABEL_ZH = {
     "ai_engineer": "AI 工程师",
@@ -1104,8 +1133,9 @@ def savings_text_from_docs(kind: str, text: str) -> str:
 
 def summarize_repo_docs_zh(repo: dict[str, Any]) -> str:
     full_name = str(repo.get("full_name") or "")
-    if full_name in README_SUMMARY_OVERRIDES:
-        return README_SUMMARY_OVERRIDES[full_name]
+    overrides = readme_summary_overrides()
+    if full_name in overrides:
+        return overrides[full_name]
 
     description = compact_sentence(str(repo.get("description") or ""), 220)
     excerpt = compact_sentence(str(repo.get("readme_excerpt") or ""), 360)

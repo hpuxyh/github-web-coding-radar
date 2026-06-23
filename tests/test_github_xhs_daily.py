@@ -99,6 +99,47 @@ Instead of manually tracking applications in a spreadsheet, you get an AI-powere
         self.assertIn("简历/CV", summary)
         self.assertNotIn("数据应用", summary)
 
+    def test_curated_readme_summaries_prevent_generic_misclassification(self):
+        cases = {
+            "omnigent-ai/omnigent": ("智能体编排框架", "终端里的 AI 编程助手"),
+            "palmier-io/palmier-pro": ("macOS 视频编辑器", "AI 工作流自动化工具"),
+            "lintsinghua/claude-code-book": ("架构图", "AI 编程技能/规则包"),
+            "HKUDS/Vibe-Trading": ("交易智能体", "HTML 页面生成工具"),
+            "browser-use/browser-harness": ("真实浏览器", "终端里的 AI 编程助手"),
+        }
+
+        for full_name, (expected, forbidden) in cases.items():
+            with self.subTest(full_name=full_name):
+                summary = daily.summarize_repo_docs_zh(
+                    {
+                        "full_name": full_name,
+                        "name": full_name.split("/")[-1],
+                        "description": "",
+                        "readme_excerpt": "",
+                        "topics": [],
+                        "examples": [],
+                    }
+                )
+                self.assertIn(expected, summary)
+                self.assertIn("它解决的是", summary)
+                self.assertIn("省掉", summary)
+                self.assertNotIn(forbidden, summary)
+
+    def test_curated_readme_summary_table_has_no_known_template_phrases(self):
+        overrides = daily.readme_summary_overrides()
+        self.assertGreaterEqual(len(overrides), 80)
+        forbidden_phrases = [
+            "这个项目还没有整理成小白版说明",
+            "先点开仓库再人工判断",
+            "终端里的 AI 编程助手，主要给习惯",
+            "AI 工作流自动化工具，主要给想把 AI 接进业务流程",
+            "HTML 页面生成工具，主要给要快速产出网页",
+        ]
+        for full_name, summary in overrides.items():
+            with self.subTest(full_name=full_name):
+                for phrase in forbidden_phrases:
+                    self.assertNotIn(phrase, summary)
+
     def test_quantitative_evidence_translates_token_savings(self):
         text = (
             "High-performance CLI proxy that reduces LLM token consumption by 60-90% "
