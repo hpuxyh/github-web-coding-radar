@@ -57,6 +57,10 @@ GITHUB_README_IMAGE_MODE_SUFFIXES = (
     "%23gh-light-mode-only",
     "%23gh-dark-mode-only",
 )
+NEW_RANKING_SECTIONS = ("hot", "used", "starred", "discussion")
+LEGACY_RANKING_SECTIONS = ("frontier", "product_ideas", "all_time", "rising")
+PAYLOAD_REPO_SECTIONS = ("all_repos", *NEW_RANKING_SECTIONS, *LEGACY_RANKING_SECTIONS, "xhs_repos")
+PAYLOAD_IMAGE_SECTIONS = (*NEW_RANKING_SECTIONS, *LEGACY_RANKING_SECTIONS, "xhs_repos", "all_repos")
 
 
 FEATURE_RULES = [
@@ -1027,6 +1031,7 @@ def latest_snapshot_before(
 def score_repo(repo: dict[str, Any], history: dict[str, Any], run_date: dt.date) -> None:
     stars = repo["stars"]
     forks = repo["forks"]
+    open_issues = int(repo.get("open_issues") or 0)
     age_days = max(1, days_between(run_date, repo.get("created_at")))
     pushed_age = max(0, days_between(run_date, repo.get("pushed_at")))
     features = repo.get("features") or []
@@ -1086,6 +1091,31 @@ def score_repo(repo: dict[str, Any], history: dict[str, Any], run_date: dt.date)
         + min(feature_bonus * 1.2, 85)
         + expert_signal_weight * 0.55
     )
+    readme_bonus = 35 if repo.get("readme_excerpt") else 0
+    example_bonus = 55 if repo.get("examples") else 0
+    homepage_bonus = 18 if repo.get("homepage") else 0
+    license_bonus = 8 if repo.get("license") else 0
+    docs_bonus = readme_bonus + example_bonus + homepage_bonus + license_bonus
+    hot_score = rising_score + min(frontier_signal * 0.35, 65)
+    used_score = (
+        min(math.sqrt(max(forks, 0)) * 8, 420)
+        + min(math.log10(max(stars, 1)) * 70, 360)
+        + min(math.sqrt(max(open_issues, 0)) * 3.5, 130)
+        + freshness * 1.4
+        + docs_bonus
+        + min(feature_bonus * 1.3, 95)
+        + expert_signal_weight * 0.25
+    )
+    starred_score = all_time_score
+    discussion_score = (
+        min(math.sqrt(max(open_issues, 0)) * 14, 440)
+        + min(math.sqrt(max(forks, 0)) * 7, 300)
+        + min(math.log10(max(stars, 1)) * 55, 290)
+        + min(delta_per_day * 20, 220)
+        + freshness * 1.2
+        + min(feature_bonus, 70)
+        + expert_signal_weight * 0.2
+    )
 
     repo["age_days"] = age_days
     repo["star_velocity"] = round(star_velocity, 2)
@@ -1094,6 +1124,10 @@ def score_repo(repo: dict[str, Any], history: dict[str, Any], run_date: dt.date)
     repo["delta_per_day"] = round(delta_per_day, 2)
     repo["expert_score"] = round(expert_raw_score, 3)
     repo["scores"] = {
+        "hot": round(hot_score, 2),
+        "used": round(used_score, 2),
+        "starred": round(starred_score, 2),
+        "discussion": round(discussion_score, 2),
         "all_time": round(all_time_score, 2),
         "rising": round(rising_score, 2),
         "frontier": round(frontier_score, 2),
@@ -1159,9 +1193,22 @@ def repo_card(repo: dict[str, Any], index: int, list_name: str) -> str:
     if repo.get("delta_stars") is not None:
         delta = f"{repo['delta_days']} 天涨星 {repo['delta_stars']}，约 {repo['delta_per_day']}/天"
     topics = ", ".join(repo.get("topics")[:8]) if repo.get("topics") else "无"
-    lens = repo.get("lens") or {}
-    reason = lens.get("product_reason") if list_name == "产品点子榜" else lens.get("frontier_reason")
-    reason = reason or "适合作为选题池里的候选项目继续观察。"
+    if list_name == "热度榜":
+        reason = f"最近增长和更新信号更强，适合优先判断是不是新趋势。{delta}"
+    elif list_name == "大家都在用榜":
+        reason = (
+            f"已有 {compact_int(repo.get('forks'))} 个分支，README / 示例 / 更新状态会一起参与评分，"
+            "更偏向能直接试用或改造的项目。"
+        )
+    elif list_name == "高收藏榜":
+        reason = f"累计 {compact_int(repo.get('stars'))} 个收藏，说明它已经被大量开发者长期认可。"
+    elif list_name == "参与讨论榜":
+        reason = (
+            f"当前有 {compact_int(repo.get('open_issues'))} 个公开 issue，"
+            f"{compact_int(repo.get('forks'))} 个分支，适合观察社区反馈和协作热度。"
+        )
+    else:
+        reason = "适合作为选题池里的候选项目继续观察。"
     expert_line = ""
     expert_summary = expert_signal_summary(repo)
     if expert_summary:
@@ -1223,10 +1270,10 @@ def xhs_draft(repo: dict[str, Any], index: int) -> str:
 
 def build_markdown(
     run_date: dt.date,
-    frontier: list[dict[str, Any]],
-    product_ideas: list[dict[str, Any]],
-    all_time: list[dict[str, Any]],
-    rising: list[dict[str, Any]],
+    hot: list[dict[str, Any]],
+    used: list[dict[str, Any]],
+    starred: list[dict[str, Any]],
+    discussion: list[dict[str, Any]],
     xhs_repos: list[dict[str, Any]],
     config: dict[str, Any],
 ) -> str:
@@ -1238,52 +1285,52 @@ def build_markdown(
         "",
         "## 今日摘要",
         "",
-        f"- 前沿关注榜收录 {len(frontier)} 个项目，用来观察人工智能前沿团队和技术专家可能关注的工具链方向。",
-        f"- 产品点子榜收录 {len(product_ideas)} 个项目，用来观察网页编程用户正在做出哪些有意思、实用、可复刻的产品。",
-        f"- 历史高星榜收录 {len(all_time)} 个项目，按星标、分支、网页编程相关功能和近期活跃度排序。",
-        f"- 新项目潜力榜收录 {len(rising)} 个项目，按创建时间、星标密度、更新活跃度、功能匹配度和历史快照涨星排序。",
+        f"- 热度榜收录 {len(hot)} 个项目，主要看最近涨星、更新、项目年龄和热点方向。",
+        f"- 大家都在用榜收录 {len(used)} 个项目，主要看 fork、文档示例、维护状态和可直接试用程度。",
+        f"- 高收藏榜收录 {len(starred)} 个项目，主要看累计星标、分支和长期认可度。",
+        f"- 参与讨论榜收录 {len(discussion)} 个项目，主要看 issue、fork、最近更新和社区协作痕迹。",
         "- 第一次运行时没有历史涨星数据；连续运行后，“最近涨星”会越来越准。",
         "",
-        "## 前沿关注榜",
+        "## 热度榜",
         "",
     ]
 
-    if frontier:
-        for index, repo in enumerate(frontier, 1):
-            lines.append(repo_card(repo, index, "前沿关注榜"))
+    if hot:
+        for index, repo in enumerate(hot, 1):
+            lines.append(repo_card(repo, index, "热度榜"))
             lines.append("")
     else:
-        lines.extend(["没有拿到符合默认前沿关注查询的项目。", ""])
+        lines.extend(["没有拿到符合默认热度查询的项目。", ""])
 
-    lines.extend(["## 产品点子榜", ""])
-    if product_ideas:
-        for index, repo in enumerate(product_ideas, 1):
-            lines.append(repo_card(repo, index, "产品点子榜"))
+    lines.extend(["## 大家都在用榜", ""])
+    if used:
+        for index, repo in enumerate(used, 1):
+            lines.append(repo_card(repo, index, "大家都在用榜"))
             lines.append("")
     else:
-        lines.extend(["没有拿到符合默认产品点子查询的项目。", ""])
+        lines.extend(["没有拿到有明显使用痕迹的项目。", ""])
 
     lines.extend(
         [
-        "## 历史高星榜",
+        "## 高收藏榜",
         "",
         ]
     )
 
-    if all_time:
-        for index, repo in enumerate(all_time, 1):
-            lines.append(repo_card(repo, index, "历史高星榜"))
+    if starred:
+        for index, repo in enumerate(starred, 1):
+            lines.append(repo_card(repo, index, "高收藏榜"))
             lines.append("")
     else:
-        lines.extend(["没有拿到历史高星项目。", ""])
+        lines.extend(["没有拿到高收藏项目。", ""])
 
-    lines.extend(["## 新项目潜力榜", ""])
-    if rising:
-        for index, repo in enumerate(rising, 1):
-            lines.append(repo_card(repo, index, "新项目潜力榜"))
+    lines.extend(["## 参与讨论榜", ""])
+    if discussion:
+        for index, repo in enumerate(discussion, 1):
+            lines.append(repo_card(repo, index, "参与讨论榜"))
             lines.append("")
     else:
-        lines.extend(["没有拿到符合默认网页编程查询的新项目。可以在 config 里放宽星标或关键词。", ""])
+        lines.extend(["没有拿到有明显公开讨论的项目。", ""])
 
     lines.extend(["## 小红书草稿", ""])
     if xhs_repos:
@@ -1299,10 +1346,11 @@ def build_markdown(
             "",
             f"- GitHub 搜索每个查询最多抓取 {config.get('per_page', 50)} 条，默认只抓第 {config.get('pages', 1)} 页。",
             "- 人物/专家观察源：只读取公开 GitHub star、配置里的公开推文链接和项目引用，不采集私信、私有收藏或登录后内容。",
-            "- 前沿关注榜：优先看智能体、模型上下文协议、代码智能体、开发者工具链、评测、上下文记忆等信号。",
-            "- 产品点子榜：优先看应用、编辑器、模板、原型、仪表盘、可视化工作流、浏览器工具等信号。",
-            "- 历史高星榜：GitHub 搜索按星标排序后，再用本地评分做二次排序。",
-            "- 新项目潜力榜：优先搜索最近创建项目；如果已有历史快照，会加入真实涨星速度。",
+            "- 热度榜：看最近涨星、星标速度、最近更新、项目年龄和热点关键词。",
+            "- 大家都在用榜：看 fork、README、截图示例、官网、维护状态和可直接试用程度。",
+            "- 高收藏榜：看 stars、forks、维护状态和长期认可度。",
+            "- 参与讨论榜：看 open issues、forks、最近更新和社区协作痕迹。",
+            "- 同一个项目只放进一个榜单；冲突时按热度榜、大家都在用榜、参与讨论榜、高收藏榜的顺序归类。",
             "- 说明文档摘要为程序自动抽取，发布前建议人工补一遍中文表达和截图。",
         ]
     )
@@ -1329,17 +1377,17 @@ def write_outputs(
     paths: RunPaths,
     run_date: dt.date,
     all_repos: list[dict[str, Any]],
-    frontier: list[dict[str, Any]],
-    product_ideas: list[dict[str, Any]],
-    all_time: list[dict[str, Any]],
-    rising: list[dict[str, Any]],
+    hot: list[dict[str, Any]],
+    used: list[dict[str, Any]],
+    starred: list[dict[str, Any]],
+    discussion: list[dict[str, Any]],
     xhs_repos: list[dict[str, Any]],
     config: dict[str, Any],
 ) -> tuple[Path, Path]:
     day_dir = paths.output_dir / run_date.isoformat()
     day_dir.mkdir(parents=True, exist_ok=True)
 
-    markdown = build_markdown(run_date, frontier, product_ideas, all_time, rising, xhs_repos, config)
+    markdown = build_markdown(run_date, hot, used, starred, discussion, xhs_repos, config)
     markdown_path = day_dir / "github-web-coding-daily.md"
     json_path = day_dir / "repos.json"
     markdown_path.write_text(markdown, encoding="utf-8")
@@ -1347,10 +1395,14 @@ def write_outputs(
         json.dump(
             {
                 "date": run_date.isoformat(),
-                "frontier": frontier,
-                "product_ideas": product_ideas,
-                "all_time": all_time,
-                "rising": rising,
+                "hot": hot,
+                "used": used,
+                "starred": starred,
+                "discussion": discussion,
+                "frontier": hot,
+                "product_ideas": used,
+                "all_time": starred,
+                "rising": hot,
                 "xhs_repos": xhs_repos,
                 "all_repos": all_repos,
                 "expert_sources": summarize_expert_sources(all_repos, config),
@@ -1369,7 +1421,7 @@ def write_outputs(
 def iter_payload_repos(payload: dict[str, Any]) -> list[dict[str, Any]]:
     repos: list[dict[str, Any]] = []
     seen: set[str] = set()
-    for section in ["all_repos", "frontier", "product_ideas", "all_time", "rising", "xhs_repos"]:
+    for section in PAYLOAD_REPO_SECTIONS:
         for repo in payload.get(section) or []:
             full_name = repo.get("full_name")
             if not full_name or full_name in seen:
@@ -1397,7 +1449,7 @@ def collect_readme_assets_from_payload(payload: dict[str, Any]) -> dict[str, dic
 def iter_payload_images(payload: dict[str, Any]) -> list[dict[str, Any]]:
     images: list[dict[str, Any]] = []
     seen_repos: set[str] = set()
-    for section in ["frontier", "product_ideas", "all_time", "rising", "xhs_repos", "all_repos"]:
+    for section in PAYLOAD_IMAGE_SECTIONS:
         for repo in payload.get(section) or []:
             full_name = repo.get("full_name")
             if not full_name:
@@ -1557,7 +1609,7 @@ def download_readme_image(url: str, asset_dir: Path = LOCAL_README_IMAGE_DIR) ->
 
 def localize_payload_images(payload: dict[str, Any], asset_dir: Path = LOCAL_README_IMAGE_DIR) -> int:
     localized = 0
-    for section in ["frontier", "product_ideas", "all_time", "rising", "xhs_repos", "all_repos"]:
+    for section in PAYLOAD_IMAGE_SECTIONS:
         for repo in payload.get(section) or []:
             for example in repo.get("examples") or []:
                 if not isinstance(example, dict):
@@ -1971,84 +2023,108 @@ def select_rankings(
     list[dict[str, Any]],
     list[dict[str, Any]],
 ]:
-    frontier_limit = int(config.get("frontier_limit", 15))
-    product_limit = int(config.get("product_limit", 15))
-    top_limit = int(config.get("top_limit", 20))
-    rising_limit = int(config.get("rising_limit", 20))
+    hot_limit = int(config.get("hot_limit", config.get("rising_limit", 15)))
+    used_limit = int(config.get("used_limit", config.get("product_limit", 15)))
+    starred_limit = int(config.get("starred_limit", config.get("top_limit", 20)))
+    discussion_limit = int(config.get("discussion_limit", config.get("frontier_limit", 15)))
     xhs_count = int(config.get("xhs_count", 5))
     rising_max_age_days = int(config.get("rising_max_age_days", 180))
 
     # 同一个项目只进一个榜单，避免不同标签页里重复出现。
-    # 认领顺序跟页面标签一致：大佬在看 -> 产品灵感 -> 正在变火 -> 经典项目。
+    # 认领顺序：先保留最近变热和真实使用痕迹，再给讨论活跃项目留位置，最后补高收藏经典项目。
     claimed: set[str] = set()
 
     def take(candidates: list[dict[str, Any]], score_key: str, limit: int) -> list[dict[str, Any]]:
         ranked = sorted(
             (repo for repo in candidates if repo["full_name"] not in claimed),
-            key=lambda repo: repo["scores"][score_key],
+            key=lambda repo: float((repo.get("scores") or {}).get(score_key, 0)),
             reverse=True,
         )[:limit]
         for repo in ranked:
             claimed.add(repo["full_name"])
         return ranked
 
-    frontier_candidates = [
+    hot_candidates = [
         repo
         for repo in repos
-        if "frontier" in repo.get("sources", [])
-        or repo.get("expert_signals")
+        if "rising" in repo.get("sources", [])
+        or repo.get("age_days", 9999) <= rising_max_age_days
+        or float(repo.get("delta_per_day") or 0) > 0
+        or float(repo.get("star_velocity") or 0) >= 5
         or repo.get("lens", {}).get("frontier_hits")
-        or "AI Coding / Agent" in repo.get("features", [])
-        or "MCP / Tool Calling" in repo.get("features", [])
     ]
-    frontier = take(frontier_candidates, "frontier", frontier_limit)
+    if not hot_candidates:
+        hot_candidates = repos
+    hot = take(hot_candidates, "hot", hot_limit)
 
-    product_candidates = [
+    used_candidates = [
         repo
         for repo in repos
         if "product" in repo.get("sources", [])
-        or repo.get("lens", {}).get("product_hits")
+        or "all_time" in repo.get("sources", [])
+        or int(repo.get("forks") or 0) >= 20
+        or repo.get("examples")
+        or repo.get("readme_excerpt")
+        or repo.get("homepage")
         or "Web IDE / Browser Editor" in repo.get("features", [])
         or "Low-code / No-code" in repo.get("features", [])
         or "Sandbox / Preview" in repo.get("features", [])
     ]
-    product_ideas = take(product_candidates, "product", product_limit)
+    if not used_candidates:
+        used_candidates = repos
+    used = take(used_candidates, "used", used_limit)
 
-    rising_candidates = [
+    discussion_candidates = [
         repo
         for repo in repos
-        if "rising" in repo.get("sources", []) or repo.get("age_days", 9999) <= rising_max_age_days
+        if int(repo.get("open_issues") or 0) > 0
+        or int(repo.get("forks") or 0) >= 10
+        or repo.get("expert_signals")
     ]
-    rising = take(rising_candidates, "rising", rising_limit)
+    if not discussion_candidates:
+        discussion_candidates = repos
+    discussion = take(discussion_candidates, "discussion", discussion_limit)
 
-    all_time_candidates = [repo for repo in repos if "all_time" in repo.get("sources", [])]
-    if not all_time_candidates:
-        all_time_candidates = repos
-    all_time = take(all_time_candidates, "all_time", top_limit)
+    starred_candidates = [repo for repo in repos if "all_time" in repo.get("sources", []) or int(repo.get("stars") or 0) > 0]
+    if not starred_candidates:
+        starred_candidates = repos
+    starred = take(starred_candidates, "starred", starred_limit)
 
     seen: set[str] = set()
     xhs_repos: list[dict[str, Any]] = []
-    for repo in product_ideas + frontier + rising + all_time:
+    for repo in used + hot + discussion + starred:
         if repo["full_name"] in seen:
             continue
         seen.add(repo["full_name"])
         xhs_repos.append(repo)
         if len(xhs_repos) >= xhs_count:
             break
-    return frontier, product_ideas, all_time, rising, xhs_repos
+    return hot, used, starred, discussion, xhs_repos
 
 
 def run(args: argparse.Namespace) -> int:
     load_dotenv(PROJECT_ROOT / ".env")
     config = load_config(Path(args.config).resolve())
+    if args.hot_limit is not None:
+        config["hot_limit"] = args.hot_limit
+    if args.used_limit is not None:
+        config["used_limit"] = args.used_limit
+    if args.starred_limit is not None:
+        config["starred_limit"] = args.starred_limit
+    if args.discussion_limit is not None:
+        config["discussion_limit"] = args.discussion_limit
     if args.top_limit is not None:
         config["top_limit"] = args.top_limit
+        config.setdefault("starred_limit", args.top_limit)
     if args.frontier_limit is not None:
         config["frontier_limit"] = args.frontier_limit
+        config.setdefault("discussion_limit", args.frontier_limit)
     if args.product_limit is not None:
         config["product_limit"] = args.product_limit
+        config.setdefault("used_limit", args.product_limit)
     if args.rising_limit is not None:
         config["rising_limit"] = args.rising_limit
+        config.setdefault("hot_limit", args.rising_limit)
     if args.xhs_count is not None:
         config["xhs_count"] = args.xhs_count
     if args.max_readmes is not None:
@@ -2092,19 +2168,19 @@ def run(args: argparse.Namespace) -> int:
         history,
         run_date,
     )
-    frontier, product_ideas, all_time, rising, xhs_repos = select_rankings(repos, config)
+    hot, used, starred, discussion, xhs_repos = select_rankings(repos, config)
     update_history(paths.data_path, history, repos, run_date)
     markdown_path, json_path = write_outputs(
-        paths, run_date, repos, frontier, product_ideas, all_time, rising, xhs_repos, config
+        paths, run_date, repos, hot, used, starred, discussion, xhs_repos, config
     )
 
     print(f"Generated: {markdown_path}")
     print(f"JSON: {json_path}")
     print(f"Repos collected: {len(repos)}")
-    print(f"Frontier ranking: {len(frontier)}")
-    print(f"Product ideas ranking: {len(product_ideas)}")
-    print(f"All-time ranking: {len(all_time)}")
-    print(f"Rising ranking: {len(rising)}")
+    print(f"Hot ranking: {len(hot)}")
+    print(f"Used ranking: {len(used)}")
+    print(f"Starred ranking: {len(starred)}")
+    print(f"Discussion ranking: {len(discussion)}")
     print(f"XHS drafts: {len(xhs_repos)}")
     if restored_readme_assets:
         print(f"Restored README assets from previous run: {restored_readme_assets}")
@@ -2141,6 +2217,10 @@ def build_parser() -> argparse.ArgumentParser:
     run_parser = subparsers.add_parser("run", help="collect repos and generate the daily report")
     run_parser.add_argument("--config", default=str(DEFAULT_CONFIG_PATH))
     run_parser.add_argument("--date", help="run date, YYYY-MM-DD")
+    run_parser.add_argument("--hot-limit", type=int)
+    run_parser.add_argument("--used-limit", type=int)
+    run_parser.add_argument("--starred-limit", type=int)
+    run_parser.add_argument("--discussion-limit", type=int)
     run_parser.add_argument("--top-limit", type=int)
     run_parser.add_argument("--frontier-limit", type=int)
     run_parser.add_argument("--product-limit", type=int)

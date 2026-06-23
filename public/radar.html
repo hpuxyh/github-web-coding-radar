@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="每天帮你找好项目，自动筛出 AI 前沿趋势、实用产品灵感和热门开源项目，并整理成小白也能看懂的中文判断。"
+      content="每天帮你找好项目，自动整理 GitHub 热度榜、大家都在用榜、高收藏榜和参与讨论榜，并压成小白也能看懂的中文判断。"
     />
     <title>GitHub 好项目雷达</title>
     <link rel="icon" href="data:," />
@@ -1626,31 +1626,31 @@
       <section class="methodology" aria-labelledby="methodologyTitle">
         <div class="methodology-header">
           <p class="methodology-kicker">榜单取数逻辑</p>
-          <h2 id="methodologyTitle">这几个标签按什么标准选项目</h2>
+          <h2 id="methodologyTitle">四个榜单分别看什么</h2>
           <p>
-            我会从 GitHub 上找最近值得看的项目，再按用途分到最合适的榜单里。同一个项目只放进一个榜，避免重复。
+            先从 GitHub 官方数据和 README 里找候选项目，再算四类分数。同一个项目只放进最合适的一个榜，避免重复。
           </p>
         </div>
         <div class="methodology-grid">
           <article class="methodology-item">
-            <strong>大佬在看</strong>
-            <p>前沿信号：AI 编程、Agent、MCP、Claude Code、开发者工具，以及公开观察源里被 star 或引用的项目。</p>
+            <strong>热度榜</strong>
+            <p>看最近涨得快不快、是不是刚出现、最近有没有更新，以及是否踩中 AI 编程、Agent、MCP 等热门方向。</p>
           </article>
           <article class="methodology-item">
-            <strong>产品灵感</strong>
-            <p>产品可用性：可直接试用、可改造成内容或工具的项目，例如 app-builder、低代码、网页编辑器、原型工具、在线预览和 AI coding 产品。</p>
+            <strong>大家都在用</strong>
+            <p>看 fork、README、截图示例、官网和持续维护情况，更偏向已经有人拿去试用、改造或集成的项目。</p>
           </article>
           <article class="methodology-item">
-            <strong>正在变火</strong>
-            <p>热度变化：近期创建、涨星快、星标密度高，并且最近更新和功能方向匹配。</p>
+            <strong>高收藏</strong>
+            <p>看累计 stars 和 forks，找长期被开发者认可、适合补课和对标的项目。</p>
           </article>
           <article class="methodology-item">
-            <strong>经典项目</strong>
-            <p>长期标杆：高星、持续维护、被反复验证的 LLM、开发者工具、代码编辑器和 AI Agent 项目，适合补课和找参照。</p>
+            <strong>参与讨论</strong>
+            <p>看 issue、fork、最近更新和公开协作痕迹，找有人反馈、有人参与、社区还在推动的项目。</p>
           </article>
         </div>
         <p class="methodology-note">
-          排序主要看热度、最近有没有更新、涨得快不快，以及项目内容是否和这个榜单匹配。页面上的排序下拉框只调整当前榜单顺序，不会重新分组。
+          冲突时按热度榜、大家都在用、参与讨论、高收藏的顺序归类。排序下拉框只调整当前榜单顺序，不会重新分组。
         </p>
       </section>
 
@@ -1662,10 +1662,10 @@
           <option value="recent">按最近更新排序</option>
         </select>
         <div class="tabs" role="tablist" aria-label="榜单切换">
-          <button type="button" role="tab" aria-selected="true" data-tab="frontier">大佬在看</button>
-          <button type="button" role="tab" aria-selected="false" data-tab="product_ideas">产品灵感</button>
-          <button type="button" role="tab" aria-selected="false" data-tab="rising">正在变火</button>
-          <button type="button" role="tab" aria-selected="false" data-tab="all_time">经典项目</button>
+          <button type="button" role="tab" aria-selected="true" data-tab="hot">热度榜</button>
+          <button type="button" role="tab" aria-selected="false" data-tab="used">大家都在用</button>
+          <button type="button" role="tab" aria-selected="false" data-tab="starred">高收藏</button>
+          <button type="button" role="tab" aria-selected="false" data-tab="discussion">参与讨论</button>
           <button type="button" role="tab" aria-selected="false" data-tab="drafts" style="display: none">发帖草稿</button>
         </div>
       </section>
@@ -1674,8 +1674,8 @@
         <section class="list" aria-live="polite">
           <div class="list-header">
             <div class="list-heading">
-              <h2 id="listTitle">大佬在看榜</h2>
-              <p class="list-hint" id="listHint">先看早期信号，再点开项目确认能不能试。</p>
+              <h2 id="listTitle">热度榜</h2>
+              <p class="list-hint" id="listHint">先看最近涨得快、还在更新、方向也对的项目。</p>
             </div>
             <span class="count" id="resultCount">0 个项目</span>
           </div>
@@ -1696,7 +1696,7 @@
     <script>
       const state = {
         data: null,
-        activeTab: 'frontier',
+        activeTab: 'hot',
         sort: 'rank',
       };
 
@@ -3387,24 +3387,26 @@
       }
 
       function rankingReason(repo, tabName = state.activeTab) {
-        const features = repo.features?.length ? repo.features.map(toChineseFeature) : ['开发者效率'];
-        if (tabName === 'frontier') {
-          return `为什么值得看：它和「${features.slice(0, 2).join('、')}」有关。简单说，这类项目通常是 AI 圈和技术圈比较早开始研究的方向。`;
+        if (tabName === 'hot') {
+          const delta = repo.delta_stars
+            ? `最近 ${repo.delta_days} 天新增 ${compact(repo.delta_stars)} 个收藏，`
+            : '';
+          return `为什么值得看：${delta}更新也比较近，说明它可能正在被更多人发现。`;
         }
-        if (tabName === 'product_ideas' || tabName === 'drafts') {
-          return `为什么值得看：它不只是技术演示，更像一个可以拿来用、拿来改、拿来做内容的产品点子。`;
+        if (tabName === 'used' || tabName === 'drafts') {
+          return `为什么值得看：它有 ${compact(repo.forks || 0)} 个 fork，README、截图示例和维护状态会一起参与判断，更像已经有人拿去试用或改造的项目。`;
         }
-        if (tabName === 'rising') {
-          return '为什么值得看：它最近涨得比较快，说明可能正在被更多人发现。';
+        if (tabName === 'starred') {
+          return `为什么值得看：它有 ${compact(repo.stars || 0)} 个收藏，说明已经被大量开发者认可，适合补课和找参照。`;
         }
-        return '为什么值得看：收藏的人很多，说明它已经被大量开发者验证过，适合当成经典案例来学习。';
+        return `为什么值得看：它有 ${compact(repo.open_issues || 0)} 个公开 issue 和 ${compact(repo.forks || 0)} 个 fork，社区反馈和参与度更明显。`;
       }
 
       function heatBadge(repo, tabName = state.activeTab) {
-        if (tabName === 'frontier') return '早期信号';
-        if (tabName === 'product_ideas' || tabName === 'drafts') return '产品灵感';
-        if (tabName === 'all_time') return '经典之作';
-        return '正在变火';
+        if (tabName === 'hot') return '正在变热';
+        if (tabName === 'used' || tabName === 'drafts') return '大家在用';
+        if (tabName === 'starred') return '高收藏';
+        return '讨论活跃';
       }
 
       // 把更新时间说成人话：最近更新过就标“还在更新”，否则给一个大概时间。
@@ -3460,10 +3462,10 @@
       function renderSummary(data) {
         const allRepos = data.all_repos || [];
         const rankings = exclusiveRankings(data);
-        const frontier = rankings.frontier;
-        const productIdeas = rankings.product_ideas;
-        const rising = rankings.rising;
-        const allTime = rankings.all_time;
+        const hot = rankings.hot;
+        const used = rankings.used;
+        const starred = rankings.starred;
+        const discussion = rankings.discussion;
         const drafts = data.xhs_repos || [];
         const topStars = Math.max(0, ...allRepos.map((repo) => Number(repo.stars || 0)));
         const featureSet = new Set(allRepos.flatMap((repo) => repo.features || []));
@@ -3478,10 +3480,10 @@
         summary.innerHTML = [
           ['日报日期', shortCnDate(data.date), '今天的数据'],
           ['候选项目', allRepos.length, '从 GitHub 找到的'],
-          ['大佬在看', frontier.length, 'AI 圈早期信号'],
-          ['产品灵感', productIdeas.length, '能拿来用或改造'],
-          ['正在变火', rising.length, '最近涨得快'],
-          ['经典项目', allTime.length, `最高 ${compact(topStars)} 个收藏`],
+          ['热度榜', hot.length, '最近涨得快'],
+          ['大家都在用', used.length, 'fork 和示例更明显'],
+          ['高收藏', starred.length, `最高 ${compact(topStars)} 个收藏`],
+          ['参与讨论', discussion.length, 'issue 和协作更多'],
           ['人物信号', expertSignalList.length, `${expertCount} 个观察源`],
           ['草稿', drafts.length, `${featureSet.size} 类工具类型`],
         ]
@@ -3499,6 +3501,111 @@
         subtitle.textContent = `日报日期 ${data.date || '未知'} · 最近项目更新 ${shortDate(latestPush)}`;
       }
 
+      function mergeRepoRecords(base = {}, extra = {}) {
+        const merged = { ...base, ...extra };
+        if (!(Array.isArray(extra.examples) && extra.examples.length) && Array.isArray(base.examples) && base.examples.length) {
+          merged.examples = base.examples;
+        }
+        if (!extra.readme_excerpt && base.readme_excerpt) {
+          merged.readme_excerpt = base.readme_excerpt;
+        }
+        merged.scores = { ...(base.scores || {}), ...(extra.scores || {}) };
+        merged.lens = { ...(base.lens || {}), ...(extra.lens || {}) };
+        return merged;
+      }
+
+      function richRepoMap(data) {
+        const sections = [
+          'all_repos',
+          'frontier',
+          'product_ideas',
+          'rising',
+          'all_time',
+          'xhs_repos',
+          'hot',
+          'used',
+          'starred',
+          'discussion',
+        ];
+        const map = new Map();
+        sections.forEach((section) => {
+          (data[section] || []).forEach((repo) => {
+            const key = repo.full_name || repo.html_url || repo.name;
+            if (!key) return;
+            map.set(key, mergeRepoRecords(map.get(key) || {}, repo));
+          });
+        });
+        return map;
+      }
+
+      function hydrateRepos(data, repos = []) {
+        const map = richRepoMap(data);
+        return repos.map((repo) => {
+          const key = repo.full_name || repo.html_url || repo.name;
+          const rich = key ? map.get(key) : null;
+          return rich ? mergeRepoRecords(rich, repo) : repo;
+        });
+      }
+
+      function rankingScore(repo, tabName) {
+        const scores = repo.scores || {};
+        const stars = Number(repo.stars || 0);
+        const forks = Number(repo.forks || 0);
+        const openIssues = Number(repo.open_issues || 0);
+        const deltaPerDay = Number(repo.delta_per_day || 0);
+        const velocity = Number(repo.star_velocity || 0);
+        const hasReadme = repo.readme_excerpt ? 1 : 0;
+        const hasExamples = Array.isArray(repo.examples) && repo.examples.length ? 1 : 0;
+        const freshness = repo.pushed_at ? Math.max(0, 45 / (1 + daysSince(repo.pushed_at))) : 0;
+        if (tabName === 'hot') {
+          return Number(scores.hot ?? scores.rising ?? 0) + Math.min(deltaPerDay * 36, 360) + Math.min(velocity * 8, 160) + freshness;
+        }
+        if (tabName === 'used') {
+          return (
+            Number(scores.used ?? scores.product ?? 0) +
+            Math.min(Math.sqrt(forks) * 8, 420) +
+            Math.min(Math.log10(Math.max(stars, 1)) * 70, 360) +
+            hasReadme * 35 +
+            hasExamples * 55 +
+            freshness
+          );
+        }
+        if (tabName === 'starred') {
+          return Number(scores.starred ?? scores.all_time ?? 0) + stars + forks * 0.8;
+        }
+        return (
+          Number(scores.discussion ?? 0) +
+          Math.min(Math.sqrt(openIssues) * 14, 440) +
+          Math.min(Math.sqrt(forks) * 7, 300) +
+          Math.min(deltaPerDay * 20, 220) +
+          freshness
+        );
+      }
+
+      function daysSince(dateValue) {
+        const timestamp = new Date(dateValue).getTime();
+        if (!Number.isFinite(timestamp)) return 3650;
+        return Math.max(0, Math.floor((Date.now() - timestamp) / 86400000));
+      }
+
+      function derivedRanking(data, tabName) {
+        const repos = [...richRepoMap(data).values()];
+        const candidates = repos.filter((repo) => {
+          if (tabName === 'hot') {
+            return Number(repo.delta_per_day || 0) > 0 || Number(repo.star_velocity || 0) >= 5 || Number(repo.age_days || 9999) <= 180;
+          }
+          if (tabName === 'used') {
+            return Number(repo.forks || 0) >= 20 || repo.readme_excerpt || (Array.isArray(repo.examples) && repo.examples.length);
+          }
+          if (tabName === 'discussion') {
+            return Number(repo.open_issues || 0) > 0 || Number(repo.forks || 0) >= 10;
+          }
+          return true;
+        });
+        const source = candidates.length ? candidates : repos;
+        return [...source].sort((a, b) => rankingScore(b, tabName) - rankingScore(a, tabName)).slice(0, 30);
+      }
+
       function exclusiveRankings(data) {
         const seen = new Set();
         const take = (repos = []) =>
@@ -3511,21 +3618,22 @@
           });
 
         return {
-          frontier: take(data.frontier || []),
-          product_ideas: take(data.product_ideas || []),
-          rising: take(data.rising || []),
-          all_time: take(data.all_time || []),
+          hot: take(hydrateRepos(data, data.hot || derivedRanking(data, 'hot') || data.rising || data.frontier || [])),
+          used: take(hydrateRepos(data, data.used || derivedRanking(data, 'used') || data.product_ideas || [])),
+          discussion: take(hydrateRepos(data, data.discussion || derivedRanking(data, 'discussion') || [])),
+          starred: take(hydrateRepos(data, data.starred || derivedRanking(data, 'starred') || data.all_time || [])),
         };
       }
 
       function getReposForTab() {
         if (!state.data) return [];
         const rankings = exclusiveRankings(state.data);
-        if (state.activeTab === 'frontier') return rankings.frontier;
-        if (state.activeTab === 'product_ideas') return rankings.product_ideas;
-        if (state.activeTab === 'all_time') return rankings.all_time;
+        if (state.activeTab === 'hot') return rankings.hot;
+        if (state.activeTab === 'used') return rankings.used;
+        if (state.activeTab === 'starred') return rankings.starred;
+        if (state.activeTab === 'discussion') return rankings.discussion;
         if (state.activeTab === 'drafts') return state.data.xhs_repos || [];
-        return rankings.rising;
+        return rankings.hot;
       }
 
       function sortedRepos(repos) {
@@ -3555,17 +3663,17 @@
       function renderRepos() {
         const repos = sortedRepos(getReposForTab());
         const titleMap = {
-          frontier: '大佬在看榜',
-          product_ideas: '产品灵感榜',
-          rising: '正在变火榜',
-          all_time: '经典项目榜',
+          hot: '热度榜',
+          used: '大家都在用榜',
+          starred: '高收藏榜',
+          discussion: '参与讨论榜',
           drafts: '发帖草稿关联项目',
         };
         const hintMap = {
-          frontier: '先看 AI 圈和技术圈的早期信号，适合找趋势和选题。',
-          product_ideas: '能试、能改、能做内容的产品点子。',
-          rising: '按近期热度变化看正在被更多人发现的项目。',
-          all_time: '适合补课和找经典案例，热度高但不一定最新。',
+          hot: '先看最近涨得快、还在更新、方向也对的项目。',
+          used: '优先看 fork、README、截图示例和维护状态更扎实的项目。',
+          starred: '适合补课和找经典案例，热度高但不一定最新。',
+          discussion: '看 issue、fork 和更新痕迹，判断社区是否还活跃。',
           drafts: '这些项目已经被整理成小红书草稿，可以直接复制再改。',
         };
         listTitle.textContent = titleMap[state.activeTab];

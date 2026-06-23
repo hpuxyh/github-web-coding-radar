@@ -15,6 +15,10 @@ import github_xhs_daily as daily
 class GithubXhsDailyTests(unittest.TestCase):
     def ranked_repo(self, name, sources, scores=None, features=None, age_days=10):
         score_values = {
+            "hot": 100,
+            "used": 100,
+            "starred": 100,
+            "discussion": 100,
             "frontier": 100,
             "product": 100,
             "rising": 100,
@@ -55,31 +59,31 @@ class GithubXhsDailyTests(unittest.TestCase):
         shared = self.ranked_repo(
             "demo/shared",
             ["frontier", "product", "rising", "all_time"],
-            scores={"frontier": 500, "product": 500, "rising": 500, "all_time": 500},
+            scores={"hot": 500, "used": 500, "starred": 500, "discussion": 500},
             features=["AI Coding / Agent", "Web IDE / Browser Editor"],
         )
         repos = [
             shared,
-            self.ranked_repo("demo/frontier", ["frontier"], scores={"frontier": 400}, features=["AI Coding / Agent"]),
-            self.ranked_repo("demo/product", ["product"], scores={"product": 400}, features=["Web IDE / Browser Editor"]),
-            self.ranked_repo("demo/rising", ["rising"], scores={"rising": 400}),
-            self.ranked_repo("demo/classic", ["all_time"], scores={"all_time": 400}),
+            self.ranked_repo("demo/hot", ["rising"], scores={"hot": 400}, features=["AI Coding / Agent"]),
+            self.ranked_repo("demo/used", ["product"], scores={"used": 400}, features=["Web IDE / Browser Editor"]),
+            self.ranked_repo("demo/starred", ["all_time"], scores={"starred": 400}),
+            self.ranked_repo("demo/discussion", ["frontier"], scores={"discussion": 400}),
         ]
-        frontier, product_ideas, all_time, rising, _ = daily.select_rankings(
+        hot, used, starred, discussion, _ = daily.select_rankings(
             repos,
             {
-                "frontier_limit": 3,
-                "product_limit": 3,
-                "top_limit": 3,
-                "rising_limit": 3,
+                "hot_limit": 3,
+                "used_limit": 3,
+                "starred_limit": 3,
+                "discussion_limit": 3,
                 "xhs_count": 3,
             },
         )
-        sections = [frontier, product_ideas, rising, all_time]
+        sections = [hot, used, discussion, starred]
         names = [repo["full_name"] for section in sections for repo in section]
         self.assertEqual(len(names), len(set(names)))
-        self.assertIn("demo/shared", [repo["full_name"] for repo in frontier])
-        self.assertNotIn("demo/shared", [repo["full_name"] for repo in product_ideas + rising + all_time])
+        self.assertIn("demo/shared", [repo["full_name"] for repo in hot])
+        self.assertNotIn("demo/shared", [repo["full_name"] for repo in used + discussion + starred])
 
     def test_extract_readme_examples_from_usage_section(self):
         readme = """
@@ -225,6 +229,7 @@ MIT
 
         daily.score_repo(base_repo, {"repos": {}}, run_date)
         daily.score_repo(expert_repo, {"repos": {}}, run_date)
+        self.assertGreater(expert_repo["scores"]["hot"], base_repo["scores"]["hot"])
         self.assertGreater(expert_repo["scores"]["frontier"], base_repo["scores"]["frontier"])
         self.assertIn("expert_summary", expert_repo["lens"])
 
@@ -255,6 +260,10 @@ MIT
         self.assertEqual(repo["delta_stars"], 50)
         self.assertEqual(repo["delta_days"], 2)
         self.assertEqual(repo["delta_per_day"], 25.0)
+        self.assertGreater(repo["scores"]["hot"], 0)
+        self.assertGreater(repo["scores"]["used"], 0)
+        self.assertGreater(repo["scores"]["starred"], 0)
+        self.assertGreater(repo["scores"]["discussion"], 0)
         self.assertGreater(repo["scores"]["rising"], 0)
         self.assertGreater(repo["scores"]["frontier"], 0)
         self.assertGreater(repo["scores"]["product"], 0)
@@ -312,6 +321,7 @@ MIT
         self.assertEqual(repo["readme_excerpt"], "AI coding agent creates videos from HTML.")
         self.assertEqual(repo["examples"][0]["images"][0]["alt"], "Hero screenshot")
         self.assertIn("AI Coding / Agent", repo["features"])
+        self.assertGreater(repo["scores"]["hot"], 0)
         self.assertGreater(repo["scores"]["frontier"], 0)
 
     def test_embed_radar_payload_escapes_script_end(self):
@@ -452,10 +462,10 @@ MIT
             "topics": ["ai-coding"],
         }
         markdown = daily.build_markdown(run_date, [repo], [repo], [repo], [repo], [repo], {"per_page": 40, "pages": 1})
-        self.assertIn("前沿关注榜", markdown)
-        self.assertIn("产品点子榜", markdown)
-        self.assertIn("历史高星榜", markdown)
-        self.assertIn("新项目潜力榜", markdown)
+        self.assertIn("热度榜", markdown)
+        self.assertIn("大家都在用榜", markdown)
+        self.assertIn("高收藏榜", markdown)
+        self.assertIn("参与讨论榜", markdown)
         self.assertIn("小红书草稿", markdown)
         self.assertIn("demo/repo", markdown)
 
