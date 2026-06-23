@@ -92,9 +92,48 @@ Instead of manually tracking applications in a spreadsheet, you get an AI-powere
         self.assertIn("AI 求职指挥中心", summary)
         self.assertIn("主要给", summary)
         self.assertIn("它解决的是", summary)
+        self.assertIn("省掉", summary)
+        self.assertIn("740+", summary)
+        self.assertIn("100+", summary)
         self.assertIn("评估岗位", summary)
         self.assertIn("简历/CV", summary)
         self.assertNotIn("数据应用", summary)
+
+    def test_quantitative_evidence_translates_token_savings(self):
+        text = (
+            "High-performance CLI proxy that reduces LLM token consumption by 60-90% "
+            "on common dev commands. Single Rust binary, 100+ supported commands, <10ms overhead."
+        )
+
+        evidence = daily.quantitative_evidence_text(text)
+
+        self.assertIn("常见开发命令可减少 60-90% 的模型 token 消耗", evidence)
+        self.assertIn("100+ 个支持命令", evidence)
+        self.assertNotIn("on common dev commands", evidence)
+
+    def test_quantitative_evidence_translates_design_counts(self):
+        text = "259+ Skills · 142+ Design Systems · Web, desktop and mobile prototypes."
+
+        evidence = daily.quantitative_evidence_text(text)
+
+        self.assertIn("259+ 个技能、142+ 套设计系统", evidence)
+        self.assertNotIn("Design Systems", evidence)
+
+    def test_design_project_beats_generic_coding_agent_classification(self):
+        repo = {
+            "full_name": "demo/open-design",
+            "name": "open-design",
+            "description": "Claude Code / Codex design workspace for prototypes, slides, images and design systems.",
+            "readme_excerpt": "Go from a vague idea to discovering references, editing interactively and producing web, desktop and mobile prototypes.",
+            "topics": ["ai-design", "coding-agents", "design-tools"],
+            "examples": [{"title": "Demo", "body": "Entry view and mobile onboarding", "code": ""}],
+        }
+
+        summary = daily.summarize_repo_docs_zh(repo)
+
+        self.assertIn("设计/原型生成工具", summary)
+        self.assertIn("省掉的是先写需求", summary)
+        self.assertNotIn("终端里的 AI 编程助手", summary)
 
     def test_select_rankings_keeps_tabs_exclusive(self):
         shared = self.ranked_repo(

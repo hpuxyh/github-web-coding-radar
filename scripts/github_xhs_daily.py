@@ -248,6 +248,8 @@ README_SUMMARY_OVERRIDES = {
         "Career-Ops 是一个 AI 求职指挥中心，主要给正在找工作、需要大量筛选职位和定制投递材料的候选人用。"
         "它解决的是手动评估岗位、改简历/CV、写求职信、导出 PDF、记录申请进度和批量处理太分散的问题，"
         "做法是把这些步骤串成 Claude Code、Codex、Gemini 等 Agent Skill CLI 里的求职流水线。"
+        "它省掉的是反复复制 JD、人工筛岗位、手改简历和求职信、维护申请表、逐个导出 PDF 这些重复步骤；"
+        "README 给出的使用信号是已经评估 740+ 个职位、生成 100+ 份个性化 CV，并帮助拿到 1 个目标岗位。"
     )
 }
 
@@ -810,6 +812,20 @@ def summary_kind_from_docs(repo: dict[str, Any], text: str) -> tuple[str, str, s
             "命令输出太长、上下文被无效内容塞满，导致 token 和费用浪费",
             "压缩命令输出、减少无效上下文或统计模型消耗，让同样的开发任务少花 token 和费用。",
         )
+    if re.search(r"\b(design|wireframe|mockup|ui generator|html artifacts|slides|deck|poster)\b", text):
+        return (
+            "设计/原型生成工具",
+            "需要快速看见方案效果的产品、设计和内容创作者",
+            "想法停留在文字里，很难判断页面、海报、幻灯片或原型是否可用",
+            "把文字需求快速转成界面、海报、幻灯片、网页原型或可预览的视觉物料。",
+        )
+    if re.search(r"\b(html editor|html page|web page|landing page|surface|hyperframe)\b", text):
+        return (
+            "HTML 页面生成工具",
+            "要快速产出网页、报告或社交媒体物料的创作者和产品同学",
+            "普通文档不够直观，自己写 HTML 又慢",
+            "把文字草稿或需求变成可预览、可发布的网页、报告、海报或社交媒体内容。",
+        )
     if re.search(r"\b(deepseek|terminal|cli|coding agent|code agent|agentic coding)\b", text):
         return (
             "终端里的 AI 编程助手",
@@ -880,20 +896,6 @@ def summary_kind_from_docs(repo: dict[str, Any], text: str) -> tuple[str, str, s
             "单次对话不能沉淀成稳定流程，人工确认、知识库和外部工具也难串起来",
             "把提示词、知识库、人工确认、外部工具和自动化步骤编排成可反复运行的工作流。",
         )
-    if re.search(r"\b(design|wireframe|mockup|ui generator|html artifacts|slides|deck|poster)\b", text):
-        return (
-            "设计/原型生成工具",
-            "需要快速看见方案效果的产品、设计和内容创作者",
-            "想法停留在文字里，很难判断页面、海报、幻灯片或原型是否可用",
-            "把文字需求快速转成界面、海报、幻灯片、网页原型或可预览的视觉物料。",
-        )
-    if re.search(r"\b(html editor|html page|web page|landing page|surface|hyperframe)\b", text):
-        return (
-            "HTML 页面生成工具",
-            "要快速产出网页、报告或社交媒体物料的创作者和产品同学",
-            "普通文档不够直观，自己写 HTML 又慢",
-            "把文字草稿或需求变成可预览、可发布的网页、报告、海报或社交媒体内容。",
-        )
     if re.search(r"\b(data app|dashboard|streamlit|visualization|analytics|chart)\b", text):
         return (
             "数据应用搭建工具",
@@ -943,6 +945,163 @@ def doc_detail_hints(text: str) -> list[str]:
     return hints
 
 
+def compact_metric_signal(value: str) -> str:
+    value = re.sub(r"\s+", " ", value).strip(" .;:|")
+    return value[:90].strip(" .;:|")
+
+
+def metric_signal_to_zh(signal: str, text: str) -> str:
+    signal = compact_metric_signal(signal)
+    lower_signal = signal.lower()
+    lower_text = text.lower()
+
+    skills_surfaces = re.search(r"(\d+\+?)\s*skills?\s*[×x]\s*(\d+\+?)\s*surfaces?", lower_signal)
+    if skills_surfaces:
+        return f"{skills_surfaces.group(1)} 个技能、{skills_surfaces.group(2)} 个输出场景。"
+
+    skills = re.search(r"(\d+\+?)\s*skills?", lower_signal)
+    design_systems = re.search(r"(\d+\+?)\s*design systems?", lower_signal)
+    if skills and design_systems:
+        return f"{skills.group(1)} 个技能、{design_systems.group(1)} 套设计系统。"
+
+    under_time = re.search(r"under\s+(\d+(?:\.\d+)?)\s*(minutes|mins|hours|hrs|seconds|weeks)", lower_signal)
+    if under_time:
+        unit = {
+            "seconds": "秒",
+            "minutes": "分钟",
+            "mins": "分钟",
+            "hours": "小时",
+            "hrs": "小时",
+            "weeks": "周",
+        }[under_time.group(2)]
+        return f"{under_time.group(1)} {unit}内可以完成上手。"
+
+    percent = re.search(r"(-?\d{1,3}(?:\s*-\s*\d{1,3})?)\s*%", signal)
+    if percent:
+        value = percent.group(1).replace(" ", "").lstrip("-") + "%"
+        if any(keyword in lower_text for keyword in ["token", "llm", "command output", "dev command"]):
+            return f"常见开发命令可减少 {value} 的模型 token 消耗。"
+        if any(keyword in lower_text for keyword in ["saving", "cost", "compress"]):
+            return f"README 提到有 {value} 的节省幅度。"
+        return f"README 提到有 {value} 的效率或节省幅度。"
+
+    time_value = re.search(
+        r"(<\s*)?(\d+(?:\.\d+)?)\s*(ms|milliseconds|seconds|minutes|mins|hours|hrs|weeks)",
+        lower_signal,
+    )
+    if time_value:
+        prefix = "小于 " if time_value.group(1) else ""
+        unit = {
+            "ms": "毫秒",
+            "milliseconds": "毫秒",
+            "seconds": "秒",
+            "minutes": "分钟",
+            "mins": "分钟",
+            "hours": "小时",
+            "hrs": "小时",
+            "weeks": "周",
+        }[time_value.group(3)]
+        if "overhead" in lower_signal or "overhead" in lower_text:
+            return f"额外耗时约 {prefix}{time_value.group(2)} {unit}。"
+        return f"耗时约 {prefix}{time_value.group(2)} {unit}。"
+
+    count = re.search(
+        r"(\d+\+?)\s*(personalized cvs|supported commands|design systems|flagship models|coding-agent clis|job listings|contributors|repositories|templates|surfaces|skills|models|agents|apps|clis)",
+        lower_signal,
+    )
+    if count:
+        labels = {
+            "job listings": "个职位",
+            "personalized cvs": "份个性化 CV",
+            "supported commands": "个支持命令",
+            "apps": "个应用",
+            "skills": "个技能",
+            "surfaces": "个输出场景",
+            "contributors": "位贡献者",
+            "models": "个模型",
+            "repositories": "个仓库",
+            "templates": "个模板",
+            "agents": "个智能体",
+            "design systems": "套设计系统",
+            "coding-agent clis": "个 AI 编程 CLI",
+            "clis": "个 CLI",
+            "flagship models": "个旗舰模型",
+        }
+        return f"{count.group(1)} {labels[count.group(2)]}。"
+
+    return signal
+
+
+def quantitative_evidence_text(text: str) -> str:
+    patterns = [
+        r"\b\d+\+?\s*skills?\s*[×x]\s*\d+\+?\s*surfaces?\b",
+        r"\b\d+\+?\s*skills?\b[^.;|]{0,50}\b\d+\+?\s*design systems?\b",
+        r"\b\d{1,3}\s*-\s*\d{1,3}%(?!\w)",
+        r"(?<!\w)-?\d{1,3}%(?!\w)",
+        r"\b\d+\+?\s*(?:personalized cvs|supported commands|design systems|flagship models|coding-agent clis|job listings|contributors|repositories|templates|surfaces|skills|models|agents|apps|clis)\b",
+        r"\bunder\s+\d+(?:\.\d+)?\s*(?:minutes|mins|hours|hrs|seconds|weeks)\b",
+        r"<\s*\d+(?:\.\d+)?\s*(?:ms|milliseconds|seconds|minutes|mins|hours|hrs)\b",
+        r"\b\d+(?:\.\d+)?\s*(?:ms|milliseconds|seconds|minutes|mins|hours|hrs|weeks)\b",
+    ]
+    signals: list[str] = []
+    for pattern in patterns:
+        for match in re.finditer(pattern, text, flags=re.I):
+            signal = metric_signal_to_zh(match.group(0), text)
+            if "%" in signal and any("%" in existing for existing in signals):
+                continue
+            if "分钟" in signal and any("分钟" in existing for existing in signals):
+                continue
+            if any(marker in signal and any(marker in existing for existing in signals) for marker in ["个技能", "套设计系统"]):
+                continue
+            if signal and signal not in signals:
+                signals.append(signal)
+            if len(signals) >= 2:
+                break
+        if len(signals) >= 2:
+            break
+    if not signals:
+        return ""
+    return f"README 里能看到的量化信号包括：{'；'.join(signal.rstrip('。') for signal in signals)}。"
+
+
+def savings_text_from_docs(kind: str, text: str) -> str:
+    if kind == "AI 求职管理系统":
+        return "它省掉的是反复复制 JD、人工筛岗位、手改简历和求职信、维护申请表、逐个导出 PDF 这些重复步骤。"
+    if kind == "AI 编程成本优化工具":
+        return "它省掉的是人工清理冗长命令输出、反复压缩上下文和事后追查 token 消耗的步骤，收益主要体现在少花模型额度和少花钱。"
+    if kind == "终端里的 AI 编程助手":
+        return "它省掉的是在聊天窗口、编辑器和终端之间来回切换、手动复制报错、再手动执行测试的步骤，把读代码、改代码、跑命令集中到一个流程里。"
+    if kind == "AI 编程技能/规则包":
+        return "它省掉的是每次都重新写提示词、重复解释项目规则、人工补安全约束和手动纠偏 AI 输出的步骤。"
+    if kind == "资料合集":
+        return "它省掉的是逐个搜索、收藏、筛选和对比资料的时间，把补课和选型的前置搜索集中到一处。"
+    if kind == "接口调试工具":
+        return "它省掉的是手动整理接口地址、复制请求参数、保存返回结果和重复搭测试用例的步骤。"
+    if kind == "浏览器自动化工具":
+        return "它省掉的是人工点网页、重复复现路径、手动截图和逐项检查页面状态的步骤。"
+    if kind == "2D 游戏开发工具":
+        return "它省掉的是从零搭游戏循环、热更新、预览和导出链路的基础工程时间。"
+    if kind == "加密协作框架":
+        return "它省掉的是团队从零设计加密同步协议、权限边界和不可信服务端协作模型的研究成本。"
+    if kind == "Microsoft 365 Copilot 智能体模板":
+        return "它省掉的是从零写 Copilot Agent 配置、整理业务提示词和接入办公流程的启动步骤。"
+    if kind == "个人知识库增强工具":
+        return "它省掉的是人工翻旧笔记、手动建立关联、反复给 AI 补背景资料的步骤。"
+    if kind == "AI 工作流自动化工具":
+        return "它省掉的是把同一套 AI 任务反复人工发起、手动复制结果、再切换外部工具执行下一步的流程成本。"
+    if kind == "设计/原型生成工具":
+        return "它省掉的是先写需求、再找设计工具、再手工做页面/海报/幻灯片初稿的步骤，让想法更快变成可看的稿子。"
+    if kind == "HTML 页面生成工具":
+        return "它省掉的是手写 HTML、调样式、跑预览和重复导出页面素材的步骤。"
+    if kind == "数据应用搭建工具":
+        return "它省掉的是把脚本结果截图发给别人、手动做表格说明、再反复解释数据含义的沟通步骤。"
+    if kind == "AI 工具连接项目":
+        return "它省掉的是在 AI 回答后再人工打开邮箱、表格、GitHub 或 Slack 执行操作的步骤，把回答和动作接在一起。"
+    if kind == "开发者框架/工具包":
+        return "它省掉的是从零封装底层能力、写样板代码和重复搭集成链路的工程时间。"
+    return "它省掉的是先点开仓库再人工判断用途、上手路径和投入成本的筛选时间。"
+
+
 def summarize_repo_docs_zh(repo: dict[str, Any]) -> str:
     full_name = str(repo.get("full_name") or "")
     if full_name in README_SUMMARY_OVERRIDES:
@@ -966,6 +1125,10 @@ def summarize_repo_docs_zh(repo: dict[str, Any]) -> str:
 
     article = "一个 " if re.match(r"^[A-Za-z0-9]", kind) else "一个"
     pieces = [f"{title} 是{article}{kind}，主要给{audience}用。它解决的是{problem}，做法是{solution}"]
+    pieces.append(savings_text_from_docs(kind, text))
+    evidence = quantitative_evidence_text(text)
+    if evidence:
+        pieces.append(evidence)
     if hints:
         pieces.append(f"README 和仓库信息里能看到的关键能力包括：{'、'.join(hints[:4])}。")
     if examples:

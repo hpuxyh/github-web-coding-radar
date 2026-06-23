@@ -1,0 +1,60 @@
+<svg width="960" height="320" viewBox="0 0 960 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="reachai-blue" x1="92" y1="46" x2="262" y2="256" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3AB8FF"/>
+      <stop offset="0.48" stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="reachai-cyan" x1="64" y1="134" x2="182" y2="236" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#06B6D4"/>
+      <stop offset="1" stop-color="#2563EB"/>
+    </linearGradient>
+    <linearGradient id="reachai-ring" x1="48" y1="228" x2="308" y2="286" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2563EB"/>
+      <stop offset="0.54" stop-color="#3B82F6"/>
+      <stop offset="1" stop-color="#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="word-ai" x1="682" y1="210" x2="820" y2="210" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#7C3AED"/>
+    </linearGradient>
+  </defs>
+
+  <g>
+    <g stroke="url(#reachai-ring)" stroke-linecap="round" opacity="0.9">
+      <ellipse cx="160" cy="236" rx="118" ry="25" stroke-width="10"/>
+      <ellipse cx="160" cy="236" rx="84" ry="16" stroke-width="7" opacity="0.82"/>
+      <ellipse cx="160" cy="236" rx="52" ry="9" stroke-width="5" opacity="0.72"/>
+    </g>
+
+    <path d="M113 62H217C263 62 298 93 298 135C298 176 265 207 221 207H201L276 268H212L125 193H218C243 193 261 176 261 153C261 130 243 113 218 113H113V62Z" fill="url(#reachai-blue)"/>
+    <path d="M113 128H202C227 128 244 144 244 166C244 188 227 204 202 204H161L216 251H152L113 216V128Z" fill="#FFFFFF" fill-opacity="0.82"/>
+    <path d="M130 146H202C214 146 223 154 223 166C223 177 214 186 202 186H154L243 260H202L130 199V146Z" fill="url(#reachai-blue)"/>
+
+    <g fill="url(#reachai-blue)">
+      <rect x="60" y="78" width="21" height="21" rx="3"/>
+      <rect x="83" y="108" width="18" height="18" rx="3"/>
+      <rect x="54" y="128" width="16" height="16" rx="3"/>
+      <rect x="97" y="144" width="13" height="13" rx="3"/>
+    </g>
+
+    <g stroke="url(#reachai-cyan)" stroke-width="6" stroke-linecap="round">
+      <path d="M74 204V165"/>
+      <path d="M98 212V148"/>
+      <path d="M124 210V169"/>
+      <path d="M148 208V183"/>
+    </g>
+    <g fill="#06B6D4">
+      <circle cx="74" cy="165" r="8"/>
+      <circle cx="98" cy="148" r="9"/>
+      <circle cx="124" cy="169" r="7"/>
+      <circle cx="148" cy="183" r="6"/>
+    </g>
+  </g>
+
+  <g>
+    <text x="354" y="142" fill="#0F172A" font-family="'Microsoft YaHei', 'PingFang SC', 'Noto Sans CJK SC', sans-serif" font-size="84" font-weight="800" letter-spacing="8">睿池</text>
+    <text x="356" y="222" fill="#0F172A" font-family="Inter, 'Segoe UI', Arial, sans-serif" font-size="56" font-weight="800" letter-spacing="1">Reach</text>
+    <text x="600" y="222" fill="url(#word-ai)" font-family="Inter, 'Segoe UI', Arial, sans-serif" font-size="56" font-weight="800" letter-spacing="1">AI</text>
+  </g>
+</svg>
