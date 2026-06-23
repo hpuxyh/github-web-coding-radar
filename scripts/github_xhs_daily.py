@@ -245,9 +245,9 @@ README_LANGUAGE_WORDS = {
 
 README_SUMMARY_OVERRIDES = {
     "santifer/career-ops": (
-        "Career-Ops 是一个 AI 求职指挥中心，运行在 Claude Code、Codex、Gemini 等支持 Agent Skill 标准的命令行工具里。"
-        "README 说明它会把岗位评估、个性化简历/CV 和求职信生成、PDF 输出、申请记录、批量处理和职位扫描串成一套流程，"
-        "帮助候选人系统化管理从筛选职位到准备投递材料的全过程。"
+        "Career-Ops 是一个 AI 求职指挥中心，主要给正在找工作、需要大量筛选职位和定制投递材料的候选人用。"
+        "它解决的是手动评估岗位、改简历/CV、写求职信、导出 PDF、记录申请进度和批量处理太分散的问题，"
+        "做法是把这些步骤串成 Claude Code、Codex、Gemini 等 Agent Skill CLI 里的求职流水线。"
     )
 }
 
@@ -789,14 +789,16 @@ def doc_text_for_summary(repo: dict[str, Any]) -> str:
     ).lower()
 
 
-def summary_kind_from_docs(repo: dict[str, Any], text: str) -> tuple[str, str]:
+def summary_kind_from_docs(repo: dict[str, Any], text: str) -> tuple[str, str, str, str]:
     if re.search(
         r"\b(job search|career|resume|cv|cover letter|interview prep|job applications?|application tracker|application tracking)\b",
         text,
     ):
         return (
             "AI 求职管理系统",
-            "重点覆盖岗位评估、简历/CV、求职信、申请记录和批量处理这些求职流程。",
+            "正在找工作、需要批量筛选岗位和定制投递材料的候选人",
+            "手动判断岗位匹配度、改简历/CV、写求职信、导出 PDF、记录申请进度太分散",
+            "把岗位评估、材料生成、PDF 输出、申请记录和批量处理串成一套求职流水线。",
         )
     if re.search(
         r"\b(token consumption|token optimization|cost reduction|token savings|compresses?|compression|reduce[sd]? llm token|token killer)\b",
@@ -804,86 +806,120 @@ def summary_kind_from_docs(repo: dict[str, Any], text: str) -> tuple[str, str]:
     ):
         return (
             "AI 编程成本优化工具",
-            "重点压缩命令输出、减少上下文浪费或统计模型消耗，让同样的开发任务少花 token 和费用。",
+            "频繁使用 Claude Code、Codex、Cursor 等 AI 编程工具的开发者",
+            "命令输出太长、上下文被无效内容塞满，导致 token 和费用浪费",
+            "压缩命令输出、减少无效上下文或统计模型消耗，让同样的开发任务少花 token 和费用。",
         )
     if re.search(r"\b(deepseek|terminal|cli|coding agent|code agent|agentic coding)\b", text):
         return (
             "终端里的 AI 编程助手",
-            "重点在命令行或编辑器里读代码、改代码、跑命令，适合先用小项目验证稳定性。",
+            "习惯在终端或编辑器里工作的工程师",
+            "希望 AI 直接参与读代码、改代码、跑命令，但又不想离开现有开发流程",
+            "把模型能力接进命令行工作流，让 AI 在项目里执行代码修改、测试和排错任务。",
         )
     if re.search(r"\b(agent harness|skills?, instincts?|agent shield|rules?)\b", text):
         return (
             "AI 编程技能/规则包",
-            "重点把提示词、流程、记忆、安全检查或开发习惯整理成可复用规则，让 Claude Code、Codex、Cursor 等工具更稳定地工作。",
+            "已经在用 Claude Code、Codex、Cursor 等 AI 编程工具的开发者或团队",
+            "AI 做任务时容易忘上下文、流程不稳定、代码风格和安全边界不一致",
+            "把提示词、流程、记忆、安全检查或开发习惯整理成可复用规则，让 AI 更稳定地完成开发任务。",
         )
     if re.search(r"\b(awesome|curated list|resources|roadmap|collection of)\b", text):
         return (
             "资料合集",
-            "重点收集同类工具、教程、模板或资源，适合用来补课、找参考项目和做选题池。",
+            "想快速补课、选型或找同类项目参考的人",
+            "相关工具和教程分散，自己从头搜索会花很多时间",
+            "把同类工具、教程、模板或资源集中整理出来，方便快速建立地图和候选池。",
         )
     if re.search(r"\b(api client|postman|rest|graphql|http client|api testing)\b", text):
         return (
             "接口调试工具",
-            "重点管理接口请求、测试返回结果和整理接口用例，适合替代或补充 Postman 这类工作流。",
+            "后端、前端和测试同学",
+            "接口请求、返回结果和测试用例不好管理，协作时容易散落在不同工具里",
+            "集中管理 API 请求、测试响应和接口用例，替代或补充 Postman 这类工作流。",
         )
     if re.search(r"\b(browser automation|puppeteer|playwright|web automation|browser harness)\b", text):
         return (
             "浏览器自动化工具",
-            "重点自动打开网页、点击、抓取内容或跑端到端测试，适合网页测试和自动化操作。",
+            "需要做网页测试、自动化操作或网页数据采集的开发者",
+            "人工点网页、复现流程和检查页面状态耗时且容易漏步骤",
+            "自动打开网页、点击、抓取内容或跑端到端测试，把重复浏览器操作流程化。",
         )
     if re.search(r"\b(game engine|2d game|lua|live reload|cross-platform export)\b", text):
         return (
             "2D 游戏开发工具",
-            "重点快速做原型、实时预览和跨平台导出，适合学习小游戏或交互原型的搭建方式。",
+            "想快速做小游戏或交互原型的开发者",
+            "从零搭游戏循环、预览和跨平台导出成本高",
+            "提供 2D 游戏原型、实时预览和导出能力，让想法更快变成可玩的 demo。",
         )
     if re.search(r"\b(cryptographic|untrusted server|encrypted|collaborative applications)\b", text):
         return (
             "加密协作框架",
-            "重点研究多人协作场景里的数据安全，尤其是服务器不可信时如何保护协作数据。",
+            "要做安全协作应用的技术团队或研究者",
+            "多人协作时服务端不一定可信，但数据仍需要保持隐私和一致性",
+            "用加密协议和协作框架来保护协作数据，研究不可信服务器下的应用架构。",
         )
     if re.search(r"\b(copilot studio|microsoft 365|declarative agents|m365)\b", text):
         return (
             "Microsoft 365 Copilot 智能体模板",
-            "重点提供可复制的业务智能体配置，帮助企业办公场景快速试用 Copilot Agent。",
+            "想在 Microsoft 365 里快速落地 Copilot Agent 的企业用户",
+            "业务部门想试智能体，但从零写配置和接办公流程门槛高",
+            "提供可复制的声明式智能体配置，让办公场景能更快试用 Copilot Agent。",
         )
     if re.search(r"\b(markdown vault|obsidian|logseq|wiki|second brain|knowledge wiki)\b", text):
         return (
             "个人知识库增强工具",
-            "重点把 Markdown、Obsidian 或 Logseq 笔记整理成可持续增长的知识系统，让 AI 能复用长期上下文。",
+            "长期用 Markdown、Obsidian 或 Logseq 记录资料的人",
+            "笔记越积越多后，AI 很难持续理解关联和复用历史上下文",
+            "把本地笔记整理成可增长的知识系统，让 AI 能读、关联和复用长期资料。",
         )
     if re.search(r"\b(workflow|automation|visual canvas|rag|human-in-the-loop|n8n alternative)\b", text):
         return (
             "AI 工作流自动化工具",
-            "重点把提示词、知识库、人工确认、外部工具和自动化流程串起来，做成可反复运行的业务流程。",
+            "想把 AI 接进业务流程的运营、产品或工程团队",
+            "单次对话不能沉淀成稳定流程，人工确认、知识库和外部工具也难串起来",
+            "把提示词、知识库、人工确认、外部工具和自动化步骤编排成可反复运行的工作流。",
         )
     if re.search(r"\b(design|wireframe|mockup|ui generator|html artifacts|slides|deck|poster)\b", text):
         return (
             "设计/原型生成工具",
-            "重点把想法快速变成界面、海报、幻灯片、网页原型或可预览的视觉物料。",
+            "需要快速看见方案效果的产品、设计和内容创作者",
+            "想法停留在文字里，很难判断页面、海报、幻灯片或原型是否可用",
+            "把文字需求快速转成界面、海报、幻灯片、网页原型或可预览的视觉物料。",
         )
     if re.search(r"\b(html editor|html page|web page|landing page|surface|hyperframe)\b", text):
         return (
             "HTML 页面生成工具",
-            "重点把文字草稿或需求变成可预览、可发布的网页、报告、海报或社交媒体内容。",
+            "要快速产出网页、报告或社交媒体物料的创作者和产品同学",
+            "普通文档不够直观，自己写 HTML 又慢",
+            "把文字草稿或需求变成可预览、可发布的网页、报告、海报或社交媒体内容。",
         )
     if re.search(r"\b(data app|dashboard|streamlit|visualization|analytics|chart)\b", text):
         return (
             "数据应用搭建工具",
-            "重点把脚本、表格或模型结果做成可交互页面，让别人不用看代码也能操作和查看结果。",
+            "有脚本、表格或模型结果要展示给别人看的数据/业务团队",
+            "结果只停留在代码或表格里，非技术同学难以操作和理解",
+            "把数据、脚本或模型结果做成可交互页面，让别人不用看代码也能查看和操作。",
         )
     if re.search(r"\b(mcp|tool calling|connect apps|real actions|send emails|slack|github issues)\b", text):
         return (
             "AI 工具连接项目",
-            "重点把邮件、表格、GitHub、Slack 等外部应用接进 AI 流程，让 AI 能执行真实动作。",
+            "想让 AI 真正操作外部系统的开发者和自动化团队",
+            "AI 只回答问题但不能安全地发邮件、查表、建 issue 或调用业务工具",
+            "把邮件、表格、GitHub、Slack 等外部应用接进 AI 流程，让模型能执行真实动作。",
         )
     if re.search(r"\b(framework|sdk|library|package|server|runtime)\b", text):
         return (
             "开发者框架/工具包",
-            "重点给技术团队接入底层能力或搭建上层产品，适合有开发经验的人深入试用。",
+            "需要接入底层能力或搭建上层产品的工程团队",
+            "从零封装基础能力成本高，重复造轮子会拖慢产品验证",
+            "提供框架、SDK、库或运行时，让开发者更快接入能力并构建自己的产品。",
         )
     return (
         "开发者工具项目",
-        "重点需要结合 README 的项目说明、示例截图和最近提交来判断它具体解决的问题。",
+        "需要评估新工具是否值得试用的开发者或产品同学",
+        "只看 stars 和标题很难判断真实用途、上手门槛和是否适合自己的场景",
+        "结合 README、项目说明、示例截图和最近提交来判断它解决的问题和使用方式。",
     )
 
 
@@ -919,7 +955,7 @@ def summarize_repo_docs_zh(repo: dict[str, Any]) -> str:
         return source
 
     text = doc_text_for_summary(repo)
-    kind, detail = summary_kind_from_docs(repo, text)
+    kind, audience, problem, solution = summary_kind_from_docs(repo, text)
     title = readable_repo_title(repo)
     hints = doc_detail_hints(text)
     examples = [
@@ -929,7 +965,7 @@ def summarize_repo_docs_zh(repo: dict[str, Any]) -> str:
     ]
 
     article = "一个 " if re.match(r"^[A-Za-z0-9]", kind) else "一个"
-    pieces = [f"{title} 是{article}{kind}。", detail]
+    pieces = [f"{title} 是{article}{kind}，主要给{audience}用。它解决的是{problem}，做法是{solution}"]
     if hints:
         pieces.append(f"README 和仓库信息里能看到的关键能力包括：{'、'.join(hints[:4])}。")
     if examples:

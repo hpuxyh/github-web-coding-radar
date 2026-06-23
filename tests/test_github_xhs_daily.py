@@ -90,7 +90,9 @@ Instead of manually tracking applications in a spreadsheet, you get an AI-powere
         summary = daily.summarize_repo_docs_zh(repo)
 
         self.assertIn("AI 求职指挥中心", summary)
-        self.assertIn("岗位评估", summary)
+        self.assertIn("主要给", summary)
+        self.assertIn("它解决的是", summary)
+        self.assertIn("评估岗位", summary)
         self.assertIn("简历/CV", summary)
         self.assertNotIn("数据应用", summary)
 
