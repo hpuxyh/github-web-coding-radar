@@ -1412,6 +1412,13 @@ def normalize_repo(item: dict[str, Any], source: str, query: str) -> dict[str, A
     }
 
 
+def meets_min_stars(repo: dict[str, Any], config: dict[str, Any]) -> bool:
+    min_stars = int(config.get("min_stars") or 0)
+    if min_stars <= 0:
+        return True
+    return int(repo.get("stars") or 0) >= min_stars
+
+
 def merge_repo(existing: dict[str, Any], incoming: dict[str, Any]) -> dict[str, Any]:
     existing["sources"] = sorted(set(existing.get("sources", [])) | set(incoming["sources"]))
     existing["queries"] = sorted(set(existing.get("queries", [])) | set(incoming["queries"]))
@@ -1768,7 +1775,7 @@ def xhs_draft(repo: dict[str, Any], index: int) -> str:
 封面文案：{cover}
 
 开头：
-今天刷到一个 GitHub 项目 {repo['full_name']}，适合关注网页编程 / 人工智能编程的朋友收藏。
+今天刷到一个 GitHub 项目 {repo['full_name']}，适合关注 AI 工具、职业效率、办公学习、内容创作和自动化应用的人收藏。
 
 项目是做什么的：
 {intro}
@@ -1777,18 +1784,18 @@ def xhs_draft(repo: dict[str, Any], index: int) -> str:
 {feature_lines}
 
 为什么现在值得看：
-目前 {compact_int(repo['stars'])} 个星标，创建于 {repo.get('created_at', '')[:10]}，最近仍有更新{delta_text}。如果你在做在线集成开发环境、人工智能写代码、代码运行沙盒或开发者工具，可以重点看它的产品思路和说明文档表达。
+目前 {compact_int(repo['stars'])} 个星标，创建于 {repo.get('created_at', '')[:10]}，最近仍有更新{delta_text}。如果你在找近一年值得关注的应用、小工具、职业提效方案或 AI 自动化产品，可以重点看它的产品思路、上手路径和 README 里的真实场景。
 
 可展开讲的角度：
-- 它解决了网页编程里的哪个具体痛点
-- 它和传统本地集成开发环境 / 普通代码生成工具有什么不同
+- 它解决了哪类人群或职业场景里的具体痛点
+- 它和传统软件、手工流程或普通 AI 对话有什么不同
 - 哪个功能最适合做成小红书截图或录屏演示
 
 项目链接：
 {repo['html_url']}
 
 标签：
-#GitHub #开源项目 #网页编程 #人工智能编程 #程序员工具 #开发者工具"""
+#GitHub #开源项目 #AI工具 #效率工具 #自动化 #职业提效"""
     return body
 
 
@@ -1803,13 +1810,13 @@ def build_markdown(
 ) -> str:
     generated_at = dt.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
     lines = [
-        f"# GitHub 网页编程日报 - {run_date.isoformat()}",
+        f"# GitHub 近一年好项目趋势榜 - {run_date.isoformat()}",
         "",
         f"生成时间：{generated_at}",
         "",
         "## 今日摘要",
         "",
-        f"- 热度榜收录 {len(hot)} 个项目，主要看最近涨星、更新、项目年龄和热点方向。",
+        f"- 热度榜收录 {len(hot)} 个项目，主要看近一年项目的最近涨星、更新、项目年龄和热点方向。",
         f"- 大家都在用榜收录 {len(used)} 个项目，主要看 fork、文档示例、维护状态和可直接试用程度。",
         f"- 高收藏榜收录 {len(starred)} 个项目，主要看累计星标、分支和长期认可度。",
         f"- 参与讨论榜收录 {len(discussion)} 个项目，主要看 issue、fork、最近更新和社区协作痕迹。",
@@ -1869,8 +1876,11 @@ def build_markdown(
             "## 数据口径",
             "",
             f"- GitHub 搜索每个查询最多抓取 {config.get('per_page', 50)} 条，默认只抓第 {config.get('pages', 1)} 页。",
+            f"- 时间口径：主榜以近 {config.get('trend_window_days', 365)} 天创建或近一年仍活跃的项目为主，不再聚焦 90 天早期项目。",
+            f"- 星标口径：候选项目最低 {config.get('min_stars', 100)} stars，上限不封顶；高 stars 项目会进入成熟参考或高收藏视角。",
             "- 人物/专家观察源：只读取公开 GitHub star、配置里的公开推文链接和项目引用，不采集私信、私有收藏或登录后内容。",
-            "- 热度榜：看最近涨星、星标速度、最近更新、项目年龄和热点关键词。",
+            "- 搜索范围：覆盖 AI 工具、浏览器插件、桌面应用、知识管理、写作、内容生产、自动化、低代码，以及产品、运营、设计、销售、研究、教育、财务等职业效率工具。",
+            "- 热度榜：看最近涨星、星标速度、最近更新、近一年成长和热点关键词。",
             "- 大家都在用榜：看 fork、README、截图示例、官网、维护状态和可直接试用程度。",
             "- 高收藏榜：看 stars、forks、维护状态和长期认可度。",
             "- 参与讨论榜：看 open issues、forks、最近更新和社区协作痕迹。",
@@ -2265,9 +2275,10 @@ def embed_latest_json(args: argparse.Namespace) -> int:
     summary_count = attach_payload_doc_summaries(payload)
     if summary_count:
         print(f"Refreshed Chinese README summaries: {summary_count}")
-    localized = localize_payload_images(payload)
-    if localized:
-        print(f"Localized README images: {localized}")
+    if not getattr(args, "skip_localize_images", False):
+        localized = localize_payload_images(payload)
+        if localized:
+            print(f"Localized README images: {localized}")
 
     files = [Path(file).resolve() for file in args.files]
     for html_path in files:
@@ -2461,6 +2472,8 @@ def collect_repositories(
                 repo = normalize_repo(item, section, query)
                 if not repo.get("full_name"):
                     continue
+                if not meets_min_stars(repo, config):
+                    continue
                 if repo["full_name"] in merged:
                     merge_repo(merged[repo["full_name"]], repo)
                 else:
@@ -2468,6 +2481,8 @@ def collect_repositories(
 
     for repo in collect_expert_repositories(client, config):
         if not repo.get("full_name"):
+            continue
+        if not meets_min_stars(repo, config):
             continue
         if repo["full_name"] in merged:
             merge_repo(merged[repo["full_name"]], repo)
@@ -2760,7 +2775,7 @@ def print_queries(args: argparse.Namespace) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="每天帮你找好项目：生成 AI 前沿、Web Coding 和热门开源项目榜单。"
+        description="每天帮你找好项目：生成近一年 GitHub 应用、效率工具、AI 自动化和成熟参考榜单。"
     )
     subparsers = parser.add_subparsers(dest="command")
 
@@ -2789,6 +2804,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     embed_parser = subparsers.add_parser("embed", help="embed generated latest JSON into static radar pages")
     embed_parser.add_argument("--data", default=str(PROJECT_ROOT / "output" / "latest.json"))
+    embed_parser.add_argument(
+        "--skip-localize-images",
+        action="store_true",
+        help="skip downloading README images while embedding the latest JSON",
+    )
     embed_parser.add_argument(
         "files",
         nargs="*",

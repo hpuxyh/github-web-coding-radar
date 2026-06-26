@@ -15,7 +15,9 @@
   "xhs_count": 5,
   "max_readmes": 0,
   "readme_excerpt_chars": 1400,
-  "rising_max_age_days": 180,
+  "min_stars": 100,
+  "trend_window_days": 365,
+  "rising_max_age_days": 365,
   "request_interval_seconds": 6.5,
   "request_timeout_seconds": 60,
   "retries": 2,
@@ -116,32 +118,37 @@
     ]
   },
   "all_time_queries": [
-    "topic:llm stars:>=20000 archived:false",
-    "topic:developer-tools stars:>=10000 archived:false",
-    "topic:code-editor stars:>=5000 archived:false",
-    "topic:ai-agent stars:>=5000 archived:false"
+    "pushed:>={date_365} stars:>=100 archived:false topic:ai-agent",
+    "pushed:>={date_365} stars:>=100 archived:false topic:productivity",
+    "pushed:>={date_365} stars:>=100 archived:false topic:automation",
+    "pushed:>={date_365} stars:>=100 archived:false topic:browser-extension",
+    "pushed:>={date_365} stars:>=100 archived:false topic:desktop-app",
+    "pushed:>={date_365} stars:>=100 archived:false topic:note-taking"
   ],
   "rising_queries": [
-    "created:>={date_60} stars:>=20 archived:false topic:coding-agent",
-    "created:>={date_60} stars:>=20 archived:false topic:mcp",
-    "created:>={date_60} stars:>=20 archived:false topic:web-ide",
-    "created:>={date_60} stars:>=20 archived:false topic:ai-agent",
-    "created:>={date_60} stars:>=20 archived:false vibe-coding"
+    "created:>={date_365} stars:>=100 archived:false in:name,description,readme ai productivity",
+    "created:>={date_365} stars:>=100 archived:false in:name,description,readme workflow automation",
+    "created:>={date_365} stars:>=100 archived:false in:name,description,readme knowledge management",
+    "created:>={date_365} stars:>=100 archived:false in:name,description,readme content creation",
+    "created:>={date_365} stars:>=100 archived:false in:name,description,readme research tools",
+    "created:>={date_365} stars:>=100 archived:false in:name,description,readme productivity app"
   ],
   "frontier_queries": [
-    "created:>={date_90} stars:>=50 archived:false topic:coding-agent",
-    "created:>={date_90} stars:>=50 archived:false topic:mcp",
-    "created:>={date_90} stars:>=50 archived:false topic:ai-agent",
-    "created:>={date_90} stars:>=50 archived:false claude-code",
-    "created:>={date_90} stars:>=50 archived:false topic:agent-framework",
-    "pushed:>={date_14} stars:>=1000 archived:false topic:developer-tools"
+    "created:>={date_365} stars:>=100 archived:false topic:ai-agent",
+    "created:>={date_365} stars:>=100 archived:false topic:mcp",
+    "created:>={date_365} stars:>=100 archived:false topic:llm",
+    "created:>={date_365} stars:>=100 archived:false topic:coding-agent",
+    "created:>={date_365} stars:>=100 archived:false in:name,description,readme claude-code",
+    "pushed:>={date_365} stars:>=100 archived:false topic:developer-tools"
   ],
   "product_queries": [
-    "created:>={date_90} stars:>=30 archived:false topic:app-builder",
-    "created:>={date_90} stars:>=30 archived:false topic:low-code",
-    "created:>={date_90} stars:>=30 archived:false topic:no-code",
-    "created:>={date_90} stars:>=30 archived:false topic:web-ide",
-    "created:>={date_90} stars:>=30 archived:false topic:ai-coding",
-    "created:>={date_90} stars:>=30 archived:false prototype"
+    "created:>={date_365} stars:>=100 archived:false topic:low-code",
+    "created:>={date_365} stars:>=100 archived:false topic:no-code",
+    "created:>={date_365} stars:>=100 archived:false topic:desktop-app",
+    "created:>={date_365} stars:>=100 archived:false topic:browser-extension",
+    "created:>={date_365} stars:>=100 archived:false in:name,description,readme ai writing",
+    "created:>={date_365} stars:>=100 archived:false in:name,description,readme markdown editor",
+    "created:>={date_365} stars:>=100 archived:false in:name,description,readme data analysis",
+    "created:>={date_365} stars:>=100 archived:false in:name,description,readme education tool"
   ]
 }

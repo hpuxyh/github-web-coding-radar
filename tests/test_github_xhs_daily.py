@@ -40,8 +40,61 @@ class GithubXhsDailyTests(unittest.TestCase):
 
     def test_render_query_expands_relative_dates(self):
         run_date = dt.date(2026, 6, 5)
-        query = daily.render_query("created:>={date_60} pushed:>={date_7}", run_date)
-        self.assertEqual(query, "created:>=2026-04-06 pushed:>=2026-05-29")
+        query = daily.render_query("created:>={date_365} pushed:>={date_7}", run_date)
+        self.assertEqual(query, "created:>=2025-06-05 pushed:>=2026-05-29")
+
+    def test_collect_repositories_respects_min_stars(self):
+        class FakeClient:
+            def search_repositories(self, query, per_page=50, pages=1):
+                return [
+                    {
+                        "id": 1,
+                        "full_name": "demo/under-threshold",
+                        "name": "under-threshold",
+                        "owner": {"login": "demo"},
+                        "html_url": "https://github.com/demo/under-threshold",
+                        "stargazers_count": 99,
+                        "forks_count": 1,
+                        "watchers_count": 99,
+                        "open_issues_count": 0,
+                        "topics": [],
+                        "created_at": "2026-01-01T00:00:00Z",
+                        "updated_at": "2026-01-02T00:00:00Z",
+                        "pushed_at": "2026-01-02T00:00:00Z",
+                    },
+                    {
+                        "id": 2,
+                        "full_name": "demo/qualified",
+                        "name": "qualified",
+                        "owner": {"login": "demo"},
+                        "html_url": "https://github.com/demo/qualified",
+                        "stargazers_count": 100,
+                        "forks_count": 1,
+                        "watchers_count": 100,
+                        "open_issues_count": 0,
+                        "topics": [],
+                        "created_at": "2026-01-01T00:00:00Z",
+                        "updated_at": "2026-01-02T00:00:00Z",
+                        "pushed_at": "2026-01-02T00:00:00Z",
+                    },
+                ]
+
+        repos = daily.collect_repositories(
+            FakeClient(),
+            {
+                "per_page": 10,
+                "pages": 1,
+                "min_stars": 100,
+                "all_time_queries": ["created:>={date_365} stars:>=100"],
+                "rising_queries": [],
+                "frontier_queries": [],
+                "product_queries": [],
+                "expert_sources": {"enabled": False},
+            },
+            dt.date(2026, 6, 5),
+        )
+
+        self.assertEqual([repo["full_name"] for repo in repos], ["demo/qualified"])
 
     def test_infer_features_from_description_and_topics(self):
         repo = {
