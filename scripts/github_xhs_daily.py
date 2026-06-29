@@ -2099,6 +2099,19 @@ def optimize_readme_image(path: Path, extension: str) -> Path:
     return path
 
 
+def env_nonnegative_number(name: str, default: str) -> str:
+    value = os.environ.get(name, "").strip()
+    if not value:
+        return default
+    try:
+        number = float(value)
+    except ValueError:
+        return default
+    if number < 0:
+        return default
+    return str(int(number) if number.is_integer() else number)
+
+
 def download_readme_image(url: str, asset_dir: Path = LOCAL_README_IMAGE_DIR) -> str | None:
     url = normalize_readme_image_url(url)
     parsed = urllib.parse.urlparse(url)
@@ -2113,17 +2126,20 @@ def download_readme_image(url: str, asset_dir: Path = LOCAL_README_IMAGE_DIR) ->
     digest = hashlib.sha256(url.encode("utf-8")).hexdigest()[:20]
     temp_path = asset_dir / f"{digest}.download"
     headers_path = asset_dir / f"{digest}.headers"
+    retry_count = env_nonnegative_number("README_IMAGE_CURL_RETRY", "2")
+    connect_timeout = env_nonnegative_number("README_IMAGE_CONNECT_TIMEOUT", "15")
+    max_time = env_nonnegative_number("README_IMAGE_CURL_MAX_TIME", "45")
     cmd = [
         "curl",
         "-L",
         "-sS",
         "--retry",
-        "2",
+        retry_count,
         "--retry-all-errors",
         "--connect-timeout",
-        "15",
+        connect_timeout,
         "--max-time",
-        "45",
+        max_time,
         "-A",
         USER_AGENT,
         "-D",

@@ -593,6 +593,47 @@ MIT
         )
         self.assertEqual(images[0]["source_url"], "https://example.com/good.png")
 
+    def test_download_readme_image_honors_env_timeouts(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            asset_dir = Path(tmpdir)
+            original_env = {name: daily.os.environ.get(name) for name in [
+                "README_IMAGE_CURL_RETRY",
+                "README_IMAGE_CONNECT_TIMEOUT",
+                "README_IMAGE_CURL_MAX_TIME",
+            ]}
+            original_run = daily.subprocess.run
+            captured = {}
+
+            def fake_run(cmd, capture_output=True, text=True, check=False):
+                captured["cmd"] = cmd
+                headers_path = Path(cmd[cmd.index("-D") + 1])
+                temp_path = Path(cmd[cmd.index("-o") + 1])
+                headers_path.write_text("HTTP/2 200\ncontent-type: image/png\n", encoding="utf-8")
+                temp_path.write_bytes(b"png")
+                return type("Completed", (), {"returncode": 0, "stderr": ""})()
+
+            daily.os.environ["README_IMAGE_CURL_RETRY"] = "0"
+            daily.os.environ["README_IMAGE_CONNECT_TIMEOUT"] = "3"
+            daily.os.environ["README_IMAGE_CURL_MAX_TIME"] = "7"
+            daily.subprocess.run = fake_run
+            try:
+                localized = daily.download_readme_image(
+                    "https://raw.githubusercontent.com/demo/repo/main/demo.png",
+                    asset_dir=asset_dir,
+                )
+            finally:
+                daily.subprocess.run = original_run
+                for name, value in original_env.items():
+                    if value is None:
+                        daily.os.environ.pop(name, None)
+                    else:
+                        daily.os.environ[name] = value
+
+            self.assertEqual(captured["cmd"][captured["cmd"].index("--retry") + 1], "0")
+            self.assertEqual(captured["cmd"][captured["cmd"].index("--connect-timeout") + 1], "3")
+            self.assertEqual(captured["cmd"][captured["cmd"].index("--max-time") + 1], "7")
+            self.assertTrue(localized.startswith("assets/readme-images/"))
+
     def test_bootstrap_history_from_embedded_payload(self):
         history = {"repos": {}}
         payload = {
